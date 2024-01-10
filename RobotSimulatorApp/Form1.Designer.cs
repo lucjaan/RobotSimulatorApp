@@ -1,4 +1,8 @@
-﻿namespace WinFormsApp3
+﻿using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace RobotSimulatorApp
 {
     partial class Form1
     {
@@ -28,29 +32,29 @@
         /// </summary>
         private void InitializeComponent()
         {
-            glControl1 = new OpenTK.WinForms.GLControl();
+            glControl = new OpenTK.WinForms.GLControl();
             SuspendLayout();
             // 
-            // glControl1
+            // glControl
             // 
-            glControl1.API = OpenTK.Windowing.Common.ContextAPI.OpenGL;
-            glControl1.APIVersion = new Version(3, 3, 0, 0);
-            glControl1.Flags = OpenTK.Windowing.Common.ContextFlags.Default;
-            glControl1.IsEventDriven = true;
-            glControl1.Location = new Point(43, 12);
-            glControl1.Name = "glControl1";
-            glControl1.Profile = OpenTK.Windowing.Common.ContextProfile.Core;
-            glControl1.SharedContext = null;
-            glControl1.Size = new Size(198, 242);
-            glControl1.TabIndex = 0;
-            glControl1.Text = "glControl1";
+            glControl.API = OpenTK.Windowing.Common.ContextAPI.OpenGL;
+            glControl.APIVersion = new Version(3, 3, 0, 0);
+            glControl.Flags = OpenTK.Windowing.Common.ContextFlags.Default;
+            glControl.IsEventDriven = true;
+            glControl.Location = new Point(12, 12);
+            glControl.Name = "glControl";
+            glControl.Profile = OpenTK.Windowing.Common.ContextProfile.Core;
+            glControl.SharedContext = null;
+            glControl.Size = new Size(609, 424);
+            glControl.TabIndex = 0;
+            glControl.Text = "glControl1";
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
-            Controls.Add(glControl1);
+            Controls.Add(glControl);
             Name = "Form1";
             Text = "Form1";
             ResumeLayout(false);
@@ -58,6 +62,6 @@
 
         #endregion
 
-        private OpenTK.WinForms.GLControl glControl1;
+        private OpenTK.WinForms.GLControl glControl;
     }
 }
