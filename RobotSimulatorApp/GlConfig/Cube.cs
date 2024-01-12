@@ -12,48 +12,69 @@ namespace RobotSimulatorApp.GlConfig
     internal class Cube
     {
         public static string Name;
+        public List<Vector3> Vertices = [];
         public Cube(string name, Vector3 position, float length, float width, float height)
         {
             Name = name;
 
-            //Create vertices responsible for generating a cube:
-            CreateWall(position, length, width, height, "x");
-            CreateWall(position, 0, width, height, "x");
-            CreateWall(position, length, width, height, "y");
-            CreateWall(position, length, 0, height, "y");
-            CreateWall(position, length, width, height, "z");
-            CreateWall(position, length, width, 0, "z");
+
+            //Create vertices responsible for generating a cube and add them for later use:
+            Vertices.AddRange(CreateWall(position, length, width, 0, "z"));
+            Vertices.AddRange(CreateWall(position, length, 0, height, "y"));
+            Vertices.AddRange(CreateWall(position, 0, width, height, "x"));
+            Vertices.AddRange(CreateWall(position, length, width, height, "z"));
+            Vertices.AddRange(CreateWall(position, length, width, height, "y"));
+            Vertices.AddRange(CreateWall(position, length, width, height, "x"));
+
+
+
+
+
+
+            var x = CreateWall(position, length, width, height, "x");
         }
 
         public Vector3[] ReturnInternalVectors()
         {
-            return null;
-        }
+            Vector3[] result = new Vector3[Vertices.Count];
+            //int i = 0;
+            //foreach (Vector3 v in Vertices) 
+            //{
+            //    result.(v);
+            //}
 
-        private Vector3[] CreateWall(Vector3 position, float x, float y, float z, string dimension)
+            for (int i = 0; i < Vertices.Count; i++)
+            {
+                result[i] = Vertices[i];
+            }
+            return result;
+        }
+        
+        private List<Vector3> CreateWall(Vector3 position, float x, float y, float z, string dimension)
         {
-            Vector3[] result = Array.Empty<Vector3>();
+            //Vector3[] result = Array.Empty<Vector3>();
+            List<Vector3> result = [];
 
             switch (dimension)
             {
                 case "x":
                     foreach (Vector2 v in CreateWallRectangle(y,z))
                     {
-                        result.Append(new Vector3(position.X, v.X + position.Y, v.Y + position.Z));
+                        result.Add(new Vector3(position.X, v.X + position.Y, v.Y + position.Z));
                     }
                     break;
 
                 case "y":
                     foreach (Vector2 v in CreateWallRectangle(x, z))
                     {
-                        result.Append(new Vector3(v.X + position.X, position.Y, v.Y + position.Z));
+                        result.Add(new Vector3(v.X + position.X, position.Y, v.Y + position.Z));
                     }
                     break;
 
                 case "z":
                     foreach (Vector2 v in CreateWallRectangle(x, y))
                     {
-                        result.Append(new Vector3(v.X + position.X, v.Y + position.Y, position.Z));
+                        result.Add(new Vector3(v.X + position.X, v.Y + position.Y, position.Z));
                     }
                     break;
             }
