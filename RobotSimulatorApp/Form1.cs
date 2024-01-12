@@ -1,24 +1,31 @@
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using RobotSimulatorApp.GlConfig;
-using System.Windows.Forms;
 using System;
-using System.IO;
+using System.Diagnostics;
+using System.Windows.Forms;
 
 namespace RobotSimulatorApp
 {
     public partial class Form1 : Form
     {
         int VertexBufferObject;
+        int ElementBufferObject;
         int VertexArrayObject;
         private Shader? shader;
         private Timer timer = null!;
 
         float[] vertices = {
-                 -0.5f, -0.5f, 0.0f, //Bottom-left vertex
-                 0.5f, -0.5f, 0.0f, //Bottom-right vertex
-                 0.0f,  0.5f, 0.0f  //Top vertex
-                  };
+            0.5f,  0.5f, 0.0f,  // top right
+            0.5f, -0.5f, 0.0f,  // bottom right
+            -0.5f, -0.5f, 0.0f,  // bottom left
+            -0.5f,  0.5f, 0.0f   // top left
+        };
+
+        uint[] indices = {  // note that we start from 0!
+            0, 1, 3,   // first triangle
+            1, 2, 3    // second triangle
+        };
 
 
         public Form1()
@@ -56,6 +63,10 @@ namespace RobotSimulatorApp
             VertexArrayObject = GL.GenVertexArray();
             GL.BindVertexArray(VertexArrayObject);
 
+            ElementBufferObject = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ElementBufferObject);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(uint), indices, BufferUsageHint.StaticDraw);
+
             shader = new Shader();
             shader.Use();
 
@@ -68,24 +79,36 @@ namespace RobotSimulatorApp
         public void Render()
         {
             glControl.MakeCurrent();
+            GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
+            GL.Enable(EnableCap.DepthTest);
+            //GL.ClearColor(Color4.MidnightBlue);
+            GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
 
-            GL.DrawElements(PrimitiveType.Triangles, 3, DrawElementsType.UnsignedInt, 0);
+            Vector3 vector3;
+            Debug.WriteLine("TODO");
 
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
+            //GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
             glControl.SwapBuffers();
+        }
+
+        public void CreateCube(string name, int baseA, int baseB, int height, int location)
+        {
+            Debug.WriteLine("TODO");
+            //dasdasda
         }
 
         public void glControl_Paint(object sender, PaintEventArgs e)
         {
-            if (sender != null) { 
-            glControl.MakeCurrent();
+            if (sender != null)
+            {
+                glControl.MakeCurrent();
 
-            GL.ClearColor(Color4.MidnightBlue);
-            //GL.ClearColor(new Color4(0, 44, 25, 255));
+                GL.ClearColor(Color4.MidnightBlue);
+                //GL.ClearColor(new Color4(0, 44, 25, 255));
 
-            GL.Clear(ClearBufferMask.ColorBufferBit);
+                GL.Clear(ClearBufferMask.ColorBufferBit);
 
-            glControl.SwapBuffers();
+                glControl.SwapBuffers();
             }
         }
     }
