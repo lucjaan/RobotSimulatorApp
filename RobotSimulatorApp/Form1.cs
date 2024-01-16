@@ -26,7 +26,7 @@ namespace RobotSimulatorApp
         bool FirstMove = true;
         Camera? camera;
         Vector3 front = new Vector3(0.0f, 0.0f, -1.0f);
-        Vector3 position = new Vector3(15f, 5.0f, 30.0f);
+        Vector3 position = new Vector3(0f, 0f, 8f);
 
 
         private static readonly int[] IndexData =
@@ -145,12 +145,13 @@ namespace RobotSimulatorApp
 
             shader = new Shader();
             shader.Use();
-
-            camera = new(Vector3.UnitZ * 3, AspectRatio);
-
+            camera = new(AspectRatio);
+            //camera = new(Vector3.UnitZ * 3, AspectRatio);
+            INativeInput input = glControl.EnableNativeInput();
             if (captureMouseCheckBox.Checked)
             {
                 MoveCamera();
+                camera.Move(input);
             }
 
             //var x = camera.GetViewMatrix();
@@ -222,6 +223,7 @@ namespace RobotSimulatorApp
             {
                 glControl.ClientSize = new System.Drawing.Size(glControl.ClientSize.Width, 1);
             }
+            Vector3 position = new Vector3(0f, 0f, 8f);
 
             GL.Viewport(0, 0, glControl.ClientSize.Width, glControl.ClientSize.Height);
 
