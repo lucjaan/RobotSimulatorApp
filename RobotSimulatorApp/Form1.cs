@@ -26,8 +26,7 @@ namespace RobotSimulatorApp
         bool FirstMove = true;
         Camera? camera;
         Vector3 front = new Vector3(0.0f, 0.0f, -1.0f);
-        Vector3 position = new Vector3(15f, 5.0f, 30.0f);
-
+        Vector3 position = new Vector3(0f, 0f, 8f);
 
         private static readonly int[] IndexData =
         {
@@ -56,7 +55,6 @@ namespace RobotSimulatorApp
             glControl.LostFocus += (sender, e) =>
                 textBox1.AppendText("Focus out");
 
-
             glControl.MouseDown += (sender, e) =>
             {
                 glControl.Focus();
@@ -81,7 +79,7 @@ namespace RobotSimulatorApp
         {
             GL.Enable(EnableCap.DepthTest);
 
-            Cube cube = new ("cube1", new Vector3(-1f, -1f, -1f), 2f, 2f, 2f);
+            Cube cube = new("cube1", new Vector3(-1f, -1f, -1f), 2f, 2f, 2f);
 
             timer = new Timer();
             timer.Tick += (sender, e) =>
@@ -90,7 +88,7 @@ namespace RobotSimulatorApp
                 const float DELTA_TIME = 1 / 50f;
                 _angle += 180f * DELTA_TIME;
             };
-            timer.Interval = 100;   // 1000 ms per sec / 50 ms per frame = 20 FPS
+            timer.Interval = 50;   // 1000 ms per sec / 50 ms per frame = 20 FPS
             timer.Start();
 
             glControl_Resize(glControl, EventArgs.Empty);
@@ -108,6 +106,8 @@ namespace RobotSimulatorApp
 
             shader = new Shader();
             shader.Use();
+
+            camera = new(new Vector3(0f, 0f, 5f), AspectRatio);
 
             GL.EnableVertexAttribArray(0); //enables vertex
             var vertexLocation = shader.GetAttribLocation("aPosition");
@@ -129,99 +129,39 @@ namespace RobotSimulatorApp
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.Enable(EnableCap.DepthTest);
 
-            position.Z = position.Z > 0 ? position.Z : 0;
-            position.Z = position.Z < 40 ? position.Z : 40;
-
-
             Matrix4 model = Matrix4.CreateFromAxisAngle(new Vector3(0.0f, 1.0f, 0.0f), MathHelper.DegreesToRadians(_angle));
 
             Matrix4 view = Matrix4.LookAt(0, 5, 5, 0, 0, 0, 0, 1, 0);
 
             Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, AspectRatio, 1, 64);
 
-            Matrix4 cameraView = Matrix4.LookAt(position, position + front, Vector3.UnitY);
-
-
-
             shader = new Shader();
             shader.Use();
-
-            camera = new(Vector3.UnitZ * 3, AspectRatio);
+            INativeInput input = glControl.EnableNativeInput();
 
             if (captureMouseCheckBox.Checked)
             {
-                MoveCamera();
+                camera.Move(input);
             }
 
-            //var x = camera.GetViewMatrix();
-           // var y = camera.GetProjectionMatrix();
-
             shader.SetMatrix4("model", model);
-            shader.SetMatrix4("view", cameraView);
-            //shader.SetMatrix4("view", camera.GetViewMatrix());
-            //shader.SetMatrix4("view", view);
+            shader.SetMatrix4("view", camera.View);
             shader.SetMatrix4("projection", projection);
-            //shader.SetMatrix4("projection", camera.GetProjectionMatrix());
 
             GL.DrawElements(BeginMode.Triangles, IndexData.Length, DrawElementsType.UnsignedInt, 0);
 
             glControl.SwapBuffers();
         }
 
-        private void MoveCamera()
-        {
-            float Yaw = 0;
-            float Pitch = 0;
-            float Sensitivity = 0.1f;
-            INativeInput input = glControl.EnableNativeInput();
-
-            NativeInput.MouseMove += (e) =>
-            {
-                // Apply the camera pitch and yaw (we clamp the pitch in the camera class)
-                Yaw += e.DeltaX * Sensitivity;
-                Pitch -= e.DeltaY * Sensitivity; // Reversed since y-coordinates range from bottom to top
-                front.X = (float)Math.Cos(MathHelper.DegreesToRadians(Pitch)) * (float)Math.Cos(MathHelper.DegreesToRadians(Yaw));
-                front.Y = (float)Math.Sin(MathHelper.DegreesToRadians(Pitch));
-                front.Z = (float)Math.Cos(MathHelper.DegreesToRadians(Pitch)) * (float)Math.Sin(MathHelper.DegreesToRadians(Yaw));
-                front = Vector3.Normalize(front);
-                //Debug.Write($"{camera.Yaw}, {camera.Pitch} \n");
-            };
-
-            NativeInput.MouseWheel += (e) =>
-            {
-                if(e.OffsetY == -1 && position.Z > 0)
-                {
-                    position.Z -= 0.1f;
-                }
-
-                if (e.OffsetY == 1 && position.Z < 40)
-                {
-                    position.Z += 0.1f;
-                }
-
-                Debug.Write(position.Z + "\n");
-            };
-
-            NativeInput.KeyUp += (e) =>
-            {
-                if (e.Key == OpenTK.Windowing.GraphicsLibraryFramework.Keys.Home)
-                {
-                    front = new Vector3(0.0f, 0.0f, -1.0f);
-                }
-            };
-
-
-
-        }
-
         private void glControl_Resize(object? sender, EventArgs e)
         {
             glControl.MakeCurrent();
-            
+
             if (glControl.ClientSize.Height == 0)
             {
                 glControl.ClientSize = new System.Drawing.Size(glControl.ClientSize.Width, 1);
             }
+            Vector3 position = new Vector3(0f, 0f, 8f);
 
             GL.Viewport(0, 0, glControl.ClientSize.Width, glControl.ClientSize.Height);
 
@@ -251,7 +191,7 @@ namespace RobotSimulatorApp
             if (captureMouseCheckBox.Checked)
             {
                 glControl.Focus();
-                Cursor.Hide();
+                //Cursor.Hide();
                 Cursor.Clip = GlControlBounds;
 
                 INativeInput input = glControl.EnableNativeInput();
@@ -259,12 +199,12 @@ namespace RobotSimulatorApp
                 {
                     NativeInput = input;
                     NativeInput.KeyUp += (e) =>
+                    {
+                        if (e.Key == OpenTK.Windowing.GraphicsLibraryFramework.Keys.Escape)
                         {
-                            if (e.Key == OpenTK.Windowing.GraphicsLibraryFramework.Keys.Escape)
-                            {
-                                captureMouseCheckBox.Checked = false;
-                            }
-                        };
+                            captureMouseCheckBox.Checked = false;
+                        }
+                    };
                 }
             }
 
@@ -272,12 +212,12 @@ namespace RobotSimulatorApp
             {
                 glControl.DisableNativeInput();
                 glControl.Focus();
-                Cursor.Show();
+                //Cursor.Show();
                 Cursor.Clip = Rectangle.Empty;
                 front = new Vector3(0.0f, 0.0f, -1.0f);
                 position.Z = 30f;
             }
         }
     }
-    
+
 }
