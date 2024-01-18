@@ -90,7 +90,7 @@ namespace RobotSimulatorApp
                 const float DELTA_TIME = 1 / 50f;
                 _angle += 180f * DELTA_TIME;
             };
-            timer.Interval = 100;   // 1000 ms per sec / 50 ms per frame = 20 FPS
+            timer.Interval = 50;   // 1000 ms per sec / 50 ms per frame = 20 FPS
             timer.Start();
 
             glControl_Resize(glControl, EventArgs.Empty);
@@ -108,6 +108,8 @@ namespace RobotSimulatorApp
 
             shader = new Shader();
             shader.Use();
+
+            camera = new(new Vector3(0f, 0f, 5f), AspectRatio);
 
             GL.EnableVertexAttribArray(0); //enables vertex
             var vertexLocation = shader.GetAttribLocation("aPosition");
@@ -129,37 +131,39 @@ namespace RobotSimulatorApp
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.Enable(EnableCap.DepthTest);
 
-            position.Z = position.Z > 0 ? position.Z : 0;
-            position.Z = position.Z < 40 ? position.Z : 40;
+            //position.Z = position.Z > 0 ? position.Z : 0;
+            //position.Z = position.Z < 40 ? position.Z : 40;
 
 
             Matrix4 model = Matrix4.CreateFromAxisAngle(new Vector3(0.0f, 1.0f, 0.0f), MathHelper.DegreesToRadians(_angle));
+            //Matrix4 model = Matrix4.Identity;
 
             Matrix4 view = Matrix4.LookAt(0, 5, 5, 0, 0, 0, 0, 1, 0);
 
             Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, AspectRatio, 1, 64);
 
-            Matrix4 cameraView = Matrix4.LookAt(position, position + front, Vector3.UnitY);
-
+            ///Matrix4 cameraView = Matrix4.LookAt(position, position + front, Vector3.UnitY);
+            //Matrix4 cameraView = Matrix4.LookAt(position, position + front, Vector3.UnitY);
+            //Debug.WriteLine($"FORM: P:{position}, F:{front}");
 
 
             shader = new Shader();
             shader.Use();
-            camera = new(AspectRatio);
             //camera = new(Vector3.UnitZ * 3, AspectRatio);
             INativeInput input = glControl.EnableNativeInput();
             if (captureMouseCheckBox.Checked)
             {
-                MoveCamera();
+                //MoveCamera();
                 camera.Move(input);
             }
 
             //var x = camera.GetViewMatrix();
            // var y = camera.GetProjectionMatrix();
 
+           
             shader.SetMatrix4("model", model);
-            shader.SetMatrix4("view", cameraView);
-            //shader.SetMatrix4("view", camera.GetViewMatrix());
+            //shader.SetMatrix4("view", cameraView);
+            shader.SetMatrix4("view", camera.View);
             //shader.SetMatrix4("view", view);
             shader.SetMatrix4("projection", projection);
             //shader.SetMatrix4("projection", camera.GetProjectionMatrix());
@@ -173,7 +177,7 @@ namespace RobotSimulatorApp
         {
             float Yaw = 0;
             float Pitch = 0;
-            float Sensitivity = 0.1f;
+            float Sensitivity = 0.01f;
             INativeInput input = glControl.EnableNativeInput();
 
             NativeInput.MouseMove += (e) =>
@@ -253,7 +257,7 @@ namespace RobotSimulatorApp
             if (captureMouseCheckBox.Checked)
             {
                 glControl.Focus();
-                Cursor.Hide();
+                //Cursor.Hide();
                 Cursor.Clip = GlControlBounds;
 
                 INativeInput input = glControl.EnableNativeInput();
@@ -274,7 +278,7 @@ namespace RobotSimulatorApp
             {
                 glControl.DisableNativeInput();
                 glControl.Focus();
-                Cursor.Show();
+                //Cursor.Show();
                 Cursor.Clip = Rectangle.Empty;
                 front = new Vector3(0.0f, 0.0f, -1.0f);
                 position.Z = 30f;
