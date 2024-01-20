@@ -7,21 +7,15 @@ namespace RobotSimulatorApp.GlConfig
 {
     public class Shader
     {
-        readonly int Handle;
-        //private readonly Dictionary<string, int> UniformLocations;
+        public int Handle { get; set; }
 
-        public Shader()
-        {
-            string path = Directory.GetCurrentDirectory() + "..\\..\\..\\..\\GLConfig\\Shaders";
-
-            string VertexShaderSource = File.ReadAllText(path + "\\shader.vert");
-            string FragmentShaderSource = File.ReadAllText(path + "\\shader.frag");
-
+        public Shader(string vertexShaderString, string fragmentShaderString)
+        { 
             var vertexShader = GL.CreateShader(ShaderType.VertexShader);
-            GL.ShaderSource(vertexShader, VertexShaderSource);
+            GL.ShaderSource(vertexShader, vertexShaderString);
 
             var fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
-            GL.ShaderSource(fragmentShader, FragmentShaderSource);
+            GL.ShaderSource(fragmentShader, fragmentShaderString);
 
             CompileShader(vertexShader);
             CompileShader(fragmentShader);
@@ -32,6 +26,12 @@ namespace RobotSimulatorApp.GlConfig
             GL.AttachShader(Handle, fragmentShader);
 
             LinkProgram(Handle);
+
+            GL.DetachShader(Handle, vertexShader);
+            GL.DetachShader(Handle, fragmentShader);
+
+            GL.DeleteShader(fragmentShader);
+            GL.DeleteShader(vertexShader);
         }
 
         public void Use()
@@ -85,15 +85,6 @@ namespace RobotSimulatorApp.GlConfig
             {
                 // We can use `GL.GetProgramInfoLog(program)` to get information about the error.
                 throw new Exception($"Error occurred whilst linking Program({program})");
-            }
-        }
-
-        private static void CleanupShaders(int program, int[] shaders)
-        {
-            foreach (var sh in shaders)
-            {
-                GL.DetachShader(program, sh);
-                GL.DeleteShader(sh);
             }
         }
 

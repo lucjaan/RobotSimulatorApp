@@ -13,30 +13,24 @@ namespace RobotSimulatorApp
 {
     public partial class Form1 : Form
     {
-        private int ElementBufferObject;
-        private int VertexArrayObject;
-        private int PositionBuffer;
-        private int ColorBuffer;
         readonly private float AspectRatio;
-        private Shader? shader;
         private Timer timer = null!;
         private float _angle = 0.0f;
         INativeInput? NativeInput;
         Rectangle GlControlBounds;
-        bool FirstMove = true;
-        Camera? camera;
-        Vector3 front = new Vector3(0.0f, 0.0f, -1.0f);
-        Vector3 position = new Vector3(0f, 0f, 8f);
 
-        private static readonly int[] IndexData =
-        {
-             0,  1,  2,  2,  3,  0,
-             4,  5,  6,  6,  7,  4,
-             8,  9, 10, 10, 11,  8,
-            12, 13, 14, 14, 15, 12,
-            16, 17, 18, 18, 19, 16,
-            20, 21, 22, 22, 23, 20,
-        };
+        Camera camera;
+        Cube cube;
+        Cube cube2;
+        Grid grid;
+
+        public int VertexArrayObject { get; private set; }
+        public int ElementBufferObject { get; private set; }
+        public int PositionBuffer { get; private set; }
+
+        Vector3 front = new Vector3(0.0f, 0.0f, -1.0f);
+        Vector3 position = new Vector3(0f, 0f, 5f);
+        private int ColorBuffer;
 
         public Form1()
         {
@@ -62,24 +56,15 @@ namespace RobotSimulatorApp
             };
             glControl.KeyDown += (sender, e) =>
                 textBox1.AppendText($"WinForms Key down: {e.KeyCode}");
-
         }
-
-        private static readonly Color4[] ColorData = new Color4[]
-{
-            Color4.Silver, Color4.Silver, Color4.Silver, Color4.Silver,
-            Color4.Honeydew, Color4.Honeydew, Color4.Honeydew, Color4.Honeydew,
-            Color4.Moccasin, Color4.Moccasin, Color4.Moccasin, Color4.Moccasin,
-            Color4.IndianRed, Color4.IndianRed, Color4.IndianRed, Color4.IndianRed,
-            Color4.PaleVioletRed, Color4.PaleVioletRed, Color4.PaleVioletRed, Color4.PaleVioletRed,
-            Color4.ForestGreen, Color4.ForestGreen, Color4.ForestGreen, Color4.ForestGreen,
-};
 
         private void SetUpOpenGL()
         {
             GL.Enable(EnableCap.DepthTest);
 
-            Cube cube = new("cube1", new Vector3(-1f, -1f, -1f), 2f, 2f, 2f);
+            cube2 = new(glControl, "cube2", new Vector3(-2f, 0f, 0f), 5f, 7f, 2f);
+            cube = new(glControl, "cube1", new Vector3(-1f, -1f, -1f), 2f, 2f, 2f);
+            grid = new Grid(glControl);
 
             timer = new Timer();
             timer.Tick += (sender, e) =>
@@ -93,32 +78,7 @@ namespace RobotSimulatorApp
 
             glControl_Resize(glControl, EventArgs.Empty);
 
-            VertexArrayObject = GL.GenVertexArray();
-            GL.BindVertexArray(VertexArrayObject);
-
-            ElementBufferObject = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ElementBufferObject);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, IndexData.Length * sizeof(int), IndexData, BufferUsageHint.StaticDraw);
-
-            PositionBuffer = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, PositionBuffer);
-            GL.BufferData(BufferTarget.ArrayBuffer, 3 * cube.ReturnInternalVectors().Length * sizeof(float), cube.ReturnInternalVectors(), BufferUsageHint.StaticDraw);
-
-            shader = new Shader();
-            shader.Use();
-
             camera = new(new Vector3(0f, 0f, 5f), AspectRatio);
-
-            GL.EnableVertexAttribArray(0); //enables vertex
-            var vertexLocation = shader.GetAttribLocation("aPosition");
-            GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
-
-            ColorBuffer = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, ColorBuffer);
-            GL.BufferData(BufferTarget.ArrayBuffer, ColorData.Length * sizeof(float) * 4, ColorData, BufferUsageHint.StaticDraw);
-
-            GL.EnableVertexAttribArray(1);
-            GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
         }
 
         private void Render()
@@ -131,12 +91,10 @@ namespace RobotSimulatorApp
 
             Matrix4 model = Matrix4.CreateFromAxisAngle(new Vector3(0.0f, 1.0f, 0.0f), MathHelper.DegreesToRadians(_angle));
 
-            Matrix4 view = Matrix4.LookAt(0, 5, 5, 0, 0, 0, 0, 1, 0);
+            //Matrix4 view = Matrix4.LookAt(0, 5, 5, 0, 0, 0, 0, 1, 0);
 
-            Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, AspectRatio, 1, 64);
+            Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, AspectRatio, 1, 100);
 
-            shader = new Shader();
-            shader.Use();
             INativeInput input = glControl.EnableNativeInput();
 
             if (captureMouseCheckBox.Checked)
@@ -144,12 +102,14 @@ namespace RobotSimulatorApp
                 camera.Move(input);
             }
 
-            shader.SetMatrix4("model", model);
-            shader.SetMatrix4("view", camera.View);
-            shader.SetMatrix4("projection", projection);
+            Matrix4 view = Matrix4.LookAt(position, position + front, Vector3.UnitY);
 
-            GL.DrawElements(BeginMode.Triangles, IndexData.Length, DrawElementsType.UnsignedInt, 0);
+            //Matrix4 view = Matrix4.LookAt(0, 10, 1, 0, 1, 0, 0, 1,0 );
+            //grid.RenderGrid(Matrix4.Identity, camera.View, projection);
 
+            cube2.RenderCube(Matrix4.Identity, camera.View, projection);
+            cube.RenderCube(model, camera.View, projection);
+            grid.RenderGrid(Matrix4.Identity, view, projection);
             glControl.SwapBuffers();
         }
 
@@ -217,6 +177,43 @@ namespace RobotSimulatorApp
                 front = new Vector3(0.0f, 0.0f, -1.0f);
                 position.Z = 30f;
             }
+        }
+
+        private void returnDefaultButton_Click(object sender, EventArgs e)
+        {
+            //positionX.Value = 0;
+            //positionY.Value = 0;
+            //positionZ.Value = 9;
+
+            //frontX.Value = 0;
+            //frontY.Value = 0;
+            //frontZ.Value = -1; 
+            
+            positionX.Value = -7;
+            positionY.Value = 35;
+            positionZ.Value = -7;
+
+            frontX.Value = -9;
+            frontY.Value = -3;
+            frontZ.Value = -1;
+        }
+
+        private void getCameraButton_Click(object sender, EventArgs e)
+        {
+            positionX.Value = (decimal)(camera != null ? camera.Position.X : 0);
+            positionY.Value = (decimal)(camera != null ? camera.Position.Y : 0);
+            positionZ.Value = (decimal)(camera != null ? camera.Position.Z : 0);
+
+            frontX.Value = (decimal)(camera != null ? camera.Front.X : 0);
+            frontY.Value = (decimal)(camera != null ? camera.Front.Y : 0);
+            frontZ.Value = (decimal)(camera != null ? camera.Front.Z : 0);
+        }
+
+        private void setCameraButton_Click(object sender, EventArgs e)
+        {
+            position = new((float)positionX.Value, (float)positionY.Value, (float)positionZ.Value);
+            front = new((float)frontX.Value, (float)frontY.Value, (float)frontZ.Value);
+            Matrix4 view = Matrix4.LookAt(position, position + front, Vector3.UnitZ);
         }
     }
 
