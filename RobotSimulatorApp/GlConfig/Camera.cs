@@ -15,11 +15,11 @@ namespace RobotSimulatorApp.GlConfig
     {
         public float AspectRatio;
         public float Sensitivity = 0.01f;
-        private Vector3 Position;
+        public Vector3 Position;
         private Vector3 Target;
         private Vector3 startPos;
 
-        private Vector3 Front = -Vector3.UnitZ;
+        public Vector3 Front = -Vector3.UnitZ;
         private Vector3 Right = Vector3.UnitX;
         private Vector3 Up = Vector3.UnitY;
 

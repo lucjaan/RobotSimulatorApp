@@ -19,7 +19,6 @@ namespace RobotSimulatorApp.GlConfig
         public static string Name;
         private GLControl GlControl;
 
-        private int VertexBufferObject;
         private int VertexArrayObject;
         private int ElementBufferObject;
         private int PositionBufferObject;
@@ -76,14 +75,10 @@ void main()
     oColor = fColor;
 }";
 
-        private Shader Shader = new Shader(VertexShader, FragmentShader);
-
         public Cube(GLControl glControl, string name, Vector3 position, float length, float width, float height)
         {
             Name = name;
             GlControl = glControl;
-
-            GlControl.MakeCurrent();
 
             //Create vertices responsible for generating a cube and add them for later use:
             Vertices.AddRange(CreateWall(position, length, width, 0, "z"));
@@ -92,11 +87,12 @@ void main()
             Vertices.AddRange(CreateWall(position, length, width, height, "z"));
             Vertices.AddRange(CreateWall(position, length, width, height, "y"));
             Vertices.AddRange(CreateWall(position, length, width, height, "x"));
-            Shader Shader = new Shader(VertexShader, FragmentShader);
-
-            Shader.Use();
-
-            GL.Enable(EnableCap.DepthTest);
+        }
+       
+        public void RenderCube(Matrix4 model, Matrix4 view, Matrix4 projection)
+        {
+            Shader shader = new(VertexShader, FragmentShader);
+            shader.Use();
 
             VertexArrayObject = GL.GenVertexArray();
             GL.BindVertexArray(VertexArrayObject);
@@ -107,41 +103,26 @@ void main()
 
             PositionBufferObject = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, PositionBufferObject);
-            GL.BufferData(BufferTarget.ArrayBuffer, 3 * ReturnInternalVectors().Length * sizeof(float), ReturnInternalVectors(), BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, 3 * Vertices.Count * sizeof(float), Vertices.ToArray(), BufferUsageHint.StaticDraw);
 
-            GL.EnableVertexAttribArray(0); //enables vertex
-            var vertexLocation = Shader.GetAttribLocation("aPosition");
+            int vertexLocation = shader.GetAttribLocation("aPosition");
+            GL.EnableVertexAttribArray(vertexLocation); //enables vertex
             GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
 
             ColorBufferObject = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, ColorBufferObject);
             GL.BufferData(BufferTarget.ArrayBuffer, ColorData.Length * sizeof(float) * 4, ColorData, BufferUsageHint.StaticDraw);
 
-            GL.EnableVertexAttribArray(1);
-            GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
-        }
+            int colorLocation = shader.GetAttribLocation("aColor");
+            GL.EnableVertexAttribArray(colorLocation);
+            GL.VertexAttribPointer(colorLocation, 4, VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
 
-        public Vector3[] ReturnInternalVectors()
-        {
-            Vector3[] result = new Vector3[Vertices.Count];
-
-            for (int i = 0; i < Vertices.Count; i++)
-            {
-                result[i] = Vertices[i];
-            }
-            return result;
-        }
-        
-        public void RenderCube(Matrix4 model, Matrix4 view, Matrix4 projection)
-        {
-            GlControl.MakeCurrent();
-
-            Shader.SetMatrix4("model", model);
-            Shader.SetMatrix4("view", view);
-            Shader.SetMatrix4("projection", projection);
+            shader.SetMatrix4("model", model);
+            shader.SetMatrix4("view", view);
+            shader.SetMatrix4("projection", projection);
 
             GL.DrawElements(BeginMode.Triangles, IndexData.Length, DrawElementsType.UnsignedInt, 0);
-            GlControl.SwapBuffers();
+            shader.Dispose();
         }
 
         private List<Vector3> CreateWall(Vector3 position, float x, float y, float z, string dimension)

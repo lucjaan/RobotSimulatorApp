@@ -7,8 +7,7 @@ namespace RobotSimulatorApp.GlConfig
 {
     public class Shader
     {
-        readonly int Handle;
-        //private readonly Dictionary<string, int> UniformLocations;
+        public int Handle { get; set; }
 
         public Shader(string vertexShaderString, string fragmentShaderString)
         { 
@@ -33,30 +32,6 @@ namespace RobotSimulatorApp.GlConfig
 
             GL.DeleteShader(fragmentShader);
             GL.DeleteShader(vertexShader);
-        }
-
-        public Shader(string vertexShaderString, string fragmentShaderString, string geometryShaderString)
-        {
-            var vertexShader = GL.CreateShader(ShaderType.VertexShader);
-            GL.ShaderSource(vertexShader, vertexShaderString);
-
-            var fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
-            GL.ShaderSource(fragmentShader, fragmentShaderString);
-
-            var geometryShader = GL.CreateShader(ShaderType.GeometryShader);
-            GL.ShaderSource(geometryShader, geometryShaderString);
-
-            CompileShader(vertexShader);
-            CompileShader(fragmentShader);
-            CompileShader(geometryShader);
-
-            Handle = GL.CreateProgram();
-
-            GL.AttachShader(Handle, vertexShader);
-            GL.AttachShader(Handle, fragmentShader);
-            GL.AttachShader(Handle, geometryShader);
-
-            LinkProgram(Handle);
         }
 
         public void Use()
