@@ -62,8 +62,8 @@ namespace RobotSimulatorApp
         {
             GL.Enable(EnableCap.DepthTest);
 
-            cube2 = new(glControl, "cube2", new Vector3(-2f, 0f, 0f), 5f, 7f, 2f);
-            cube = new(glControl, "cube1", new Vector3(-1f, -1f, -1f), 2f, 2f, 2f);
+            cube2 = new(glControl, "cube2", new Vector3(-12f, 0f, 0f), 5f, 7f, 2f);
+            cube = new(glControl, "cube1", new Vector3(-1f, -1f, -1f), 2f, 22f, 2f);
             grid = new Grid(glControl);
 
             timer = new Timer();
@@ -91,17 +91,17 @@ namespace RobotSimulatorApp
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.Enable(EnableCap.DepthTest);
 
-            Matrix4 model = Matrix4.CreateFromAxisAngle(new Vector3(1.0f, 0.0f, 0.0f), MathHelper.DegreesToRadians(_angle));
             Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, AspectRatio, 0.1f, 100f);
-
+            //var x = MathHelper.Clamp(_angle, 0, 360);
+            cube.RotateCube(0.05f, cube.Center, Axis.Y);
             if (captureMouseCheckBox.Checked)
             {
                 camera.Move(input);
             }
 
-            cube2.RenderCube(Matrix4.Identity, camera.View, projection);
-            cube.RenderCube(model, camera.View, projection);
-            grid.RenderWorld(Matrix4.Identity, camera.View, projection);
+            cube2.RenderCube(camera.View, projection);
+            cube.RenderCube(camera.View, projection);
+            grid.RenderWorld(camera.View, projection);
             glControl.SwapBuffers();
         }
 
