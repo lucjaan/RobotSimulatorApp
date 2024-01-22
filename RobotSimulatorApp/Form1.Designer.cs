@@ -47,12 +47,20 @@ namespace RobotSimulatorApp
             getCameraButton = new Button();
             setCameraButton = new Button();
             returnDefaultButton = new Button();
+            splitter1 = new Splitter();
+            splitter2 = new Splitter();
+            FrontXtrackBar = new TrackBar();
+            FrontYtrackBar = new TrackBar();
+            FrontZtrackBar = new TrackBar();
             ((System.ComponentModel.ISupportInitialize)frontX).BeginInit();
             ((System.ComponentModel.ISupportInitialize)frontY).BeginInit();
             ((System.ComponentModel.ISupportInitialize)frontZ).BeginInit();
             ((System.ComponentModel.ISupportInitialize)positionX).BeginInit();
             ((System.ComponentModel.ISupportInitialize)positionY).BeginInit();
             ((System.ComponentModel.ISupportInitialize)positionZ).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)FrontXtrackBar).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)FrontYtrackBar).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)FrontZtrackBar).BeginInit();
             SuspendLayout();
             // 
             // glControl
@@ -66,14 +74,14 @@ namespace RobotSimulatorApp
             glControl.Name = "glControl";
             glControl.Profile = OpenTK.Windowing.Common.ContextProfile.Core;
             glControl.SharedContext = null;
-            glControl.Size = new Size(1019, 527);
+            glControl.Size = new Size(1058, 621);
             glControl.TabIndex = 0;
             glControl.Text = "glControl";
             // 
             // captureMouseCheckBox
             // 
             captureMouseCheckBox.AutoSize = true;
-            captureMouseCheckBox.Location = new Point(1192, 520);
+            captureMouseCheckBox.Location = new Point(1231, 614);
             captureMouseCheckBox.Name = "captureMouseCheckBox";
             captureMouseCheckBox.Size = new Size(98, 19);
             captureMouseCheckBox.TabIndex = 1;
@@ -83,7 +91,7 @@ namespace RobotSimulatorApp
             // 
             // releaseMouseTextBox
             // 
-            releaseMouseTextBox.Location = new Point(1135, 491);
+            releaseMouseTextBox.Location = new Point(1174, 585);
             releaseMouseTextBox.Name = "releaseMouseTextBox";
             releaseMouseTextBox.Size = new Size(155, 23);
             releaseMouseTextBox.TabIndex = 2;
@@ -91,7 +99,7 @@ namespace RobotSimulatorApp
             // 
             // textBox1
             // 
-            textBox1.Location = new Point(1064, 12);
+            textBox1.Location = new Point(1103, 19);
             textBox1.Multiline = true;
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(226, 213);
@@ -100,7 +108,7 @@ namespace RobotSimulatorApp
             // Position
             // 
             Position.AutoSize = true;
-            Position.Location = new Point(1069, 288);
+            Position.Location = new Point(1103, 285);
             Position.Name = "Position";
             Position.Size = new Size(50, 15);
             Position.TabIndex = 12;
@@ -109,7 +117,7 @@ namespace RobotSimulatorApp
             // FrontLabel
             // 
             FrontLabel.AutoSize = true;
-            FrontLabel.Location = new Point(1066, 235);
+            FrontLabel.Location = new Point(1103, 241);
             FrontLabel.Name = "FrontLabel";
             FrontLabel.Size = new Size(35, 15);
             FrontLabel.TabIndex = 13;
@@ -117,7 +125,7 @@ namespace RobotSimulatorApp
             // 
             // frontX
             // 
-            frontX.Location = new Point(1071, 259);
+            frontX.Location = new Point(1103, 259);
             frontX.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             frontX.Minimum = new decimal(new int[] { 1000, 0, 0, int.MinValue });
             frontX.Name = "frontX";
@@ -126,7 +134,7 @@ namespace RobotSimulatorApp
             // 
             // frontY
             // 
-            frontY.Location = new Point(1149, 259);
+            frontY.Location = new Point(1183, 259);
             frontY.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             frontY.Minimum = new decimal(new int[] { 1000, 0, 0, int.MinValue });
             frontY.Name = "frontY";
@@ -135,7 +143,7 @@ namespace RobotSimulatorApp
             // 
             // frontZ
             // 
-            frontZ.Location = new Point(1227, 259);
+            frontZ.Location = new Point(1266, 259);
             frontZ.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             frontZ.Minimum = new decimal(new int[] { 1000, 0, 0, int.MinValue });
             frontZ.Name = "frontZ";
@@ -144,7 +152,7 @@ namespace RobotSimulatorApp
             // 
             // positionX
             // 
-            positionX.Location = new Point(1071, 315);
+            positionX.Location = new Point(1103, 303);
             positionX.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             positionX.Minimum = new decimal(new int[] { 1000, 0, 0, int.MinValue });
             positionX.Name = "positionX";
@@ -153,7 +161,7 @@ namespace RobotSimulatorApp
             // 
             // positionY
             // 
-            positionY.Location = new Point(1149, 315);
+            positionY.Location = new Point(1183, 303);
             positionY.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             positionY.Minimum = new decimal(new int[] { 1000, 0, 0, int.MinValue });
             positionY.Name = "positionY";
@@ -162,7 +170,7 @@ namespace RobotSimulatorApp
             // 
             // positionZ
             // 
-            positionZ.Location = new Point(1227, 315);
+            positionZ.Location = new Point(1266, 303);
             positionZ.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             positionZ.Minimum = new decimal(new int[] { 1000, 0, 0, int.MinValue });
             positionZ.Name = "positionZ";
@@ -171,7 +179,7 @@ namespace RobotSimulatorApp
             // 
             // getCameraButton
             // 
-            getCameraButton.Location = new Point(1192, 353);
+            getCameraButton.Location = new Point(1243, 332);
             getCameraButton.Name = "getCameraButton";
             getCameraButton.Size = new Size(86, 25);
             getCameraButton.TabIndex = 21;
@@ -181,7 +189,7 @@ namespace RobotSimulatorApp
             // 
             // setCameraButton
             // 
-            setCameraButton.Location = new Point(1192, 384);
+            setCameraButton.Location = new Point(1243, 363);
             setCameraButton.Name = "setCameraButton";
             setCameraButton.Size = new Size(86, 25);
             setCameraButton.TabIndex = 22;
@@ -191,7 +199,7 @@ namespace RobotSimulatorApp
             // 
             // returnDefaultButton
             // 
-            returnDefaultButton.Location = new Point(1071, 353);
+            returnDefaultButton.Location = new Point(1151, 332);
             returnDefaultButton.Name = "returnDefaultButton";
             returnDefaultButton.Size = new Size(86, 56);
             returnDefaultButton.TabIndex = 23;
@@ -199,11 +207,65 @@ namespace RobotSimulatorApp
             returnDefaultButton.UseVisualStyleBackColor = true;
             returnDefaultButton.Click += returnDefaultButton_Click;
             // 
+            // splitter1
+            // 
+            splitter1.Location = new Point(0, 0);
+            splitter1.Name = "splitter1";
+            splitter1.Size = new Size(3, 654);
+            splitter1.TabIndex = 24;
+            splitter1.TabStop = false;
+            // 
+            // splitter2
+            // 
+            splitter2.Location = new Point(3, 0);
+            splitter2.Name = "splitter2";
+            splitter2.Size = new Size(3, 654);
+            splitter2.TabIndex = 25;
+            splitter2.TabStop = false;
+            // 
+            // FrontXtrackBar
+            // 
+            FrontXtrackBar.AutoSize = false;
+            FrontXtrackBar.Location = new Point(1121, 394);
+            FrontXtrackBar.Maximum = 180;
+            FrontXtrackBar.Minimum = -180;
+            FrontXtrackBar.Name = "FrontXtrackBar";
+            FrontXtrackBar.Size = new Size(208, 33);
+            FrontXtrackBar.TabIndex = 26;
+            FrontXtrackBar.Scroll += FrontXtrackBar_Scroll;
+            // 
+            // FrontYtrackBar
+            // 
+            FrontYtrackBar.AutoSize = false;
+            FrontYtrackBar.Location = new Point(1121, 433);
+            FrontYtrackBar.Maximum = 180;
+            FrontYtrackBar.Minimum = -180;
+            FrontYtrackBar.Name = "FrontYtrackBar";
+            FrontYtrackBar.Size = new Size(208, 33);
+            FrontYtrackBar.TabIndex = 27;
+            FrontYtrackBar.Scroll += FrontYtrackBar_Scroll;
+            // 
+            // FrontZtrackBar
+            // 
+            FrontZtrackBar.AutoSize = false;
+            FrontZtrackBar.Location = new Point(1121, 472);
+            FrontZtrackBar.Maximum = 180;
+            FrontZtrackBar.Minimum = -180;
+            FrontZtrackBar.Name = "FrontZtrackBar";
+            FrontZtrackBar.Size = new Size(208, 33);
+            FrontZtrackBar.TabIndex = 28;
+            FrontZtrackBar.Scroll += FrontZtrackBar_Scroll;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1302, 560);
+            ClientSize = new Size(1341, 654);
+            Controls.Add(FrontZtrackBar);
+            Controls.Add(FrontYtrackBar);
+            Controls.Add(FrontXtrackBar);
+            Controls.Add(splitter2);
+            Controls.Add(splitter1);
             Controls.Add(returnDefaultButton);
             Controls.Add(setCameraButton);
             Controls.Add(getCameraButton);
@@ -227,6 +289,9 @@ namespace RobotSimulatorApp
             ((System.ComponentModel.ISupportInitialize)positionX).EndInit();
             ((System.ComponentModel.ISupportInitialize)positionY).EndInit();
             ((System.ComponentModel.ISupportInitialize)positionZ).EndInit();
+            ((System.ComponentModel.ISupportInitialize)FrontXtrackBar).EndInit();
+            ((System.ComponentModel.ISupportInitialize)FrontYtrackBar).EndInit();
+            ((System.ComponentModel.ISupportInitialize)FrontZtrackBar).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -248,5 +313,10 @@ namespace RobotSimulatorApp
         private Button getCameraButton;
         private Button setCameraButton;
         private Button returnDefaultButton;
+        private Splitter splitter1;
+        private Splitter splitter2;
+        private TrackBar FrontXtrackBar;
+        private TrackBar FrontYtrackBar;
+        private TrackBar FrontZtrackBar;
     }
 }

@@ -36,7 +36,7 @@ namespace RobotSimulatorApp.GlConfig
             AspectRatio = aspectRatio;
             Position = position;
             //Front = new (0f, 0f, -1f);
-            View = Matrix4.LookAt(Position, Position + Front, Vector3.UnitY);
+            View = Matrix4.LookAt(Position, Position + Front, Up);
         }
 
         public void Move(INativeInput input)
@@ -56,8 +56,21 @@ namespace RobotSimulatorApp.GlConfig
             //Up = Vector3.Normalize(Vector3.Cross(Right, Front));
 
             //Debug.WriteLine($"CAM: P:{Position}, F:{Front}");
-            View = Matrix4.LookAt(Position, Position + Front, Vector3.UnitY);
+            View = Matrix4.LookAt(Position, Position + Front, Up);
             //Debug.WriteLine($"Pos {Position} {Front}");
+        }
+
+        public void UpdateVectors()
+        {
+
+            //Debug.WriteLine($"pre-normal: {Front}");
+            Front = Vector3.Normalize(Front);
+            //Debug.WriteLine($"normalized: {Front}");
+
+            Right = Vector3.Normalize(Vector3.Cross(Front, Vector3.UnitY));
+            Up = Vector3.Normalize(Vector3.Cross(Right, Front));
+
+            View = Matrix4.LookAt(Position, Position + Front, Up);
         }
 
         private void LookAround(INativeInput input)
@@ -74,8 +87,10 @@ namespace RobotSimulatorApp.GlConfig
                 //Front.X = 0; //HERE
                 Front.Y = (float)Math.Sin(MathHelper.DegreesToRadians(Pitch));
                 Front.Z = (float)Math.Cos(MathHelper.DegreesToRadians(Pitch)) * (float)Math.Sin(MathHelper.DegreesToRadians(Yaw));
-
+                //Debug.WriteLine($"pre-normal: {Front}");
                 Front = Vector3.Normalize(Front);
+                //Debug.WriteLine($"normalized: {Front}");
+
             };
         }
 
