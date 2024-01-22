@@ -85,31 +85,23 @@ namespace RobotSimulatorApp
         {
 
             glControl.MakeCurrent();
+            INativeInput input = glControl.EnableNativeInput();
+
             GL.ClearColor(Color4.MidnightBlue);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.Enable(EnableCap.DepthTest);
 
-            Matrix4 model = Matrix4.CreateFromAxisAngle(new Vector3(0.0f, 1.0f, 0.0f), MathHelper.DegreesToRadians(_angle));
-
-            //Matrix4 view = Matrix4.LookAt(0, 5, 5, 0, 0, 0, 0, 1, 0);
-
-            Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, AspectRatio, 1, 100);
-
-            INativeInput input = glControl.EnableNativeInput();
+            Matrix4 model = Matrix4.CreateFromAxisAngle(new Vector3(1.0f, 0.0f, 0.0f), MathHelper.DegreesToRadians(_angle));
+            Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, AspectRatio, 0.1f, 100f);
 
             if (captureMouseCheckBox.Checked)
             {
                 camera.Move(input);
             }
 
-            Matrix4 view = Matrix4.LookAt(position, position + front, Vector3.UnitY);
-
-            //Matrix4 view = Matrix4.LookAt(0, 10, 1, 0, 1, 0, 0, 1,0 );
-            //grid.RenderGrid(Matrix4.Identity, camera.View, projection);
-
             cube2.RenderCube(Matrix4.Identity, camera.View, projection);
             cube.RenderCube(model, camera.View, projection);
-            grid.RenderGrid(Matrix4.Identity, view, projection);
+            grid.RenderWorld(Matrix4.Identity, camera.View, projection);
             glControl.SwapBuffers();
         }
 
@@ -121,7 +113,6 @@ namespace RobotSimulatorApp
             {
                 glControl.ClientSize = new System.Drawing.Size(glControl.ClientSize.Width, 1);
             }
-            Vector3 position = new Vector3(0f, 0f, 8f);
 
             GL.Viewport(0, 0, glControl.ClientSize.Width, glControl.ClientSize.Height);
 
@@ -188,14 +179,22 @@ namespace RobotSimulatorApp
             //frontX.Value = 0;
             //frontY.Value = 0;
             //frontZ.Value = -1; 
-            
-            positionX.Value = -7;
-            positionY.Value = 35;
-            positionZ.Value = -7;
 
-            frontX.Value = -9;
-            frontY.Value = -3;
-            frontZ.Value = -1;
+            //positionX.Value = -7;
+            //positionY.Value = 35;
+            //positionZ.Value = -7;
+
+            //frontX.Value = -9;
+            //frontY.Value = -3;
+            //frontZ.Value = -1;
+
+            positionX.Value = 5;
+            positionY.Value = 38;
+            positionZ.Value = -19;
+
+            frontX.Value = -3;
+            frontY.Value = -72;
+            frontZ.Value = -7;
         }
 
         private void getCameraButton_Click(object sender, EventArgs e)
@@ -211,9 +210,31 @@ namespace RobotSimulatorApp
 
         private void setCameraButton_Click(object sender, EventArgs e)
         {
-            position = new((float)positionX.Value, (float)positionY.Value, (float)positionZ.Value);
-            front = new((float)frontX.Value, (float)frontY.Value, (float)frontZ.Value);
-            Matrix4 view = Matrix4.LookAt(position, position + front, Vector3.UnitZ);
+            //position = new((float)positionX.Value, (float)positionY.Value, (float)positionZ.Value);
+            //front = new((float)frontX.Value, (float)frontY.Value, (float)frontZ.Value);
+
+            camera.Position = new((float)positionX.Value, (float)positionY.Value, (float)positionZ.Value);
+            camera.Front = new((float)frontX.Value, (float)frontY.Value, (float)frontZ.Value);
+
+            camera.UpdateVectors();
+        }
+
+        private void FrontXtrackBar_Scroll(object sender, EventArgs e)
+        {
+            camera.Front.X = MathHelper.DegreesToRadians((float)FrontXtrackBar.Value) / MathHelper.Pi;
+            camera.UpdateVectors();
+        }
+
+        private void FrontYtrackBar_Scroll(object sender, EventArgs e)
+        {
+            camera.Front.Y = MathHelper.DegreesToRadians((float)FrontYtrackBar.Value) / MathHelper.Pi;
+            camera.UpdateVectors();
+        }
+
+        private void FrontZtrackBar_Scroll(object sender, EventArgs e)
+        {
+            camera.Front.Z = MathHelper.DegreesToRadians((float)FrontZtrackBar.Value) / MathHelper.Pi;
+            camera.UpdateVectors();
         }
     }
 

@@ -16,7 +16,8 @@ namespace RobotSimulatorApp.GlConfig
 {
     internal class Cube
     {
-        public static string Name;
+        public string Name;
+        private static Vector3 Position;
         private GLControl GlControl;
 
         private int VertexArrayObject;
@@ -78,15 +79,16 @@ void main()
         public Cube(GLControl glControl, string name, Vector3 position, float length, float width, float height)
         {
             Name = name;
+            Position = position;
             GlControl = glControl;
 
             //Create vertices responsible for generating a cube and add them for later use:
-            Vertices.AddRange(CreateWall(position, length, width, 0, "z"));
-            Vertices.AddRange(CreateWall(position, length, 0, height, "y"));
-            Vertices.AddRange(CreateWall(position, 0, width, height, "x"));
-            Vertices.AddRange(CreateWall(position, length, width, height, "z"));
-            Vertices.AddRange(CreateWall(position, length, width, height, "y"));
-            Vertices.AddRange(CreateWall(position, length, width, height, "x"));
+            Vertices.AddRange(CreateWall(length, width, 0, "z"));
+            Vertices.AddRange(CreateWall(length, 0, height, "y"));
+            Vertices.AddRange(CreateWall(0, width, height, "x"));
+            Vertices.AddRange(CreateWall(length, width, height, "z"));
+            Vertices.AddRange(CreateWall(length, width, height, "y"));
+            Vertices.AddRange(CreateWall(length, width, height, "x"));
         }
        
         public void RenderCube(Matrix4 model, Matrix4 view, Matrix4 projection)
@@ -117,7 +119,7 @@ void main()
             GL.EnableVertexAttribArray(colorLocation);
             GL.VertexAttribPointer(colorLocation, 4, VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
 
-            shader.SetMatrix4("model", model);
+            shader.SetMatrix4("model", model * Matrix4.CreateTranslation(Position));
             shader.SetMatrix4("view", view);
             shader.SetMatrix4("projection", projection);
 
@@ -125,7 +127,7 @@ void main()
             shader.Dispose();
         }
 
-        private List<Vector3> CreateWall(Vector3 position, float x, float y, float z, string dimension)
+        private List<Vector3> CreateWall(float x, float y, float z, string dimension)
         {
             List<Vector3> result = [];
 
@@ -134,21 +136,21 @@ void main()
                 case "x":
                     foreach (Vector2 v in CreateWallRectangle(y,z))
                     {
-                        result.Add(new Vector3(position.X + x, v.X + position.Y, v.Y + position.Z));
+                        result.Add(new Vector3(x, v.X, v.Y));
                     }
                     break;
 
                 case "y":
                     foreach (Vector2 v in CreateWallRectangle(x, z))
                     {
-                        result.Add(new Vector3(v.X + position.X, position.Y + y, v.Y + position.Z));
+                        result.Add(new Vector3(v.X, y, v.Y));
                     }
                     break;
 
                 case "z":
                     foreach (Vector2 v in CreateWallRectangle(x, y))
                     {
-                        result.Add(new Vector3(v.X + position.X, v.Y + position.Y, position.Z + z));
+                        result.Add(new Vector3(v.X, v.Y, z));
                     }
                     break;
             }
