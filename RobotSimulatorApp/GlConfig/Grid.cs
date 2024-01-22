@@ -17,20 +17,18 @@ namespace RobotSimulatorApp.GlConfig
 {
     internal class Grid
     {
-        private GLControl GlControl;
+        private readonly GLControl GlControl;
 
-        private List<Vector3> GridVertices = [];
-        private List<Vector4> GridIndices = [];
-        private List<int> GridIndexData = [];
+        private readonly List<Vector3> GridVertices = [];
+        private readonly List<int> GridIndexData = [];
 
         private List<Vector3> XYZVertices = [];
-        private List<Vector4> XYZIndices = [];
-        private List<int> XYZIndexData = [];
+        private static readonly List<int> XYZIndexData = [1, 2, 3, 4, 5];
 
-        private int VertexBufferObject;
-        private int VertexArrayObject;
-        private int ElementBufferObject;
-        private int ColorBufferObject;
+        private int VertexBufferObject { get; set; }
+        private int VertexArrayObject { get; set; }
+        private int ElementBufferObject { get; set; }
+        private int ColorBufferObject { get; set; }
 
         private static readonly Color4 GridColor = Color4.FloralWhite;
         private static readonly Color4[] XYZColors =
@@ -94,10 +92,10 @@ void main()
             CreateXYZ();
         }
 
-        public void RenderWorld(Matrix4 model, Matrix4 view, Matrix4 projection)
+        public void RenderWorld(Matrix4 view, Matrix4 projection)
         {
-            RenderGrid(model, view, projection);
-            RenderXYZ(model, view, projection);
+            RenderGrid(view, projection);
+            RenderXYZ(view, projection);
         }
 
         public void CreateGrid()
@@ -109,7 +107,6 @@ void main()
             //Creating vertical lines
             for (int i = -bounds; i < bounds; i+=size) 
             {
-                var zx = i;
                 Vector3[] vertical = [new(-bounds, 0f, i + size), new(bounds, 0f, i + size)];
                 GridVertices.AddRange(vertical);
             }
@@ -117,7 +114,6 @@ void main()
             //Creating horizontal lines
             for (int i = -bounds; i < bounds; i += size)
             {
-                var zx = i;
                 Vector3[] vertical = [new(i + size, 0f, -bounds), new(i + size, 0f, bounds)];
                 GridVertices.AddRange(vertical);
             }
@@ -126,9 +122,6 @@ void main()
             {
                 GridIndexData.Add(i);
             }
-
-            var x = GridVertices;
-
         }
 
         private void CreateXYZ()
@@ -141,10 +134,9 @@ void main()
             XYZVertices.Add(new Vector3(0, 0, length));
             XYZVertices.Add(new Vector3(0, -length, 0));
             XYZVertices.Add(new Vector3(0, length, 0));
-            XYZIndexData.AddRange(new int[] { 0, 1, 2, 3, 4, 5 });
         }
 
-        private void RenderXYZ(Matrix4 model, Matrix4 view, Matrix4 projection)
+        private void RenderXYZ(Matrix4 view, Matrix4 projection)
         {
             Shader shader = new(XyzVertexShader, XyzFragmentShader);
             shader.Use();
@@ -160,7 +152,7 @@ void main()
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ElementBufferObject);
             GL.BufferData(BufferTarget.ElementArrayBuffer, XYZIndexData.Count * sizeof(int), XYZIndexData.ToArray(), BufferUsageHint.StaticDraw);
 
-            GL.EnableVertexAttribArray(0); //enables vertex
+            GL.EnableVertexAttribArray(0);
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
 
             ColorBufferObject = GL.GenBuffer();
@@ -171,7 +163,7 @@ void main()
             GL.EnableVertexAttribArray(1);
             GL.VertexAttribPointer(colorLocation, 4, VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
 
-            shader.SetMatrix4("model", model);
+            shader.SetMatrix4("model", Matrix4.Identity);
             shader.SetMatrix4("view", view);
             shader.SetMatrix4("projection", projection);
 
@@ -179,7 +171,7 @@ void main()
             shader.Dispose();
         }
 
-        private void RenderGrid(Matrix4 model, Matrix4 view, Matrix4 projection)
+        private void RenderGrid(Matrix4 view, Matrix4 projection)
         {
             Shader shader = new(GridVertexShader, GridFragmentShader);
             shader.Use();
@@ -198,7 +190,7 @@ void main()
             GL.EnableVertexAttribArray(0); //enables vertex
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
 
-            shader.SetMatrix4("model", model);
+            shader.SetMatrix4("model", Matrix4.Identity);
             shader.SetMatrix4("view", view);
             shader.SetMatrix4("projection", projection);
 

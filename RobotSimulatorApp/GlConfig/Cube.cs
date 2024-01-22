@@ -1,12 +1,14 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.WinForms;
+//using Matrix4Extensions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.DirectoryServices;
 using System.IO;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -16,17 +18,20 @@ namespace RobotSimulatorApp.GlConfig
 {
     internal class Cube
     {
-        public string Name;
-        private static Vector3 Position;
-        private GLControl GlControl;
+        public string Name { get; set; }
+        public Vector3 Center { get; set; }
+        private Vector3 Position { get; set; }
+        private Matrix4 Model { get; set; }
 
-        private int VertexArrayObject;
-        private int ElementBufferObject;
-        private int PositionBufferObject;
-        private int ColorBufferObject;
+        private readonly GLControl GlControl;
+        
+        private int VertexArrayObject { get; set; }
+        private int ElementBufferObject { get; set; }
+        private int PositionBufferObject { get; set; }
+        private int ColorBufferObject { get; set; }
 
         private List<Vector3> Vertices = [];
-        public readonly int[] IndexData =
+        private static readonly int[] IndexData =
         {
              0,  1,  2,  2,  3,  0,
              4,  5,  6,  6,  7,  4,
@@ -76,22 +81,24 @@ void main()
     oColor = fColor;
 }";
 
-        public Cube(GLControl glControl, string name, Vector3 position, float length, float width, float height)
+        public Cube(GLControl glControl, string name, Vector3 position, float length, float height, float width)
         {
             Name = name;
             Position = position;
             GlControl = glControl;
+            Center = new Vector3(length / 2, height / 2, width / 2) + position;
+            Model = Matrix4.CreateTranslation(position);
 
             //Create vertices responsible for generating a cube and add them for later use:
-            Vertices.AddRange(CreateWall(length, width, 0, "z"));
-            Vertices.AddRange(CreateWall(length, 0, height, "y"));
-            Vertices.AddRange(CreateWall(0, width, height, "x"));
-            Vertices.AddRange(CreateWall(length, width, height, "z"));
-            Vertices.AddRange(CreateWall(length, width, height, "y"));
-            Vertices.AddRange(CreateWall(length, width, height, "x"));
+            Vertices.AddRange(CreateWall(length, height, 0, Axis.Z));
+            Vertices.AddRange(CreateWall(length, 0, width, Axis.Y));
+            Vertices.AddRange(CreateWall(0, height, width, Axis.X));
+            Vertices.AddRange(CreateWall(length, height, width, Axis.Z));
+            Vertices.AddRange(CreateWall(length, height, width, Axis.Y));
+            Vertices.AddRange(CreateWall(length, height, width, Axis.X));
         }
        
-        public void RenderCube(Matrix4 model, Matrix4 view, Matrix4 projection)
+        public void RenderCube(Matrix4 view, Matrix4 projection)
         {
             Shader shader = new(VertexShader, FragmentShader);
             shader.Use();
@@ -108,7 +115,7 @@ void main()
             GL.BufferData(BufferTarget.ArrayBuffer, 3 * Vertices.Count * sizeof(float), Vertices.ToArray(), BufferUsageHint.StaticDraw);
 
             int vertexLocation = shader.GetAttribLocation("aPosition");
-            GL.EnableVertexAttribArray(vertexLocation); //enables vertex
+            GL.EnableVertexAttribArray(vertexLocation);
             GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
 
             ColorBufferObject = GL.GenBuffer();
@@ -119,7 +126,7 @@ void main()
             GL.EnableVertexAttribArray(colorLocation);
             GL.VertexAttribPointer(colorLocation, 4, VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
 
-            shader.SetMatrix4("model", model * Matrix4.CreateTranslation(Position));
+            shader.SetMatrix4("model", Model);
             shader.SetMatrix4("view", view);
             shader.SetMatrix4("projection", projection);
 
@@ -127,27 +134,52 @@ void main()
             shader.Dispose();
         }
 
-        private List<Vector3> CreateWall(float x, float y, float z, string dimension)
+        public void RotateCube(float angle, Vector3 centerOfRotation, Axis axis)
+        {
+            switch (axis)
+            {
+                case Axis.X:
+                    Model *= CreateRotationXAroundPoint(angle, centerOfRotation);
+                    break;
+
+                case Axis.Y:
+                    Model *= CreateRotationYAroundPoint(angle, centerOfRotation);
+                    break;
+
+                case Axis.Z:
+                    Model *= CreateRotationZAroundPoint(angle, centerOfRotation);
+                    break;
+            }
+        }
+
+        private Matrix4 CreateRotationXAroundPoint(float angle, Vector3 centerVector)
+            => Matrix4.CreateTranslation(centerVector) * Matrix4.CreateRotationX(angle) * Matrix4.CreateTranslation(-centerVector);
+        private Matrix4 CreateRotationYAroundPoint(float angle, Vector3 centerVector)
+            => Matrix4.CreateTranslation(centerVector) * Matrix4.CreateRotationY(angle) * Matrix4.CreateTranslation(-centerVector);
+        private Matrix4 CreateRotationZAroundPoint(float angle, Vector3 centerVector)
+            => Matrix4.CreateTranslation(centerVector) * Matrix4.CreateRotationZ(angle) * Matrix4.CreateTranslation(-centerVector);
+
+        private List<Vector3> CreateWall(float x, float y, float z, Axis axis)
         {
             List<Vector3> result = [];
 
-            switch (dimension)
+            switch (axis)
             {
-                case "x":
+                case Axis.X:
                     foreach (Vector2 v in CreateWallRectangle(y,z))
                     {
                         result.Add(new Vector3(x, v.X, v.Y));
                     }
                     break;
 
-                case "y":
+                case Axis.Y:
                     foreach (Vector2 v in CreateWallRectangle(x, z))
                     {
                         result.Add(new Vector3(v.X, y, v.Y));
                     }
                     break;
 
-                case "z":
+                case Axis.Z:
                     foreach (Vector2 v in CreateWallRectangle(x, y))
                     {
                         result.Add(new Vector3(v.X, v.Y, z));
