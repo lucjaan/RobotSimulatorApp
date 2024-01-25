@@ -1,0 +1,23 @@
+﻿https://www.fanuc.eu/pl/pl/roboty/robot-strona-filtrowania/scara-series/sr-6ia-c
+ Robot SCARA SR-6iA/C 
+
+Base 
+	width, length = 340
+	heigth = no idea around 200, less than 340
+J1 
+	length from center of rotation 1 to 2 = 350
+	total length = 90 + 350 + idk I guess around 90 maybe less
+	width = 159 I think, propably less
+	motion range = 296
+J2
+	length from center of rotation 2 to 3 = 300
+	total length = 350 + idk, around 120
+	width = 150
+	motion range = 300
+J3 
+	height = 748 - 65 = 683 - starts 65 from the ground, goes to 748
+
+Manipulator
+	height = 48
+	extends up to 210 (can go below base level) 
+

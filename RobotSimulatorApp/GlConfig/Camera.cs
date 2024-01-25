@@ -39,6 +39,13 @@ namespace RobotSimulatorApp.GlConfig
             View = Matrix4.LookAt(Position, Position + Front, Up);
         }
 
+        public void SetView(Vector3 position, Vector3 front)
+        {
+            Position = position;
+            Front = front;
+            UpdateVectors();
+        }
+
         public void Move(INativeInput input)
         {
 
@@ -75,11 +82,10 @@ namespace RobotSimulatorApp.GlConfig
 
         private void LookAround(INativeInput input)
         {
-
             input.MouseMove += (e) =>
             {
                 Yaw += e.DeltaX * Sensitivity;
-                Pitch -= e.DeltaY * Sensitivity; // Reversed since y-coordinates range from bottom to top
+                Pitch -= MathHelper.Clamp(e.DeltaY * Sensitivity, -89f, 89f); // Reversed since y-coordinates range from bottom to top
                 Debug.WriteLine($"e{e.Delta}");
 
                 Front.X = (float)Math.Cos(MathHelper.DegreesToRadians(Pitch)) * (float)Math.Cos(MathHelper.DegreesToRadians(Yaw));
@@ -90,7 +96,6 @@ namespace RobotSimulatorApp.GlConfig
                 //Debug.WriteLine($"pre-normal: {Front}");
                 Front = Vector3.Normalize(Front);
                 //Debug.WriteLine($"normalized: {Front}");
-
             };
         }
 
