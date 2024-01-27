@@ -172,15 +172,17 @@ void main()
                 //very rudimentary shadow simulation
                 color[i +16] = colorData;
 
-                color[i] =  color[i + 8] = color[i + 12] = color[i + 20]  = new Color4
-                    (MathHelper.Clamp(colorData.R - 0.05f, 0f, 1), 
+                color[i] =  color[i + 8] = color[i + 12] = color[i + 20]  = new Color4(
+                    MathHelper.Clamp(colorData.R - 0.05f, 0f, 1), 
                     MathHelper.Clamp(colorData.G - 0.05f, 0f, 1), 
-                    MathHelper.Clamp(colorData.B - 0.05f, 0f, 1), 1);
+                    MathHelper.Clamp(colorData.B - 0.05f, 0f, 1),
+                    1);
 
-                color[i + 4] = new Color4
-                    (MathHelper.Clamp(colorData.R - 0.1f, 0f, 1),
+                color[i + 4] = new Color4(
+                    MathHelper.Clamp(colorData.R - 0.1f, 0f, 1),
                     MathHelper.Clamp(colorData.G - 0.1f, 0f, 1),
-                    MathHelper.Clamp(colorData.B - 0.1f, 0f, 1), 1);
+                    MathHelper.Clamp(colorData.B - 0.1f, 0f, 1),
+                    1);
             }
 
             ColorData = color;
