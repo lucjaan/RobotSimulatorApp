@@ -23,7 +23,7 @@ namespace RobotSimulatorApp.GlConfig
         private readonly List<int> GridIndexData = [];
 
         private List<Vector3> XYZVertices = [];
-        private static readonly List<int> XYZIndexData = [1, 2, 3, 4, 5];
+        private static readonly List<int> XYZIndexData = [0, 1, 2, 3, 4, 5];
 
         private int VertexBufferObject { get; set; }
         private int VertexArrayObject { get; set; }
@@ -126,14 +126,14 @@ void main()
 
         private void CreateXYZ()
         {
-            int length = 100;
+            float length = 300f;
 
-            XYZVertices.Add(new Vector3(-length, 0, 0));
-            XYZVertices.Add(new Vector3(length, 0, 0));
-            XYZVertices.Add(new Vector3(0, 0, -length));
-            XYZVertices.Add(new Vector3(0, 0, length));
-            XYZVertices.Add(new Vector3(0, -length, 0));
-            XYZVertices.Add(new Vector3(0, length, 0));
+            XYZVertices.Add(new Vector3(-length, 0f, 0f));
+            XYZVertices.Add(new Vector3(length, 0f, 0f));
+            XYZVertices.Add(new Vector3(0f, 0f, -length));
+            XYZVertices.Add(new Vector3(0f, 0f, length));
+            XYZVertices.Add(new Vector3(0f, -length, 0f));
+            XYZVertices.Add(new Vector3(0f, length, 0f));
         }
 
         private void RenderXYZ(Matrix4 view, Matrix4 projection)
