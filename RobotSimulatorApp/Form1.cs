@@ -3,6 +3,7 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.WinForms;
 using RobotSimulatorApp.GlConfig;
+using RobotSimulatorApp.Robot.SCARA;
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -22,8 +23,9 @@ namespace RobotSimulatorApp
         Camera camera;
         Cube cube;
         Cube cube2;
+        Cube cube0;
         Grid grid;
-
+        SCARA_Robot scara;
         public int VertexArrayObject { get; private set; }
         public int ElementBufferObject { get; private set; }
         public int PositionBuffer { get; private set; }
@@ -43,29 +45,19 @@ namespace RobotSimulatorApp
             base.OnLoad(e);
             //glControl.Paint += glControl_Paint;
             SetUpOpenGL();
-
-            glControl.GotFocus += (sender, e) =>
-                textBox1.AppendText("Focus in");
-            glControl.LostFocus += (sender, e) =>
-                textBox1.AppendText("Focus out");
-
-            glControl.MouseDown += (sender, e) =>
-            {
-                glControl.Focus();
-                textBox1.AppendText($"WinForms Mouse down: ({e.X},{e.Y})");
-            };
-            glControl.KeyDown += (sender, e) =>
-                textBox1.AppendText($"WinForms Key down: {e.KeyCode}");
         }
 
         private void SetUpOpenGL()
         {
             GL.Enable(EnableCap.DepthTest);
 
-            cube2 = new(glControl, "cube2", new Vector3(-12f, 0f, 0f), 5f, 7f, 2f);
-            cube = new(glControl, "cube1", new Vector3(-1f, -1f, -1f), 2f, 22f, 2f);
-            grid = new Grid(glControl);
+            //cube = new(glControl, new Vector3(-5f, -1f, -5f), new Vector3(2f, 22f, 2f));
+            //cube2 = new(glControl, new Vector3(15f, 0f, 9f), new Vector3(6f, 8f, 10f));
+            //cube0 = new(glControl, new Vector3(0f, -3f, 0f), new Vector3(6f, 6f, 6f));
+            //cube0.SetColor(Color4.LimeGreen);
 
+            grid = new Grid(glControl);
+            scara = new SCARA_Robot(glControl, "tomek");
             timer = new Timer();
             timer.Tick += (sender, e) =>
             {
@@ -79,6 +71,8 @@ namespace RobotSimulatorApp
             glControl_Resize(glControl, EventArgs.Empty);
 
             camera = new(new Vector3(0f, 0f, 5f), AspectRatio);
+            camera.SetView(new Vector3(69f, 102f, 174f), new Vector3(-35f, -77f, -155f));
+            UpdateTrackBars();
         }
 
         private void Render()
@@ -91,16 +85,22 @@ namespace RobotSimulatorApp
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.Enable(EnableCap.DepthTest);
 
-            Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, AspectRatio, 0.1f, 100f);
+            Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, AspectRatio, 0.1f, 500f);
             //var x = MathHelper.Clamp(_angle, 0, 360);
-            cube.RotateCube(0.05f, cube.Center, Axis.Y);
+
+            //cube.RotateCube(15f, cube.Center, Axis.X);
+            //cube2.RotateCube(15f, cube2.Center, Axis.Y);
+            //cube0.RotateCube(15f, cube0.Center, Axis.Z);
+
             if (captureMouseCheckBox.Checked)
             {
                 camera.Move(input);
             }
 
-            cube2.RenderCube(camera.View, projection);
-            cube.RenderCube(camera.View, projection);
+            //cube2.RenderCube(camera.View, projection);
+            //cube.RenderCube(camera.View, projection);
+            //cube0.RenderCube(camera.View, projection);
+            scara.RenderRobot(camera.View, projection);
             grid.RenderWorld(camera.View, projection);
             glControl.SwapBuffers();
         }
@@ -188,24 +188,24 @@ namespace RobotSimulatorApp
             //frontY.Value = -3;
             //frontZ.Value = -1;
 
-            positionX.Value = 5;
-            positionY.Value = 38;
-            positionZ.Value = -19;
+            //positionX.Value = 5;
+            //positionY.Value = 38;
+            //positionZ.Value = -19;
 
-            frontX.Value = -3;
-            frontY.Value = -72;
-            frontZ.Value = -7;
+            //frontX.Value = -3;
+            //frontY.Value = -72;
+            //frontZ.Value = -7;
         }
 
         private void getCameraButton_Click(object sender, EventArgs e)
         {
-            positionX.Value = (decimal)(camera != null ? camera.Position.X : 0);
-            positionY.Value = (decimal)(camera != null ? camera.Position.Y : 0);
-            positionZ.Value = (decimal)(camera != null ? camera.Position.Z : 0);
+            //positionX.Value = (decimal)(camera != null ? camera.Position.X : 0);
+            //positionY.Value = (decimal)(camera != null ? camera.Position.Y : 0);
+            //positionZ.Value = (decimal)(camera != null ? camera.Position.Z : 0);
 
-            frontX.Value = (decimal)(camera != null ? camera.Front.X : 0);
-            frontY.Value = (decimal)(camera != null ? camera.Front.Y : 0);
-            frontZ.Value = (decimal)(camera != null ? camera.Front.Z : 0);
+            //frontX.Value = (decimal)(camera != null ? camera.Front.X : 0);
+            //frontY.Value = (decimal)(camera != null ? camera.Front.Y : 0);
+            //frontZ.Value = (decimal)(camera != null ? camera.Front.Z : 0);
         }
 
         private void setCameraButton_Click(object sender, EventArgs e)
@@ -213,29 +213,85 @@ namespace RobotSimulatorApp
             //position = new((float)positionX.Value, (float)positionY.Value, (float)positionZ.Value);
             //front = new((float)frontX.Value, (float)frontY.Value, (float)frontZ.Value);
 
-            camera.Position = new((float)positionX.Value, (float)positionY.Value, (float)positionZ.Value);
-            camera.Front = new((float)frontX.Value, (float)frontY.Value, (float)frontZ.Value);
+            //camera.Position = new((float)positionX.Value, (float)positionY.Value, (float)positionZ.Value);
+            //camera.Front = new((float)frontX.Value, (float)frontY.Value, (float)frontZ.Value);
 
             camera.UpdateVectors();
+        }
+
+        private void UpdateTextBoxes()
+        {
+            if (camera == null)
+            {
+                positionTextBox.Text = string.Empty;
+                frontTextBox.Text = string.Empty;
+            }
+            else
+            {
+                positionTextBox.Text = $"{camera.Position}";
+                frontTextBox.Text = $"{FrontXtrackBar.Value}, {FrontYtrackBar.Value}, {FrontZtrackBar.Value}";
+                //frontTextBox.Text = $"{camera.Front}";
+            }
+        }
+
+        private void UpdateTrackBars()
+        {
+            FrontXtrackBar.Value = (int)(MathHelper.RadiansToDegrees(camera.Front.X) * MathHelper.Pi);
+            FrontYtrackBar.Value = (int)(MathHelper.RadiansToDegrees(camera.Front.Y) * MathHelper.Pi); ;
+            FrontZtrackBar.Value = (int)(MathHelper.RadiansToDegrees(camera.Front.Z) * MathHelper.Pi); ;
+            PosXTrackBar.Value = (int)camera.Position.X;
+            PosYTrackBar.Value = (int)camera.Position.X;
+            PosZTrackBar.Value = (int)camera.Position.X;
         }
 
         private void FrontXtrackBar_Scroll(object sender, EventArgs e)
         {
             camera.Front.X = MathHelper.DegreesToRadians((float)FrontXtrackBar.Value) / MathHelper.Pi;
             camera.UpdateVectors();
+            UpdateTextBoxes();
         }
 
         private void FrontYtrackBar_Scroll(object sender, EventArgs e)
         {
             camera.Front.Y = MathHelper.DegreesToRadians((float)FrontYtrackBar.Value) / MathHelper.Pi;
             camera.UpdateVectors();
+            UpdateTextBoxes();
+
         }
 
         private void FrontZtrackBar_Scroll(object sender, EventArgs e)
         {
             camera.Front.Z = MathHelper.DegreesToRadians((float)FrontZtrackBar.Value) / MathHelper.Pi;
             camera.UpdateVectors();
+            UpdateTextBoxes();
+        }
+
+        private void PosXTrackBar_Scroll(object sender, EventArgs e)
+        {
+            camera.Position.X = PosXTrackBar.Value;
+            camera.UpdateVectors();
+            UpdateTextBoxes();
+        }
+
+        private void PosYTrackBar_Scroll(object sender, EventArgs e)
+        {
+            camera.Position.Y = PosYTrackBar.Value;
+            camera.UpdateVectors();
+            UpdateTextBoxes();
+        }
+
+        private void PosZTrackBar_Scroll(object sender, EventArgs e)
+        {
+            camera.Position.Z = PosZTrackBar.Value;
+            camera.UpdateVectors();
+            UpdateTextBoxes();
+        }
+
+        private void jointTrackBar_Scroll(object sender, EventArgs e)
+        {
+            scara.RobotBase.RotateCube((float)jointTrackBar.Value/1000, scara.RobotBase.Center, Axis.Y);
+            var x = (float)jointTrackBar.Value / 1000;
+            var z = scara.RobotBase.Center;
         }
     }
-
 }

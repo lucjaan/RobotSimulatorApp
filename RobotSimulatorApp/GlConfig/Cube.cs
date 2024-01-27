@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.DirectoryServices;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Security.Principal;
@@ -18,19 +19,19 @@ namespace RobotSimulatorApp.GlConfig
 {
     internal class Cube
     {
-        public string Name { get; set; }
         public Vector3 Center { get; set; }
-        private Vector3 Position { get; set; }
+        public Vector3 Position { get; set; }
         private Matrix4 Model { get; set; }
+        private Trace Trace { get; set; }
 
         private readonly GLControl GlControl;
-        
+        private bool isTraceSet;
         private int VertexArrayObject { get; set; }
         private int ElementBufferObject { get; set; }
         private int PositionBufferObject { get; set; }
         private int ColorBufferObject { get; set; }
 
-        private List<Vector3> Vertices = [];
+        private readonly List<Vector3> Vertices = [];
         private static readonly int[] IndexData =
         {
              0,  1,  2,  2,  3,  0,
@@ -41,15 +42,43 @@ namespace RobotSimulatorApp.GlConfig
             20, 21, 22, 22, 23, 20,
         };
 
-        private static readonly Color4[] ColorData = new Color4[]
-        {
-            Color4.Silver, Color4.Silver, Color4.Silver, Color4.Silver,
-            Color4.Honeydew, Color4.Honeydew, Color4.Honeydew, Color4.Honeydew,
-            Color4.Moccasin, Color4.Moccasin, Color4.Moccasin, Color4.Moccasin,
-            Color4.IndianRed, Color4.IndianRed, Color4.IndianRed, Color4.IndianRed,
-            Color4.PaleVioletRed, Color4.PaleVioletRed, Color4.PaleVioletRed, Color4.PaleVioletRed,
-            Color4.ForestGreen, Color4.ForestGreen, Color4.ForestGreen, Color4.ForestGreen,
-        };
+        //private Color4[] ColorData =
+        //[
+        //    Color4.Silver, Color4.Silver, Color4.Silver, Color4.Silver,
+        //    Color4.Honeydew, Color4.Honeydew, Color4.Honeydew, Color4.Honeydew,
+        //    Color4.Moccasin, Color4.Moccasin, Color4.Moccasin, Color4.Moccasin,
+        //    Color4.IndianRed, Color4.IndianRed, Color4.IndianRed, Color4.IndianRed,
+        //    Color4.PaleVioletRed, Color4.PaleVioletRed, Color4.PaleVioletRed, Color4.PaleVioletRed,
+        //    Color4.ForestGreen, Color4.ForestGreen, Color4.ForestGreen, Color4.ForestGreen,
+        //];
+
+        private Color4[] ColorData =
+        [
+            Color4.DarkRed,
+            Color4.DarkRed,
+            Color4.DarkRed,
+            Color4.DarkRed,
+            Color4.WhiteSmoke,
+            Color4.WhiteSmoke,
+            Color4.WhiteSmoke,
+            Color4.WhiteSmoke,
+            Color4.Yellow,
+            Color4.Yellow,
+            Color4.Yellow,
+            Color4.Yellow,
+            Color4.Orange,
+            Color4.Orange,
+            Color4.Orange,
+            Color4.Orange,
+            Color4.Black,
+            Color4.Black,
+            Color4.Black,
+            Color4.Black,
+            Color4.ForestGreen,
+            Color4.ForestGreen,
+            Color4.ForestGreen,
+            Color4.ForestGreen,
+        ];
 
         public static readonly string VertexShader =
            @"#version 330 core
@@ -70,7 +99,7 @@ void main(void)
 
 }";
 
-        public static readonly string FragmentShader = 
+        public static readonly string FragmentShader =
            @"#version 330 core
 in vec4 fColor;
 
@@ -81,23 +110,23 @@ void main()
     oColor = fColor;
 }";
 
-        public Cube(GLControl glControl, string name, Vector3 position, float length, float height, float width)
+        public Cube(GLControl glControl, Vector3 position, Vector3 size)
         {
-            Name = name;
             Position = position;
             GlControl = glControl;
-            Center = new Vector3(length / 2, height / 2, width / 2) + position;
+            Center = new Vector3(size.X / 2, size.Y / 2, size.Z / 2) + position;
             Model = Matrix4.CreateTranslation(position);
 
+            isTraceSet = false;
             //Create vertices responsible for generating a cube and add them for later use:
-            Vertices.AddRange(CreateWall(length, height, 0, Axis.Z));
-            Vertices.AddRange(CreateWall(length, 0, width, Axis.Y));
-            Vertices.AddRange(CreateWall(0, height, width, Axis.X));
-            Vertices.AddRange(CreateWall(length, height, width, Axis.Z));
-            Vertices.AddRange(CreateWall(length, height, width, Axis.Y));
-            Vertices.AddRange(CreateWall(length, height, width, Axis.X));
+            Vertices.AddRange(CreateWall(size.X, size.Y, 0, Axis.Z));
+            Vertices.AddRange(CreateWall(size.X, 0, size.Z, Axis.Y));
+            Vertices.AddRange(CreateWall(0, size.Y, size.Z, Axis.X));
+            Vertices.AddRange(CreateWall(size.X, size.Y, size.Z, Axis.Z));
+            Vertices.AddRange(CreateWall(size.X, size.Y, size.Z, Axis.Y));
+            Vertices.AddRange(CreateWall(size.X, size.Y, size.Z, Axis.X));
         }
-       
+
         public void RenderCube(Matrix4 view, Matrix4 projection)
         {
             Shader shader = new(VertexShader, FragmentShader);
@@ -136,6 +165,7 @@ void main()
 
         public void RotateCube(float angle, Vector3 centerOfRotation, Axis axis)
         {
+            angle = MathHelper.DegreesToRadians(angle);
             switch (axis)
             {
                 case Axis.X:
@@ -152,12 +182,38 @@ void main()
             }
         }
 
-        private Matrix4 CreateRotationXAroundPoint(float angle, Vector3 centerVector)
-            => Matrix4.CreateTranslation(centerVector) * Matrix4.CreateRotationX(angle) * Matrix4.CreateTranslation(-centerVector);
-        private Matrix4 CreateRotationYAroundPoint(float angle, Vector3 centerVector)
-            => Matrix4.CreateTranslation(centerVector) * Matrix4.CreateRotationY(angle) * Matrix4.CreateTranslation(-centerVector);
-        private Matrix4 CreateRotationZAroundPoint(float angle, Vector3 centerVector)
-            => Matrix4.CreateTranslation(centerVector) * Matrix4.CreateRotationZ(angle) * Matrix4.CreateTranslation(-centerVector);
+        public void SetColor(Color4 colorData)
+        {
+            Color4[] color = new Color4[24];
+            for (int i = 0; i < 4; i++)
+            {
+                //very rudimentary shadow simulation
+                color[i + 16] = colorData;
+
+                color[i] = color[i + 8] = color[i + 12] = color[i + 20] = new Color4
+                    (MathHelper.Clamp(colorData.R - 0.05f, 0f, 1),
+                    MathHelper.Clamp(colorData.G - 0.05f, 0f, 1),
+                    MathHelper.Clamp(colorData.B - 0.05f, 0f, 1), 1);
+
+                color[i + 4] = new Color4
+                    (MathHelper.Clamp(colorData.R - 0.1f, 0f, 1),
+                    MathHelper.Clamp(colorData.G - 0.1f, 0f, 1),
+                    MathHelper.Clamp(colorData.B - 0.1f, 0f, 1), 1);
+            }
+
+            ColorData = color;
+        }
+
+        public void SetTrace(bool isSet) => isTraceSet = isSet;
+
+        private static Matrix4 CreateRotationXAroundPoint(float angle, Vector3 centerVector)
+            => Matrix4.CreateTranslation(-centerVector) * Matrix4.CreateRotationX(angle) * Matrix4.CreateTranslation(centerVector);
+
+        private static Matrix4 CreateRotationYAroundPoint(float angle, Vector3 centerVector)
+             => Matrix4.CreateTranslation(-centerVector) * Matrix4.CreateRotationY(angle) * Matrix4.CreateTranslation(centerVector);
+        
+        private static Matrix4 CreateRotationZAroundPoint(float angle, Vector3 centerVector)
+            => Matrix4.CreateTranslation(-centerVector) * Matrix4.CreateRotationZ(angle) * Matrix4.CreateTranslation(centerVector);
 
         private List<Vector3> CreateWall(float x, float y, float z, Axis axis)
         {
@@ -166,7 +222,7 @@ void main()
             switch (axis)
             {
                 case Axis.X:
-                    foreach (Vector2 v in CreateWallRectangle(y,z))
+                    foreach (Vector2 v in CreateWallRectangle(y, z))
                     {
                         result.Add(new Vector3(x, v.X, v.Y));
                     }
@@ -189,7 +245,7 @@ void main()
             return result;
         }
 
-        private Vector2[] CreateWallRectangle(float a, float b)
+        private static Vector2[] CreateWallRectangle(float a, float b)
             => new Vector2[] { new(0, 0), new(a, 0), new(a, b), new(0, b) };
     }
 }
