@@ -51,11 +51,10 @@ namespace RobotSimulatorApp
         {
             GL.Enable(EnableCap.DepthTest);
 
-            cube2 = new(glControl, new Vector3(11f, 0f, 11f), new Vector3(5f, 5f, 5f));
-            cube = new(glControl, new Vector3(-1f, -1f, -1f), new Vector3(2f, 22f, 2f));
-
-            cube0 = new(glControl, new Vector3(0f, -3f, 0f), new Vector3(6f, 6f, 6f));
-            cube0.SetColor(Color4.LimeGreen);
+            //cube = new(glControl, new Vector3(-5f, -1f, -5f), new Vector3(2f, 22f, 2f));
+            //cube2 = new(glControl, new Vector3(15f, 0f, 9f), new Vector3(6f, 8f, 10f));
+            //cube0 = new(glControl, new Vector3(0f, -3f, 0f), new Vector3(6f, 6f, 6f));
+            //cube0.SetColor(Color4.LimeGreen);
 
             grid = new Grid(glControl);
             scara = new SCARA_Robot(glControl, "tomek");
@@ -88,21 +87,20 @@ namespace RobotSimulatorApp
 
             Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, AspectRatio, 0.1f, 500f);
             //var x = MathHelper.Clamp(_angle, 0, 360);
-            var dasd = cube.Center;
-            var dasd1 = cube2.Center;
-            var dasd2 = cube0.Center;
-            cube.RotateCube(0.05f, cube2.Center, Axis.Y);
-            cube2.RotateCube(0.05f, cube2.Center, Axis.Y);
-            cube0.RotateCube(0.05f, cube2.Center, Axis.Y);
+
+            //cube.RotateCube(15f, cube.Center, Axis.X);
+            //cube2.RotateCube(15f, cube2.Center, Axis.Y);
+            //cube0.RotateCube(15f, cube0.Center, Axis.Z);
+
             if (captureMouseCheckBox.Checked)
             {
                 camera.Move(input);
             }
 
-            cube2.RenderCube(camera.View, projection);
-            cube.RenderCube(camera.View, projection);
-            cube0.RenderCube(camera.View, projection);
-            //scara.RenderRobot(camera.View, projection);
+            //cube2.RenderCube(camera.View, projection);
+            //cube.RenderCube(camera.View, projection);
+            //cube0.RenderCube(camera.View, projection);
+            scara.RenderRobot(camera.View, projection);
             grid.RenderWorld(camera.View, projection);
             glControl.SwapBuffers();
         }
