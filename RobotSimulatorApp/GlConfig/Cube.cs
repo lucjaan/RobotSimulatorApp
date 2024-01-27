@@ -115,10 +115,7 @@ void main()
             Position = position;
             GlControl = glControl;
             Center = new Vector3(size.X / 2, size.Y / 2, size.Z / 2) + position;
-            //Center = new Vector3(15, 2, 11);// + position;
             Model = Matrix4.CreateTranslation(position);
-
-            //Center = new Vector3(size.X / 2, size.Y / 2, size.Z / 2) + position;
 
             isTraceSet = false;
             //Create vertices responsible for generating a cube and add them for later use:
@@ -128,7 +125,6 @@ void main()
             Vertices.AddRange(CreateWall(size.X, size.Y, size.Z, Axis.Z));
             Vertices.AddRange(CreateWall(size.X, size.Y, size.Z, Axis.Y));
             Vertices.AddRange(CreateWall(size.X, size.Y, size.Z, Axis.X));
-
         }
 
         public void RenderCube(Matrix4 view, Matrix4 projection)
@@ -177,9 +173,7 @@ void main()
                     break;
 
                 case Axis.Y:
-                    var dd = Model;
                     Model *= CreateRotationYAroundPoint(angle, centerOfRotation);
-                    var z = Model;
                     break;
 
                 case Axis.Z:
@@ -212,41 +206,14 @@ void main()
 
         public void SetTrace(bool isSet) => isTraceSet = isSet;
 
-        private Matrix4 CreateRotationXAroundPoint(float angle, Vector3 centerVector)
-            => Matrix4.CreateTranslation(centerVector) * Matrix4.CreateRotationX(angle) * Matrix4.CreateTranslation(-centerVector);
-        //private static Matrix4 CreateRotationYAroundPoint(float angle, Vector3 centerVector)
-        //    => Matrix4.CreateTranslation(centerVector) * Matrix4.CreateRotationY(angle) * Matrix4.CreateTranslation(-centerVector);
+        private static Matrix4 CreateRotationXAroundPoint(float angle, Vector3 centerVector)
+            => Matrix4.CreateTranslation(-centerVector) * Matrix4.CreateRotationX(angle) * Matrix4.CreateTranslation(centerVector);
 
-        private Matrix4 CreateRotationYAroundPoint(float angle, Vector3 centerVector)
-        {
-            //angle = MathHelper.DegreesToRadians(5f);
-            //Matrix4 rotationBase = Matrix4.CreateRotationY(angle);
-            //Matrix4 rotation = Matrix4.CreateRotationY(angle);
-            //bool areEqual = Matrix4.Equals(rotationBase, rotation);
-
-            ////rotation.M41 = centerVector.X;
-            ////rotation.M43 = centerVector.Z;
-
-            //rotation.M41 = 5;
-            //rotation.M43 = 0;
-            ////rotation = Matrix4.CreateTranslation(new ) * Matrix4.CreateRotationY(angle) * Matrix4.CreateTranslation(-centerVector);
-            ////rotation.M41 = 0;
-            ////rotation.M43 = 0;
-            //areEqual = Matrix4.Equals(rotationBase, rotation);
-
-            //return rotation;
-            //centerVector = Vector3.Normalize(new(centerVector.X, 0, centerVector.Z));
-            //centerVector = new(centerVector.X, 0, centerVector.Z);
-            //centerVector = new(1, 15, 1);
-            //centerVector = Position;
-
-            //return Matrix4.CreateFromAxisAngle(centerVector, angle);
-            return Matrix4.CreateTranslation(centerVector) * Matrix4.CreateRotationY(angle) * Matrix4.CreateTranslation(-centerVector);
-        }
-        //=> Matrix4.CreateTranslation(centerVector) * Matrix4.CreateRotationY(angle) * Matrix4.CreateTranslation(-centerVector); 
-
-        private Matrix4 CreateRotationZAroundPoint(float angle, Vector3 centerVector)
-            => Matrix4.CreateTranslation(centerVector) * Matrix4.CreateRotationZ(angle) * Matrix4.CreateTranslation(-centerVector);
+        private static Matrix4 CreateRotationYAroundPoint(float angle, Vector3 centerVector)
+             => Matrix4.CreateTranslation(-centerVector) * Matrix4.CreateRotationY(angle) * Matrix4.CreateTranslation(centerVector);
+        
+        private static Matrix4 CreateRotationZAroundPoint(float angle, Vector3 centerVector)
+            => Matrix4.CreateTranslation(-centerVector) * Matrix4.CreateRotationZ(angle) * Matrix4.CreateTranslation(centerVector);
 
         private List<Vector3> CreateWall(float x, float y, float z, Axis axis)
         {
@@ -278,7 +245,7 @@ void main()
             return result;
         }
 
-        private Vector2[] CreateWallRectangle(float a, float b)
+        private static Vector2[] CreateWallRectangle(float a, float b)
             => new Vector2[] { new(0, 0), new(a, 0), new(a, b), new(0, b) };
     }
 }
