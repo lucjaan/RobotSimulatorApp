@@ -22,9 +22,10 @@ namespace RobotSimulatorApp.GlConfig
         public Vector3 Center { get; set; }
         public Vector3 Position { get; set; }
         private Matrix4 Model { get; set; }
+        private Trace Trace { get; set; }
 
         private readonly GLControl GlControl;
-        
+        private bool isTraceSet;
         private int VertexArrayObject { get; set; }
         private int ElementBufferObject { get; set; }
         private int PositionBufferObject { get; set; }
@@ -53,12 +54,30 @@ namespace RobotSimulatorApp.GlConfig
 
         private Color4[] ColorData =
         [
-            Color4.DarkRed, Color4.DarkRed, Color4.DarkRed, Color4.DarkRed,
-            Color4.WhiteSmoke, Color4.WhiteSmoke, Color4.WhiteSmoke, Color4.WhiteSmoke,
-            Color4.Yellow, Color4.Yellow, Color4.Yellow, Color4.Yellow,
-            Color4.Orange, Color4.Orange, Color4.Orange, Color4.Orange,
-            Color4.Black, Color4.Black, Color4.Black, Color4.Black,
-            Color4.ForestGreen, Color4.ForestGreen, Color4.ForestGreen, Color4.ForestGreen,
+            Color4.DarkRed,
+            Color4.DarkRed,
+            Color4.DarkRed,
+            Color4.DarkRed,
+            Color4.WhiteSmoke,
+            Color4.WhiteSmoke,
+            Color4.WhiteSmoke,
+            Color4.WhiteSmoke,
+            Color4.Yellow,
+            Color4.Yellow,
+            Color4.Yellow,
+            Color4.Yellow,
+            Color4.Orange,
+            Color4.Orange,
+            Color4.Orange,
+            Color4.Orange,
+            Color4.Black,
+            Color4.Black,
+            Color4.Black,
+            Color4.Black,
+            Color4.ForestGreen,
+            Color4.ForestGreen,
+            Color4.ForestGreen,
+            Color4.ForestGreen,
         ];
 
         public static readonly string VertexShader =
@@ -80,7 +99,7 @@ void main(void)
 
 }";
 
-        public static readonly string FragmentShader = 
+        public static readonly string FragmentShader =
            @"#version 330 core
 in vec4 fColor;
 
@@ -96,9 +115,12 @@ void main()
             Position = position;
             GlControl = glControl;
             Center = new Vector3(size.X / 2, size.Y / 2, size.Z / 2) + position;
-            //Center = new Vector3(size.X / 2, size.Y / 2, size.Z / 2) + position;
+            //Center = new Vector3(15, 2, 11);// + position;
             Model = Matrix4.CreateTranslation(position);
 
+            //Center = new Vector3(size.X / 2, size.Y / 2, size.Z / 2) + position;
+
+            isTraceSet = false;
             //Create vertices responsible for generating a cube and add them for later use:
             Vertices.AddRange(CreateWall(size.X, size.Y, 0, Axis.Z));
             Vertices.AddRange(CreateWall(size.X, 0, size.Z, Axis.Y));
@@ -106,8 +128,9 @@ void main()
             Vertices.AddRange(CreateWall(size.X, size.Y, size.Z, Axis.Z));
             Vertices.AddRange(CreateWall(size.X, size.Y, size.Z, Axis.Y));
             Vertices.AddRange(CreateWall(size.X, size.Y, size.Z, Axis.X));
+
         }
-       
+
         public void RenderCube(Matrix4 view, Matrix4 projection)
         {
             Shader shader = new(VertexShader, FragmentShader);
@@ -146,6 +169,7 @@ void main()
 
         public void RotateCube(float angle, Vector3 centerOfRotation, Axis axis)
         {
+            angle = MathHelper.DegreesToRadians(angle);
             switch (axis)
             {
                 case Axis.X:
@@ -170,11 +194,11 @@ void main()
             for (int i = 0; i < 4; i++)
             {
                 //very rudimentary shadow simulation
-                color[i +16] = colorData;
+                color[i + 16] = colorData;
 
-                color[i] =  color[i + 8] = color[i + 12] = color[i + 20]  = new Color4
-                    (MathHelper.Clamp(colorData.R - 0.05f, 0f, 1), 
-                    MathHelper.Clamp(colorData.G - 0.05f, 0f, 1), 
+                color[i] = color[i + 8] = color[i + 12] = color[i + 20] = new Color4
+                    (MathHelper.Clamp(colorData.R - 0.05f, 0f, 1),
+                    MathHelper.Clamp(colorData.G - 0.05f, 0f, 1),
                     MathHelper.Clamp(colorData.B - 0.05f, 0f, 1), 1);
 
                 color[i + 4] = new Color4
@@ -186,15 +210,42 @@ void main()
             ColorData = color;
         }
 
-        private static Matrix4 CreateRotationXAroundPoint(float angle, Vector3 centerVector)
+        public void SetTrace(bool isSet) => isTraceSet = isSet;
+
+        private Matrix4 CreateRotationXAroundPoint(float angle, Vector3 centerVector)
             => Matrix4.CreateTranslation(centerVector) * Matrix4.CreateRotationX(angle) * Matrix4.CreateTranslation(-centerVector);
         //private static Matrix4 CreateRotationYAroundPoint(float angle, Vector3 centerVector)
         //    => Matrix4.CreateTranslation(centerVector) * Matrix4.CreateRotationY(angle) * Matrix4.CreateTranslation(-centerVector);
 
-        private static Matrix4 CreateRotationYAroundPoint(float angle, Vector3 centerVector)
-            => Matrix4.CreateTranslation(centerVector) * Matrix4.CreateRotationY(angle) * Matrix4.CreateTranslation(-centerVector); 
+        private Matrix4 CreateRotationYAroundPoint(float angle, Vector3 centerVector)
+        {
+            //angle = MathHelper.DegreesToRadians(5f);
+            //Matrix4 rotationBase = Matrix4.CreateRotationY(angle);
+            //Matrix4 rotation = Matrix4.CreateRotationY(angle);
+            //bool areEqual = Matrix4.Equals(rotationBase, rotation);
 
-        private static Matrix4 CreateRotationZAroundPoint(float angle, Vector3 centerVector)
+            ////rotation.M41 = centerVector.X;
+            ////rotation.M43 = centerVector.Z;
+
+            //rotation.M41 = 5;
+            //rotation.M43 = 0;
+            ////rotation = Matrix4.CreateTranslation(new ) * Matrix4.CreateRotationY(angle) * Matrix4.CreateTranslation(-centerVector);
+            ////rotation.M41 = 0;
+            ////rotation.M43 = 0;
+            //areEqual = Matrix4.Equals(rotationBase, rotation);
+
+            //return rotation;
+            //centerVector = Vector3.Normalize(new(centerVector.X, 0, centerVector.Z));
+            //centerVector = new(centerVector.X, 0, centerVector.Z);
+            //centerVector = new(1, 15, 1);
+            //centerVector = Position;
+
+            //return Matrix4.CreateFromAxisAngle(centerVector, angle);
+            return Matrix4.CreateTranslation(centerVector) * Matrix4.CreateRotationY(angle) * Matrix4.CreateTranslation(-centerVector);
+        }
+        //=> Matrix4.CreateTranslation(centerVector) * Matrix4.CreateRotationY(angle) * Matrix4.CreateTranslation(-centerVector); 
+
+        private Matrix4 CreateRotationZAroundPoint(float angle, Vector3 centerVector)
             => Matrix4.CreateTranslation(centerVector) * Matrix4.CreateRotationZ(angle) * Matrix4.CreateTranslation(-centerVector);
 
         private List<Vector3> CreateWall(float x, float y, float z, Axis axis)
@@ -204,7 +255,7 @@ void main()
             switch (axis)
             {
                 case Axis.X:
-                    foreach (Vector2 v in CreateWallRectangle(y,z))
+                    foreach (Vector2 v in CreateWallRectangle(y, z))
                     {
                         result.Add(new Vector3(x, v.X, v.Y));
                     }
