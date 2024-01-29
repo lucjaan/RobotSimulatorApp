@@ -289,9 +289,11 @@ namespace RobotSimulatorApp
 
         private void jointTrackBar_Scroll(object sender, EventArgs e)
         {
-            scara.RobotBase.RotateCube((float)jointTrackBar.Value/1000, scara.RobotBase.Center, Axis.Y);
-            var x = (float)jointTrackBar.Value / 1000;
-            var z = scara.RobotBase.Center;
+            float value = (float)jointTrackBar.Value / 10;
+            //scara.RobotBase.RotateCube(value, scara.RobotBase.Center, Axis.Y);
+            //var z = scara.RobotBase.Center;
+            Debug.WriteLine(value);
+            scara.MoveJoint((int)jointNumeric.Value - 1, value);
         }
     }
 }

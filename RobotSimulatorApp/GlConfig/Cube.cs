@@ -21,6 +21,7 @@ namespace RobotSimulatorApp.GlConfig
     {
         public Vector3 Center { get; set; }
         public Vector3 Position { get; set; }
+        public Vector3 Size { get; set; }
         private Matrix4 Model { get; set; }
         private Trace Trace { get; set; }
 
@@ -114,6 +115,7 @@ void main()
         {
             Position = position;
             GlControl = glControl;
+            Size = size;
             Center = new Vector3(size.X / 2, size.Y / 2, size.Z / 2) + position;
             Model = Matrix4.CreateTranslation(position);
 
@@ -190,22 +192,51 @@ void main()
                 //very rudimentary shadow simulation
                 color[i + 16] = colorData;
 
-                color[i] = color[i + 8] = color[i + 12] = color[i + 20] = new Color4
-                    (MathHelper.Clamp(colorData.R - 0.05f, 0f, 1),
+                color[i] = color[i + 8] = color[i + 12] = color[i + 20] = new Color4(
+                    MathHelper.Clamp(colorData.R - 0.05f, 0f, 1),
                     MathHelper.Clamp(colorData.G - 0.05f, 0f, 1),
-                    MathHelper.Clamp(colorData.B - 0.05f, 0f, 1), 1);
+                    MathHelper.Clamp(colorData.B - 0.05f, 0f, 1),
+                    1);
 
-                color[i + 4] = new Color4
-                    (MathHelper.Clamp(colorData.R - 0.1f, 0f, 1),
+                color[i + 4] = new Color4(
+                    MathHelper.Clamp(colorData.R - 0.1f, 0f, 1),
                     MathHelper.Clamp(colorData.G - 0.1f, 0f, 1),
-                    MathHelper.Clamp(colorData.B - 0.1f, 0f, 1), 1);
+                    MathHelper.Clamp(colorData.B - 0.1f, 0f, 1),
+                    1);
             }
 
-            ColorData = color;
+                ColorData = color;
         }
 
-        public void SetTrace(bool isSet) => isTraceSet = isSet;
+        private Vector3 SetCenter(Vector3 position) => new Vector3(Size.X / 2, Size.Y / 2, Size.Z / 2) + new Vector3(Model.M41, Model.M42, Model.M43);
 
+
+
+        public void UpdateCenter(float angle)
+        {
+            float testx = ((Size.X / 2) * MathF.Cos(angle)) - ((Size.Z / 2) * MathF.Sin(angle)) + Model.M41;
+            float testz = ((Size.X / 2) * MathF.Sin(angle)) + ((Size.Z / 2) * MathF.Cos(angle)) + Model.M43;
+
+
+            Vector3 updated = new(
+                ((Size.X / 2) * MathF.Cos(angle)) - ((Size.X / 2) * MathF.Sin(angle)) + Model.M41,
+                Center.Y,
+                ((Size.Z / 2) * MathF.Sin(angle)) + ((Size.Z / 2) * MathF.Cos(angle)) + Model.M43
+                );
+            Center = updated;
+        }
+
+
+        //Center = new Vector3(Size.X / 2, Size.Y / 2, Size.Z / 2) + new Vector3(Model.M41, Model.M42, Model.M43);
+
+
+        public void SetTrace(bool isSet) => isTraceSet = isSet;
+        public void SetRotationCenter(Vector3 rotationCenter) => Center = rotationCenter;
+        public void TranslateCube(Vector3 translationVector)
+        {
+            Model *= Matrix4.CreateTranslation(translationVector);
+            Position += translationVector;
+        }
         private static Matrix4 CreateRotationXAroundPoint(float angle, Vector3 centerVector)
             => Matrix4.CreateTranslation(-centerVector) * Matrix4.CreateRotationX(angle) * Matrix4.CreateTranslation(centerVector);
 

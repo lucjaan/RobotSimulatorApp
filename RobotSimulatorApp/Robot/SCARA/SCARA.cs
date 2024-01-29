@@ -4,6 +4,7 @@ using OpenTK.WinForms;
 using RobotSimulatorApp.GlConfig;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -35,7 +36,6 @@ namespace RobotSimulatorApp.Robot.SCARA
             RobotBase = new(GLControl, Vector3.Zero, new Vector3(34f, 20f, 34f));
             //RobotBase = new(GLControl, Vector3.Zero, new Vector3(34f, 20f, 34f));
             RobotBase.SetColor(Color4.DarkOrange);
-            //RobotBase.SetColor();
 
             RobotJoints.Add(CreateRevoluteJoint(
                 GLControl, "J1", new Vector3(9f, 20f, 9f), new Vector3(40f, 6f, 14f), 9f, RobotBase.Center));
@@ -45,7 +45,15 @@ namespace RobotSimulatorApp.Robot.SCARA
                 GLControl, "J3", new Vector3(74f, 6.5f, 6f), new Vector3(15f, 68.3f, 10f), 25f, new Vector3(RobotBase.Center.X + 65f, RobotBase.Center.Y, RobotBase.Center.Z)));
             RobotJoints.Add(CreateLinearJoint(
                 GLControl, "J4", new Vector3(74f, 6.5f, 6f), new Vector3(3.5f, 4.8f, 2.8f), 21f, new Vector3(RobotBase.Center.X + 65f, RobotBase.Center.Y, RobotBase.Center.Z)));
-            //Manipulator = new(GLControl, new Vector3(74f, 6.5f, 6f), 2.7f, 4.8f, 4.8f,
+
+            //RobotJoints.Add(CreateRevoluteJoint(
+            //    GLControl, "J1", new Vector3(9f, 20f, 9f), new Vector3(40f, 6f, 14f), 9f, RobotBase.Center, Vector3.Zero));
+            //RobotJoints.Add(CreateRevoluteJoint(
+            //    GLControl, "J2", new Vector3(44f, 26f, 6f), new Vector3(35f, 20f, 15f), 30f, RobotJoints[0].RotationCenter, new Vector3(35f, 0f, 0f)));
+            //RobotJoints.Add(CreateRevoluteJoint(
+            //    GLControl, "J3", new Vector3(74f, 6.5f, 6f), new Vector3(15f, 68.3f, 10f), 25f, RobotJoints[1].RotationCenter, new Vector3(28f, 0f, 0f)));
+            //RobotJoints.Add(CreateRevoluteJoint(
+
             for (int i = 0; i < RobotJoints.Count; i++)
             {
                 RobotJoints[i].Cube.SetColor(Color4.OrangeRed);
@@ -55,10 +63,30 @@ namespace RobotSimulatorApp.Robot.SCARA
 
         }
 
-        public void Rotate(int jointId, float angle)
+        public void MoveJoint(int jointId, float value)
         {
-            angle = MathHelper.Clamp(angle, -RobotJoints[jointId].MaximumMovement / 2, RobotJoints[jointId].MaximumMovement / 2);
-            
+            //value = MathHelper.Clamp(value, -RobotJoints[jointId].MaximumMovement / 2, RobotJoints[jointId].MaximumMovement / 2);
+            var joint = RobotJoints[jointId];
+            // var x = joint.RotationCenter;
+            //joint.UpdateCenter(value, joint.RotationCenter);
+
+            // joint.MoveJoint_Angular(value, joint.RotationCenter, Axis.Y);
+            //joint.UpdateCenter(value, RobotBase.Center);
+            //var z = joint.RotationCenter;
+
+            if (joint.JointType == RobotLimb.JointTypes.Revolute)
+            {
+                joint.MoveJoint_Angular(value, joint.RotationCenter, joint.Axis);
+                //for (int i = jointId + 1; i < RobotJoints.Count; i++)
+                for (int i = jointId + 1; i < RobotJoints.Count; i++)
+                {
+                    RobotJoints[i].MoveJoint_Angular(value, joint.RotationCenter, joint.Axis);
+                    RobotJoints[i].UpdateCenter(value, RobotJoints[i - 1].RotationCenter);
+
+                    Debug.WriteLine($"Distance between base and rotation center {i}: {Vector3.Distance(RobotJoints[0].RotationCenter, RobotJoints[i].RotationCenter)}");
+                }
+            }
+
         }
 
         public void RenderRobot(Matrix4 view, Matrix4 projection)

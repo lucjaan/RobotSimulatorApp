@@ -254,8 +254,7 @@ namespace RobotSimulatorApp
             // 
             jointTrackBar.AutoSize = false;
             jointTrackBar.Location = new Point(1166, 347);
-            jointTrackBar.Maximum = 18000;
-            jointTrackBar.Minimum = -18000;
+            jointTrackBar.Maximum = 3600;
             jointTrackBar.Name = "jointTrackBar";
             jointTrackBar.Size = new Size(163, 33);
             jointTrackBar.TabIndex = 35;
