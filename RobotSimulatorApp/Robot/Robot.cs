@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace RobotSimulatorApp.Robot
 {
-    internal abstract class Robot
+    public abstract class Robot
     {
         protected string Name { get; set; }
-        protected RobotTypes RobotType { get; set; }
+        public RobotTypes RobotType { get; set; }
         //protected Dictionary<int, Cube> RobotJoints { get; set; }
         //protected Dictionary<int, Vector3> JointRotationPoints { get; set; }
         protected Robot() { }

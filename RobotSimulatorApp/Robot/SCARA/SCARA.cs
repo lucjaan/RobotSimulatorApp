@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace RobotSimulatorApp.Robot.SCARA
 {
-    internal class SCARA_Robot : Robot
+    public class SCARA_Robot : Robot
     {
 
         private Vector3 Position { get; set; }

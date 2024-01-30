@@ -25,7 +25,7 @@ namespace RobotSimulatorApp
         Cube cube2;
         Cube cube0;
         Grid grid;
-        SCARA_Robot scara;
+        public SCARA_Robot scara { get; set; }
         public int VertexArrayObject { get; private set; }
         public int ElementBufferObject { get; private set; }
         public int PositionBuffer { get; private set; }
@@ -304,13 +304,21 @@ namespace RobotSimulatorApp
             //scara.RobotBase.RotateCube(value, scara.RobotBase.Center, Axis.Y);
             //scara.MoveJoint((int)jointNumeric.Value - 1, value);
             scara.MoveJoint(1, value);
+
         }
 
         private void jointNumeric_ValueChanged(object sender, EventArgs e)
         {
-            scara.RobotJoints[(int)jointNumeric.Value - 1].Cube.UpdateBaseModel();
+            //scara.RobotJoints[(int)jointNumeric.Value - 1].Cube.UpdateBaseModel();
             //scara.RobotJoints[(int)jointNumeric.Value - 1].UpdateCenter((float)jointTrackBar.Value, scara.RobotBase.Center);
             //jointTrackBar.Value = 0;
+            scara.RobotJoints[(int)jointNumeric.Value - 1].Cube.UpdateBaseModel();
+        }
+
+        private void OpenControlsButton_Click(object sender, EventArgs e)
+        {
+            ControlsForm controlsForm = new ControlsForm(scara);
+            controlsForm.Show();
         }
     }
 }

@@ -17,7 +17,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace RobotSimulatorApp.GlConfig
 {
-    internal class Cube
+    public class Cube
     {
         public Vector3 Center { get; set; }
         public Vector3 Position { get; set; }

@@ -1,4 +1,4 @@
-﻿enum Axis
+﻿public enum Axis
 {
     X,
     Y,

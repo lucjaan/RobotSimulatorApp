@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace RobotSimulatorApp.Robot.SCARA
 {
-    internal class RobotLimb
+    public class RobotLimb
     {
         public enum JointTypes
         {
@@ -93,7 +93,7 @@ namespace RobotSimulatorApp.Robot.SCARA
             RotationCenter = new(rX + prevCent.X, FirstCenter.Y, rZ + prevCent.Z);
             //RotationCenter = new(rX + prevCent.X, FirstCenter.Y, rZ + prevCent.Z);
             //Cube.Model = Cube.BaseModel * Matrix4.CreateTranslation(oldRot - RotationCenter) * Cube.Model;
-            Cube.Model = Matrix4.Identity;
+           // Cube.Model = Matrix4.Identity;
             Debug.WriteLine($"rot {RotationCenter}");
 
             //RotationCenter = new Vector3(17f, 10f, 52f);
