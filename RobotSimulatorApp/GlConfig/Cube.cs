@@ -22,7 +22,8 @@ namespace RobotSimulatorApp.GlConfig
         public Vector3 Center { get; set; }
         public Vector3 Position { get; set; }
         public Vector3 Size { get; set; }
-        private Matrix4 Model { get; set; }
+        public Matrix4 Model { get; set; }
+        public Matrix4 BaseModel { get; set; }
         private Trace Trace { get; set; }
 
         private readonly GLControl GlControl;
@@ -117,8 +118,7 @@ void main()
             GlControl = glControl;
             Size = size;
             Center = new Vector3(size.X / 2, size.Y / 2, size.Z / 2) + position;
-            Model = Matrix4.CreateTranslation(position);
-
+            BaseModel = Model = Matrix4.CreateTranslation(position);
             isTraceSet = false;
             //Create vertices responsible for generating a cube and add them for later use:
             Vertices.AddRange(CreateWall(size.X, size.Y, 0, Axis.Z));
@@ -171,18 +171,26 @@ void main()
             switch (axis)
             {
                 case Axis.X:
-                    Model *= CreateRotationXAroundPoint(angle, centerOfRotation);
+                    Model = BaseModel * CreateRotationXAroundPoint(angle, centerOfRotation);
                     break;
 
                 case Axis.Y:
-                    Model *= CreateRotationYAroundPoint(angle, centerOfRotation);
+                    Model = BaseModel * CreateRotationYAroundPoint(angle, centerOfRotation);
+                    Debug.WriteLine($"cube {centerOfRotation}");
+                    //Model *= CreateRotationYAroundPoint(angle, centerOfRotation);
                     break;
 
                 case Axis.Z:
-                    Model *= CreateRotationZAroundPoint(angle, centerOfRotation);
+                    Model = BaseModel * CreateRotationZAroundPoint(angle, centerOfRotation);
                     break;
             }
         }
+
+        public void UpdateBaseModel()
+        {
+            BaseModel = Model;
+        }
+
 
         public void SetColor(Color4 colorData)
         {
@@ -234,8 +242,8 @@ void main()
         public void SetRotationCenter(Vector3 rotationCenter) => Center = rotationCenter;
         public void TranslateCube(Vector3 translationVector)
         {
-            Model *= Matrix4.CreateTranslation(translationVector);
             Position += translationVector;
+            Model *= Matrix4.CreateTranslation(translationVector);
         }
         private static Matrix4 CreateRotationXAroundPoint(float angle, Vector3 centerVector)
             => Matrix4.CreateTranslation(-centerVector) * Matrix4.CreateRotationX(angle) * Matrix4.CreateTranslation(centerVector);

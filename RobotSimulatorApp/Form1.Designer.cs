@@ -52,6 +52,7 @@ namespace RobotSimulatorApp
             frontTextBox = new TextBox();
             jointNumeric = new NumericUpDown();
             jointTrackBar = new TrackBar();
+            trackBar1 = new TrackBar();
             ((System.ComponentModel.ISupportInitialize)FrontXtrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)FrontYtrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)FrontZtrackBar).BeginInit();
@@ -60,6 +61,7 @@ namespace RobotSimulatorApp
             ((System.ComponentModel.ISupportInitialize)PosZTrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)jointNumeric).BeginInit();
             ((System.ComponentModel.ISupportInitialize)jointTrackBar).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)trackBar1).BeginInit();
             SuspendLayout();
             // 
             // glControl
@@ -249,22 +251,36 @@ namespace RobotSimulatorApp
             jointNumeric.Size = new Size(35, 23);
             jointNumeric.TabIndex = 34;
             jointNumeric.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            jointNumeric.ValueChanged += jointNumeric_ValueChanged;
             // 
             // jointTrackBar
             // 
             jointTrackBar.AutoSize = false;
+            jointTrackBar.LargeChange = 1;
             jointTrackBar.Location = new Point(1166, 347);
-            jointTrackBar.Maximum = 3600;
+            jointTrackBar.Maximum = 3;
             jointTrackBar.Name = "jointTrackBar";
             jointTrackBar.Size = new Size(163, 33);
             jointTrackBar.TabIndex = 35;
             jointTrackBar.Scroll += jointTrackBar_Scroll;
+            // 
+            // trackBar1
+            // 
+            trackBar1.AutoSize = false;
+            trackBar1.LargeChange = 1;
+            trackBar1.Location = new Point(1166, 386);
+            trackBar1.Maximum = 3;
+            trackBar1.Name = "trackBar1";
+            trackBar1.Size = new Size(163, 33);
+            trackBar1.TabIndex = 36;
+            trackBar1.Scroll += trackBar1_Scroll;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1341, 654);
+            Controls.Add(trackBar1);
             Controls.Add(jointTrackBar);
             Controls.Add(jointNumeric);
             Controls.Add(frontTextBox);
@@ -295,6 +311,7 @@ namespace RobotSimulatorApp
             ((System.ComponentModel.ISupportInitialize)PosZTrackBar).EndInit();
             ((System.ComponentModel.ISupportInitialize)jointNumeric).EndInit();
             ((System.ComponentModel.ISupportInitialize)jointTrackBar).EndInit();
+            ((System.ComponentModel.ISupportInitialize)trackBar1).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -321,5 +338,6 @@ namespace RobotSimulatorApp
         private TextBox frontTextBox;
         private NumericUpDown jointNumeric;
         private TrackBar jointTrackBar;
+        private TrackBar trackBar1;
     }
 }

@@ -18,7 +18,7 @@ namespace RobotSimulatorApp.Robot
 
         public abstract void CreateKinematicChain();
         //public abstract void CreateJoint();
-        public abstract void MoveJoint(int jointId);
+        //public abstract void MoveJoint(int jointId);
         public void SaveToFile()
         {
             //TODO

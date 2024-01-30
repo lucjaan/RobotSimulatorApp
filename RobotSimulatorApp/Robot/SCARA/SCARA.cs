@@ -15,9 +15,9 @@ namespace RobotSimulatorApp.Robot.SCARA
     internal class SCARA_Robot : Robot
     {
 
-        private Vector3 Position {  get; set; }
+        private Vector3 Position { get; set; }
         //protected Dictionary<int, RobotJoint> RobotJoints { get; set; }
-        protected List<RobotLimb> RobotJoints = [];
+        public List<RobotLimb> RobotJoints = [];
         protected Dictionary<int, Vector3> JointCenters { get; set; }
         private GLControl GLControl { get; set; }
         public Cube RobotBase;
@@ -76,14 +76,18 @@ namespace RobotSimulatorApp.Robot.SCARA
 
             if (joint.JointType == RobotLimb.JointTypes.Revolute)
             {
+                var x = joint.Cube.Model;
                 joint.MoveJoint_Angular(value, joint.RotationCenter, joint.Axis);
+                var z = joint.Cube.Model;
                 //for (int i = jointId + 1; i < RobotJoints.Count; i++)
-                for (int i = jointId + 1; i < RobotJoints.Count; i++)
+                for (int i = jointId + 1; i < 2; i++)
                 {
+                    RobotJoints[i].UpdateCenter(value, joint.RotationCenter);
+                    //RobotJoints[i].UpdateCenter(value, RobotJoints[i - 1].RotationCenter);
                     RobotJoints[i].MoveJoint_Angular(value, joint.RotationCenter, joint.Axis);
-                    RobotJoints[i].UpdateCenter(value, RobotJoints[i - 1].RotationCenter);
+                    //RobotJoints[i].UpdateCenter(value, RobotJoints[i - 1].RotationCenter);
 
-                    Debug.WriteLine($"Distance between base and rotation center {i}: {Vector3.Distance(RobotJoints[0].RotationCenter, RobotJoints[i].RotationCenter)}");
+                    //Debug.WriteLine($"Distance between base and rotation center {i}: {Vector3.Distance(RobotJoints[0].RotationCenter, RobotJoints[i].RotationCenter)}");
                 }
             }
 
@@ -130,10 +134,5 @@ namespace RobotSimulatorApp.Robot.SCARA
 
         //        public RobotJoint(GLControl glc, Vector3 position, int x, int y, int z, float maximumAngle, Vector3 rotationCenter)
 
-
-        public override void MoveJoint(int jointId)
-        {
-            //
-        }
     }
 }
