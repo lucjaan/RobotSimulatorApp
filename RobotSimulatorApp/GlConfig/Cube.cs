@@ -23,7 +23,10 @@ namespace RobotSimulatorApp.GlConfig
         public Vector3 Position { get; set; }
         public Vector3 Size { get; set; }
         public Matrix4 Model { get; set; }
+        public Matrix4 Translation { get; set; }
+        public Matrix4 Rotation { get; set; }
         public Matrix4 BaseModel { get; set; }
+        public float Angle { get; set; }
         private Trace Trace { get; set; }
 
         private readonly GLControl GlControl;
@@ -118,6 +121,7 @@ void main()
             GlControl = glControl;
             Size = size;
             Center = new Vector3(size.X / 2, size.Y / 2, size.Z / 2) + position;
+            Rotation = Translation = Model = Matrix4.Identity;
             BaseModel = Model = Matrix4.CreateTranslation(position);
             isTraceSet = false;
             //Create vertices responsible for generating a cube and add them for later use:
@@ -157,6 +161,7 @@ void main()
             GL.EnableVertexAttribArray(colorLocation);
             GL.VertexAttribPointer(colorLocation, 4, VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
 
+            //UpdateBaseModel();
             shader.SetMatrix4("model", Model);
             shader.SetMatrix4("view", view);
             shader.SetMatrix4("projection", projection);
@@ -281,6 +286,7 @@ void main()
                     }
                     break;
             }
+            
             return result;
         }
 

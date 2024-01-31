@@ -4,6 +4,7 @@ using OpenTK.WinForms;
 using RobotSimulatorApp.GlConfig;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design.Serialization;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -82,8 +83,8 @@ namespace RobotSimulatorApp.Robot.SCARA
                 //for (int i = jointId + 1; i < RobotJoints.Count; i++)
                 for (int i = jointId + 1; i < 2; i++)
                 {
-                    RobotJoints[i].UpdateCenter(value, joint.RotationCenter);
-                    //RobotJoints[i].UpdateCenter(value, RobotJoints[i - 1].RotationCenter);
+                    //RobotJoints[i].UpdateCenter(value, joint.RotationCenter);
+                    RobotJoints[i].UpdateCenter(value, RobotJoints[i - 1].RotationCenter);
                     RobotJoints[i].MoveJoint_Angular(value, joint.RotationCenter, joint.Axis);
                     //RobotJoints[i].UpdateCenter(value, RobotJoints[i - 1].RotationCenter);
 
@@ -91,6 +92,14 @@ namespace RobotSimulatorApp.Robot.SCARA
                 }
             }
 
+        }
+
+        public void UpdateModels()
+        {
+            foreach(RobotLimb joint in RobotJoints)
+            {
+
+            }
         }
 
         public void RenderRobot(Matrix4 view, Matrix4 projection)
