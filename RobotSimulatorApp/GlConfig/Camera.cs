@@ -23,7 +23,6 @@ namespace RobotSimulatorApp.GlConfig
         private Vector3 Right = Vector3.UnitX;
         private Vector3 Up = Vector3.UnitY;
 
-
         private float Pitch, Yaw;
         public Matrix4 View;
         private bool firstMove = true;
@@ -49,31 +48,20 @@ namespace RobotSimulatorApp.GlConfig
         public void Move(INativeInput input)
         {
 
-            //INativeInput input = glControl.EnableNativeInput();
             if (input != null)
             {
                 LookAround(input);
                 Zoom(input);
                 Rotate(input);
                 Home(input);
-                //Debug.WriteLine("aaaaaaaaa");
             }
-
-            //Right = Vector3.Normalize(Vector3.Cross(Front, Vector3.UnitY));
-            //Up = Vector3.Normalize(Vector3.Cross(Right, Front));
-
-            //Debug.WriteLine($"CAM: P:{Position}, F:{Front}");
             View = Matrix4.LookAt(Position, Position + Front, Up);
-            //Debug.WriteLine($"Pos {Position} {Front}");
         }
 
         public void UpdateVectors()
         {
 
-            //Debug.WriteLine($"pre-normal: {Front}");
             Front = Vector3.Normalize(Front);
-            //Debug.WriteLine($"normalized: {Front}");
-
             Right = Vector3.Normalize(Vector3.Cross(Front, Vector3.UnitY));
             Up = Vector3.Normalize(Vector3.Cross(Right, Front));
 
@@ -93,9 +81,7 @@ namespace RobotSimulatorApp.GlConfig
                 //Front.X = 0; //HERE
                 Front.Y = (float)Math.Sin(MathHelper.DegreesToRadians(Pitch));
                 Front.Z = (float)Math.Cos(MathHelper.DegreesToRadians(Pitch)) * (float)Math.Sin(MathHelper.DegreesToRadians(Yaw));
-                //Debug.WriteLine($"pre-normal: {Front}");
                 Front = Vector3.Normalize(Front);
-                //Debug.WriteLine($"normalized: {Front}");
             };
         }
 
@@ -109,7 +95,7 @@ namespace RobotSimulatorApp.GlConfig
 
         private void Rotate(INativeInput input)
         {
-//TODO
+            //TODO
         }
 
         private void Home(INativeInput input)
@@ -124,13 +110,6 @@ namespace RobotSimulatorApp.GlConfig
                     Debug.WriteLine(Position.ToString());
                 }
             };
-
-            //FileStream fs = new(@"C:\Users\Luk\Desktop\deltaLog.txt", FileMode.OpenOrCreate);
-            //using (StreamWriter sr = new StreamWriter(fs))
-            //{
-            //    sr.WriteLine(log);
-            //    sr.Close();
-            //}
         }
     }
 }

@@ -16,7 +16,6 @@ namespace RobotSimulatorApp
     {
         readonly private float AspectRatio;
         private Timer timer = null!;
-        private float _angle = 0.0f;
         INativeInput? NativeInput;
         Rectangle GlControlBounds;
 
@@ -54,6 +53,7 @@ namespace RobotSimulatorApp
             //cube = new(glControl, new Vector3(-5f, -1f, -5f), new Vector3(2f, 22f, 2f));
             //cube2 = new(glControl, new Vector3(15f, 0f, 9f), new Vector3(6f, 8f, 10f));
             //cube0 = new(glControl, new Vector3(0f, -3f, 0f), new Vector3(6f, 6f, 6f));
+
             //cube0.SetColor(Color4.LimeGreen);
             //cube2.SetColor(Color4.MediumVioletRed);
             //cube.SetColor(Color4.Olive);
@@ -65,7 +65,6 @@ namespace RobotSimulatorApp
             {
                 Render();
                 const float DELTA_TIME = 1 / 50f;
-                _angle += 180f * DELTA_TIME;
             };
             timer.Interval = 50;   // 1000 ms per sec / 50 ms per frame = 20 FPS
             timer.Start();
@@ -88,7 +87,6 @@ namespace RobotSimulatorApp
             GL.Enable(EnableCap.DepthTest);
 
             Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, AspectRatio, 0.1f, 500f);
-            //var x = MathHelper.Clamp(_angle, 0, 360);
 
             //cube.RotateCube(15f, cube.Center, Axis.Y);
             //cube2.RotateCube(15f, cube2.Center, Axis.Y);
@@ -179,49 +177,17 @@ namespace RobotSimulatorApp
 
         private void returnDefaultButton_Click(object sender, EventArgs e)
         {
-            //positionX.Value = 0;
-            //positionY.Value = 0;
-            //positionZ.Value = 9;
-
-            //frontX.Value = 0;
-            //frontY.Value = 0;
-            //frontZ.Value = -1; 
-
-            //positionX.Value = -7;
-            //positionY.Value = 35;
-            //positionZ.Value = -7;
-
-            //frontX.Value = -9;
-            //frontY.Value = -3;
-            //frontZ.Value = -1;
-
-            //positionX.Value = 5;
-            //positionY.Value = 38;
-            //positionZ.Value = -19;
-
-            //frontX.Value = -3;
-            //frontY.Value = -72;
-            //frontZ.Value = -7;
+            camera.SetView(new Vector3(69f, 102f, 174f), new Vector3(-35f, -77f, -155f));
         }
 
         private void getCameraButton_Click(object sender, EventArgs e)
         {
-            //positionX.Value = (decimal)(camera != null ? camera.Position.X : 0);
-            //positionY.Value = (decimal)(camera != null ? camera.Position.Y : 0);
-            //positionZ.Value = (decimal)(camera != null ? camera.Position.Z : 0);
 
-            //frontX.Value = (decimal)(camera != null ? camera.Front.X : 0);
-            //frontY.Value = (decimal)(camera != null ? camera.Front.Y : 0);
-            //frontZ.Value = (decimal)(camera != null ? camera.Front.Z : 0);
         }
 
         private void setCameraButton_Click(object sender, EventArgs e)
         {
-            //position = new((float)positionX.Value, (float)positionY.Value, (float)positionZ.Value);
-            //front = new((float)frontX.Value, (float)frontY.Value, (float)frontZ.Value);
-
-            //camera.Position = new((float)positionX.Value, (float)positionY.Value, (float)positionZ.Value);
-            //camera.Front = new((float)frontX.Value, (float)frontY.Value, (float)frontZ.Value);
+;
 
             camera.UpdateVectors();
         }
@@ -237,7 +203,6 @@ namespace RobotSimulatorApp
             {
                 positionTextBox.Text = $"{camera.Position}";
                 frontTextBox.Text = $"{FrontXtrackBar.Value}, {FrontYtrackBar.Value}, {FrontZtrackBar.Value}";
-                //frontTextBox.Text = $"{camera.Front}";
             }
         }
 
@@ -292,34 +257,6 @@ namespace RobotSimulatorApp
             camera.Position.Z = PosZTrackBar.Value;
             camera.UpdateVectors();
             UpdateTextBoxes();
-        }
-
-        private void jointTrackBar_Scroll(object sender, EventArgs e)
-        {
-            float value = (float)jointTrackBar.Value * 90;
-            //scara.RobotBase.RotateCube(value, scara.RobotBase.Center, Axis.Y);
-            //var z = scara.RobotBase.Center;
-            //scara.RobotBase.RotateCube(value, scara.RobotBase.Center, Axis.Y);
-            scara.MoveJoint((int)jointNumeric.Value - 1, value);
-        }
-
-        private void trackBar1_Scroll(object sender, EventArgs e)
-        {
-            float value = (float)trackBar1.Value * 90;
-            //scara.RobotBase.RotateCube(value, scara.RobotBase.Center, Axis.Y);
-            //var z = scara.RobotBase.Center;
-            //scara.RobotBase.RotateCube(value, scara.RobotBase.Center, Axis.Y);
-            //scara.MoveJoint((int)jointNumeric.Value - 1, value);
-            scara.MoveJoint(1, value);
-
-        }
-
-        private void jointNumeric_ValueChanged(object sender, EventArgs e)
-        {
-            //scara.RobotJoints[(int)jointNumeric.Value - 1].Cube.UpdateBaseModel();
-            //scara.RobotJoints[(int)jointNumeric.Value - 1].UpdateCenter((float)jointTrackBar.Value, scara.RobotBase.Center);
-            //jointTrackBar.Value = 0;
-            scara.RobotJoints[(int)jointNumeric.Value - 1].Cube.UpdateBaseModel();
         }
 
         private void OpenControlsButton_Click(object sender, EventArgs e)

@@ -47,16 +47,6 @@ namespace RobotSimulatorApp.GlConfig
             20, 21, 22, 22, 23, 20,
         };
 
-        //private Color4[] ColorData =
-        //[
-        //    Color4.Silver, Color4.Silver, Color4.Silver, Color4.Silver,
-        //    Color4.Honeydew, Color4.Honeydew, Color4.Honeydew, Color4.Honeydew,
-        //    Color4.Moccasin, Color4.Moccasin, Color4.Moccasin, Color4.Moccasin,
-        //    Color4.IndianRed, Color4.IndianRed, Color4.IndianRed, Color4.IndianRed,
-        //    Color4.PaleVioletRed, Color4.PaleVioletRed, Color4.PaleVioletRed, Color4.PaleVioletRed,
-        //    Color4.ForestGreen, Color4.ForestGreen, Color4.ForestGreen, Color4.ForestGreen,
-        //];
-
         private Color4[] ColorData =
         [
             Color4.DarkRed,
@@ -183,7 +173,6 @@ void main()
                 case Axis.Y:
                     Model = BaseModel * CreateRotationYAroundPoint(angle, centerPoint);
                     Debug.WriteLine($"cube {centerOfRotation}");
-                    //Model *= CreateRotationYAroundPoint(angle, centerOfRotation);
                     break;
 
                 case Axis.Z:
@@ -222,30 +211,8 @@ void main()
                 ColorData = color;
         }
 
-        private Vector3 SetCenter(Vector3 position) => new Vector3(Size.X / 2, Size.Y / 2, Size.Z / 2) + new Vector3(Model.M41, Model.M42, Model.M43);
-
-
-
-        //public void UpdateCenter(float angle)
-        //{
-        //    float testx = ((Size.X / 2) * MathF.Cos(angle)) - ((Size.Z / 2) * MathF.Sin(angle)) + Model.M41;
-        //    float testz = ((Size.X / 2) * MathF.Sin(angle)) + ((Size.Z / 2) * MathF.Cos(angle)) + Model.M43;
-
-
-        //    Vector3 updated = new(
-        //        ((Size.X / 2) * MathF.Cos(angle)) - ((Size.X / 2) * MathF.Sin(angle)) + Model.M41,
-        //        Center.Y,
-        //        ((Size.Z / 2) * MathF.Sin(angle)) + ((Size.Z / 2) * MathF.Cos(angle)) + Model.M43
-        //        );
-        //    Center = updated;
-        //}
-
-
-        //Center = new Vector3(Size.X / 2, Size.Y / 2, Size.Z / 2) + new Vector3(Model.M41, Model.M42, Model.M43);
-
-
         public void SetTrace(bool isSet) => isTraceSet = isSet;
-        //public void SetRotationCenter(Vector3 rotationCenter) => Center = rotationCenter;
+
         public void TranslateCube(Vector3 translationVector)
         {
             Position += translationVector;

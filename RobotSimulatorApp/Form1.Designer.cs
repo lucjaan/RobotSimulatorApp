@@ -50,9 +50,6 @@ namespace RobotSimulatorApp
             PosZTrackBar = new TrackBar();
             positionTextBox = new TextBox();
             frontTextBox = new TextBox();
-            jointNumeric = new NumericUpDown();
-            jointTrackBar = new TrackBar();
-            trackBar1 = new TrackBar();
             OpenControlsButton = new Button();
             ((System.ComponentModel.ISupportInitialize)FrontXtrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)FrontYtrackBar).BeginInit();
@@ -60,9 +57,6 @@ namespace RobotSimulatorApp
             ((System.ComponentModel.ISupportInitialize)PosXTrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)PosYTrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)PosZTrackBar).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)jointNumeric).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)jointTrackBar).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)trackBar1).BeginInit();
             SuspendLayout();
             // 
             // glControl
@@ -243,39 +237,6 @@ namespace RobotSimulatorApp
             frontTextBox.Size = new Size(208, 23);
             frontTextBox.TabIndex = 33;
             // 
-            // jointNumeric
-            // 
-            jointNumeric.Location = new Point(1111, 427);
-            jointNumeric.Maximum = new decimal(new int[] { 4, 0, 0, 0 });
-            jointNumeric.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            jointNumeric.Name = "jointNumeric";
-            jointNumeric.Size = new Size(35, 23);
-            jointNumeric.TabIndex = 34;
-            jointNumeric.Value = new decimal(new int[] { 1, 0, 0, 0 });
-            jointNumeric.ValueChanged += jointNumeric_ValueChanged;
-            // 
-            // jointTrackBar
-            // 
-            jointTrackBar.AutoSize = false;
-            jointTrackBar.LargeChange = 1;
-            jointTrackBar.Location = new Point(1166, 427);
-            jointTrackBar.Maximum = 3;
-            jointTrackBar.Name = "jointTrackBar";
-            jointTrackBar.Size = new Size(163, 33);
-            jointTrackBar.TabIndex = 35;
-            jointTrackBar.Scroll += jointTrackBar_Scroll;
-            // 
-            // trackBar1
-            // 
-            trackBar1.AutoSize = false;
-            trackBar1.LargeChange = 1;
-            trackBar1.Location = new Point(1166, 466);
-            trackBar1.Maximum = 3;
-            trackBar1.Name = "trackBar1";
-            trackBar1.Size = new Size(163, 33);
-            trackBar1.TabIndex = 36;
-            trackBar1.Scroll += trackBar1_Scroll;
-            // 
             // OpenControlsButton
             // 
             OpenControlsButton.Location = new Point(1121, 346);
@@ -292,9 +253,6 @@ namespace RobotSimulatorApp
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1341, 654);
             Controls.Add(OpenControlsButton);
-            Controls.Add(trackBar1);
-            Controls.Add(jointTrackBar);
-            Controls.Add(jointNumeric);
             Controls.Add(frontTextBox);
             Controls.Add(positionTextBox);
             Controls.Add(PosZTrackBar);
@@ -321,9 +279,6 @@ namespace RobotSimulatorApp
             ((System.ComponentModel.ISupportInitialize)PosXTrackBar).EndInit();
             ((System.ComponentModel.ISupportInitialize)PosYTrackBar).EndInit();
             ((System.ComponentModel.ISupportInitialize)PosZTrackBar).EndInit();
-            ((System.ComponentModel.ISupportInitialize)jointNumeric).EndInit();
-            ((System.ComponentModel.ISupportInitialize)jointTrackBar).EndInit();
-            ((System.ComponentModel.ISupportInitialize)trackBar1).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -348,9 +303,6 @@ namespace RobotSimulatorApp
         private TrackBar PosZTrackBar;
         private TextBox positionTextBox;
         private TextBox frontTextBox;
-        private NumericUpDown jointNumeric;
-        private TrackBar jointTrackBar;
-        private TrackBar trackBar1;
         private Button OpenControlsButton;
     }
 }
