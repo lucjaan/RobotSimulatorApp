@@ -55,6 +55,8 @@ namespace RobotSimulatorApp
             //cube2 = new(glControl, new Vector3(15f, 0f, 9f), new Vector3(6f, 8f, 10f));
             //cube0 = new(glControl, new Vector3(0f, -3f, 0f), new Vector3(6f, 6f, 6f));
             //cube0.SetColor(Color4.LimeGreen);
+            //cube2.SetColor(Color4.MediumVioletRed);
+            //cube.SetColor(Color4.Olive);
 
             grid = new Grid(glControl);
             scara = new SCARA_Robot(glControl, "tomek");
@@ -88,9 +90,9 @@ namespace RobotSimulatorApp
             Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, AspectRatio, 0.1f, 500f);
             //var x = MathHelper.Clamp(_angle, 0, 360);
 
-            //cube.RotateCube(15f, cube.Center, Axis.X);
+            //cube.RotateCube(15f, cube.Center, Axis.Y);
             //cube2.RotateCube(15f, cube2.Center, Axis.Y);
-            //cube0.RotateCube(15f, cube0.Center, Axis.Z);
+            //cube0.RotateCube(15f, cube0.Center, Axis.Y);
 
             if (captureMouseCheckBox.Checked)
             {
@@ -100,6 +102,11 @@ namespace RobotSimulatorApp
             //cube2.RenderCube(camera.View, projection);
             //cube.RenderCube(camera.View, projection);
             //cube0.RenderCube(camera.View, projection);
+
+            //cube2.UpdateBaseModel();
+            //cube.UpdateBaseModel();
+            //cube2.UpdateBaseModel();
+
             scara.RenderRobot(camera.View, projection);
             grid.RenderWorld(camera.View, projection);
             glControl.SwapBuffers();

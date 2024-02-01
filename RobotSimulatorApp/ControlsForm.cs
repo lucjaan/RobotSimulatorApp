@@ -66,24 +66,62 @@ namespace RobotSimulatorApp
 
         private void J1TrackBar_GotFocus(object sender, EventArgs e)
         {
-            Scara.RobotJoints[0].Cube.UpdateBaseModel();
+            //Scara.RobotJoints[0].Cube.UpdateBaseModel();
+                
+            //Scara.RobotJoints[0].UpdateModel();
             //Scara.RobotJoints[0].ce;
-            
+
+        }
+
+        private void J1TrackBar_LostFocus(object sender, EventArgs e)
+        {
+            for (int i = 1; i < Scara.RobotJoints.Count; i++)
+            {
+                Scara.RobotJoints[i].UpdateModel((float)J1TrackBar.Value, Scara.RobotJoints[0].RotationCenter);
+            }
         }
 
         private void J2TrackBar_GotFocus(object sender, EventArgs e)
         {
-            Scara.RobotJoints[1].Cube.UpdateBaseModel();
+            ////Scara.RobotJoints[1].Cube.UpdateBaseModel();
+            //Scara.RobotJoints[1].UpdateModel();
+
+            //foreach (RobotLimb rl in Scara.RobotJoints)
+            //{
+            //    rl.UpdateModel();
+            //}
+        }
+
+        private void J2TrackBar_LostFocus(object sender, EventArgs e)
+        {
+            for (int  i = 2; i < Scara.RobotJoints.Count; i++)
+            {
+                Scara.RobotJoints[i].UpdateModel((float)J2TrackBar.Value, Scara.RobotJoints[1].RotationCenter);
+            }
         }
 
         private void J3TrackBar_GotFocus(object sender, EventArgs e)
         {
-            Scara.RobotJoints[2].Cube.UpdateBaseModel();
+            //Scara.RobotJoints[2].Cube.UpdateBaseModel();
+            //Scara.RobotJoints[2].UpdateModel();
+
+            //foreach (RobotLimb rl in Scara.RobotJoints)
+            //{
+            //    rl.UpdateModel();
+            //}
         }
+
+
 
         private void J4TrackBar_GotFocus(object sender, EventArgs e)
         {
-            Scara.RobotJoints[3].Cube.UpdateBaseModel();
+            //Scara.RobotJoints[3].Cube.UpdateBaseModel();
+            //Scara.RobotJoints[3].UpdateModel();
+
+            //foreach (RobotLimb rl in Scara.RobotJoints)
+            //{
+            //    rl.UpdateModel();
+            //}
         }
     }
 }

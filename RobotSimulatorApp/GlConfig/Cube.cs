@@ -19,7 +19,7 @@ namespace RobotSimulatorApp.GlConfig
 {
     public class Cube
     {
-        public Vector3 Center { get; set; }
+        public Matrix4 Center { get; set; }
         public Vector3 Position { get; set; }
         public Vector3 Size { get; set; }
         public Matrix4 Model { get; set; }
@@ -120,7 +120,7 @@ void main()
             Position = position;
             GlControl = glControl;
             Size = size;
-            Center = new Vector3(size.X / 2, size.Y / 2, size.Z / 2) + position;
+            Center = Matrix4.CreateTranslation(new Vector3(size.X / 2, size.Y / 2, size.Z / 2) + position);
             Rotation = Translation = Model = Matrix4.Identity;
             BaseModel = Model = Matrix4.CreateTranslation(position);
             isTraceSet = false;
@@ -170,23 +170,24 @@ void main()
             shader.Dispose();
         }
 
-        public void RotateCube(float angle, Vector3 centerOfRotation, Axis axis)
+        public void RotateCube(float angle, Matrix4 centerOfRotation, Axis axis)
         {
+            Vector3 centerPoint = new(centerOfRotation.M41, centerOfRotation.M41, centerOfRotation.M43);
             angle = MathHelper.DegreesToRadians(angle);
             switch (axis)
             {
                 case Axis.X:
-                    Model = BaseModel * CreateRotationXAroundPoint(angle, centerOfRotation);
+                    Model = BaseModel * CreateRotationXAroundPoint(angle, centerPoint);
                     break;
 
                 case Axis.Y:
-                    Model = BaseModel * CreateRotationYAroundPoint(angle, centerOfRotation);
+                    Model = BaseModel * CreateRotationYAroundPoint(angle, centerPoint);
                     Debug.WriteLine($"cube {centerOfRotation}");
                     //Model *= CreateRotationYAroundPoint(angle, centerOfRotation);
                     break;
 
                 case Axis.Z:
-                    Model = BaseModel * CreateRotationZAroundPoint(angle, centerOfRotation);
+                    Model = BaseModel * CreateRotationZAroundPoint(angle, centerPoint);
                     break;
             }
         }
@@ -225,26 +226,26 @@ void main()
 
 
 
-        public void UpdateCenter(float angle)
-        {
-            float testx = ((Size.X / 2) * MathF.Cos(angle)) - ((Size.Z / 2) * MathF.Sin(angle)) + Model.M41;
-            float testz = ((Size.X / 2) * MathF.Sin(angle)) + ((Size.Z / 2) * MathF.Cos(angle)) + Model.M43;
+        //public void UpdateCenter(float angle)
+        //{
+        //    float testx = ((Size.X / 2) * MathF.Cos(angle)) - ((Size.Z / 2) * MathF.Sin(angle)) + Model.M41;
+        //    float testz = ((Size.X / 2) * MathF.Sin(angle)) + ((Size.Z / 2) * MathF.Cos(angle)) + Model.M43;
 
 
-            Vector3 updated = new(
-                ((Size.X / 2) * MathF.Cos(angle)) - ((Size.X / 2) * MathF.Sin(angle)) + Model.M41,
-                Center.Y,
-                ((Size.Z / 2) * MathF.Sin(angle)) + ((Size.Z / 2) * MathF.Cos(angle)) + Model.M43
-                );
-            Center = updated;
-        }
+        //    Vector3 updated = new(
+        //        ((Size.X / 2) * MathF.Cos(angle)) - ((Size.X / 2) * MathF.Sin(angle)) + Model.M41,
+        //        Center.Y,
+        //        ((Size.Z / 2) * MathF.Sin(angle)) + ((Size.Z / 2) * MathF.Cos(angle)) + Model.M43
+        //        );
+        //    Center = updated;
+        //}
 
 
         //Center = new Vector3(Size.X / 2, Size.Y / 2, Size.Z / 2) + new Vector3(Model.M41, Model.M42, Model.M43);
 
 
         public void SetTrace(bool isSet) => isTraceSet = isSet;
-        public void SetRotationCenter(Vector3 rotationCenter) => Center = rotationCenter;
+        //public void SetRotationCenter(Vector3 rotationCenter) => Center = rotationCenter;
         public void TranslateCube(Vector3 translationVector)
         {
             Position += translationVector;
@@ -253,7 +254,7 @@ void main()
         private static Matrix4 CreateRotationXAroundPoint(float angle, Vector3 centerVector)
             => Matrix4.CreateTranslation(-centerVector) * Matrix4.CreateRotationX(angle) * Matrix4.CreateTranslation(centerVector);
 
-        private static Matrix4 CreateRotationYAroundPoint(float angle, Vector3 centerVector)
+        public static Matrix4 CreateRotationYAroundPoint(float angle, Vector3 centerVector)
              => Matrix4.CreateTranslation(-centerVector) * Matrix4.CreateRotationY(angle) * Matrix4.CreateTranslation(centerVector);
         
         private static Matrix4 CreateRotationZAroundPoint(float angle, Vector3 centerVector)

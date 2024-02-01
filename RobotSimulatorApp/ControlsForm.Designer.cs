@@ -58,6 +58,7 @@ namespace RobotSimulatorApp
             J1TrackBar.TabIndex = 0;
             J1TrackBar.Scroll += J1TrackBar_Scroll;
             J1TrackBar.GotFocus += J1TrackBar_GotFocus;
+            J1TrackBar.LostFocus += J1TrackBar_LostFocus;
             // 
             // J2TrackBar
             // 
@@ -68,6 +69,8 @@ namespace RobotSimulatorApp
             J2TrackBar.TabIndex = 1;
             J2TrackBar.Scroll += J2TrackBar_Scroll;
             J2TrackBar.GotFocus += J2TrackBar_GotFocus;
+            J2TrackBar.LostFocus += J2TrackBar_LostFocus;
+
             // 
             // J3TrackBar
             // 

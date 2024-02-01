@@ -20,8 +20,8 @@ namespace RobotSimulatorApp.Robot.SCARA
         }
 
 
-        private Vector3 FirstCenter {  get; set; }
-        public Vector3 RotationCenter { get; set; }
+        private Matrix4 FirstCenter {  get; set; }
+        public Matrix4 RotationCenter { get; set; }
         /// <summary>
         /// Distance between previous and current joint center, used to keep the model rigid after rotation.
         /// </summary>
@@ -34,7 +34,7 @@ namespace RobotSimulatorApp.Robot.SCARA
         /// </summary>
         public float MaximumMovement { get; set; }
         public JointTypes JointType { get; set; }
-        public RobotLimb(Cube cube, string name, float maximumMovement, JointTypes type, Vector3 rotationCenter)
+        public RobotLimb(Cube cube, string name, float maximumMovement, JointTypes type, Matrix4 rotationCenter)
         {
             Name = name;
             Cube = cube;
@@ -51,7 +51,7 @@ namespace RobotSimulatorApp.Robot.SCARA
         /// <summary>
         /// When we move one revolute joint, all joints higher on kinematic chain get rotated in relation to it's axis
         /// </summary>
-        public void MoveJoint_Angular(float angle, Vector3 centerOfRotation, Axis axis)
+        public void MoveJoint_Angular(float angle, Matrix4 centerOfRotation, Axis axis)
         {
             Debug.WriteLine($"MJ_A {centerOfRotation}");
             Cube.RotateCube(angle, centerOfRotation, axis);
@@ -72,31 +72,43 @@ namespace RobotSimulatorApp.Robot.SCARA
         //    RotationCenter = new(X, RotationCenter.Y, Z);
         //}
 
-        public void UpdateCenter(float angle, Vector3 prevCent)
+        public void UpdateCenter(float angle, Matrix4 prevCent)
         {
-            angle = MathHelper.DegreesToRadians(angle);
-            Vector3 oldRot = FirstCenter;
-            float tX = RotationCenter.X - prevCent.X;
-            float tZ = RotationCenter.Z - prevCent.Z;
-
-            //float tX = - prevCent.X;
-            //float tZ = - prevCent.Z;
-
-            //float rX = tX * MathF.Cos(angle) - tZ * MathF.Sin(angle);
-            //float rZ = tX * MathF.Sin(angle) + tZ * MathF.Cos(angle);
-
-            float rX = tX * MathF.Cos(angle) + tZ * MathF.Sin(angle);
-            float rZ = tX * -MathF.Sin(angle) + tZ * MathF.Cos(angle);
-
-            rX = (float)Math.Round(rX, 3);
-            rZ = (float)Math.Round(rZ, 3);
-            RotationCenter = new(rX + prevCent.X, FirstCenter.Y, rZ + prevCent.Z);
-            //RotationCenter = new(rX + prevCent.X, FirstCenter.Y, rZ + prevCent.Z);
-            //Cube.Model = Cube.BaseModel * Matrix4.CreateTranslation(oldRot - RotationCenter) * Cube.Model;
-           // Cube.Model = Matrix4.Identity;
-            Debug.WriteLine($"rot {RotationCenter}");
-
-            //RotationCenter = new Vector3(17f, 10f, 52f);
+            RotationCenter = FirstCenter * Cube.CreateRotationYAroundPoint(angle, new Vector3(prevCent.M41, prevCent.M42, prevCent.M43));
         }
+
+        public void UpdateModel(float angle, Matrix4 prevCent)
+        {
+            RotationCenter = FirstCenter * Cube.CreateRotationYAroundPoint(angle, new Vector3(prevCent.M41, prevCent.M42, prevCent.M43));
+            //FirstCenter = RotationCenter;
+            Cube.UpdateBaseModel();
+        }
+
+        //public void UpdateCenter(float angle, Vector3 prevCent)
+        //{
+        //    angle = MathHelper.DegreesToRadians(angle);
+        //    Vector3 oldRot = FirstCenter;
+        //    float tX = RotationCenter.X - prevCent.X;
+        //    float tZ = RotationCenter.Z - prevCent.Z;
+
+        //    //float tX = - prevCent.X;
+        //    //float tZ = - prevCent.Z;
+
+        //    //float rX = tX * MathF.Cos(angle) - tZ * MathF.Sin(angle);
+        //    //float rZ = tX * MathF.Sin(angle) + tZ * MathF.Cos(angle);
+
+        //    float rX = tX * MathF.Cos(angle) + tZ * MathF.Sin(angle);
+        //    float rZ = tX * -MathF.Sin(angle) + tZ * MathF.Cos(angle);
+
+        //    rX = (float)Math.Round(rX, 3);
+        //    rZ = (float)Math.Round(rZ, 3);
+        //    RotationCenter = new(rX + prevCent.X, FirstCenter.Y, rZ + prevCent.Z);
+        //    //RotationCenter = new(rX + prevCent.X, FirstCenter.Y, rZ + prevCent.Z);
+        //    //Cube.Model = Cube.BaseModel * Matrix4.CreateTranslation(oldRot - RotationCenter) * Cube.Model;
+        //   // Cube.Model = Matrix4.Identity;
+        //    Debug.WriteLine($"rot {RotationCenter}");
+
+        //    //RotationCenter = new Vector3(17f, 10f, 52f);
+        //}
     }
 }
