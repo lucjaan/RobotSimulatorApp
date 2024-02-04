@@ -25,6 +25,7 @@ namespace RobotSimulatorApp.GlConfig
         public Matrix4 Model { get; set; }
         public Matrix4 Translation { get; set; }
         public Matrix4 Rotation { get; set; }
+        public Matrix4 Transformation { get; set; }
         public Matrix4 BaseModel { get; set; }
         public float Angle { get; set; }
         private Trace Trace { get; set; }
@@ -121,6 +122,7 @@ void main()
             GlControl = glControl;
             Size = size;
             Center = Matrix4.CreateTranslation(new Vector3(size.X / 2, size.Y / 2, size.Z / 2) + position);
+            Transformation = Matrix4.Identity;
             Rotation = Translation = Model = Matrix4.Identity;
             BaseModel = Model = Matrix4.CreateTranslation(position);
             isTraceSet = false;
@@ -148,7 +150,7 @@ void main()
             PositionBufferObject = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, PositionBufferObject);
             GL.BufferData(BufferTarget.ArrayBuffer, 3 * Vertices.Count * sizeof(float), Vertices.ToArray(), BufferUsageHint.StaticDraw);
-
+                
             int vertexLocation = shader.GetAttribLocation("aPosition");
             GL.EnableVertexAttribArray(vertexLocation);
             GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
@@ -162,7 +164,7 @@ void main()
             GL.VertexAttribPointer(colorLocation, 4, VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
 
             //UpdateBaseModel();
-            shader.SetMatrix4("model", Model);
+            shader.SetMatrix4("model", Model * Transformation);
             shader.SetMatrix4("view", view);
             shader.SetMatrix4("projection", projection);
 
@@ -195,6 +197,11 @@ void main()
         public void UpdateBaseModel()
         {
             BaseModel = Model;
+        }
+
+        public void SetTransformation(Matrix4 hgm)
+        {
+            Transformation = hgm;
         }
 
 
@@ -245,6 +252,7 @@ void main()
 
 
         public void SetTrace(bool isSet) => isTraceSet = isSet;
+        //public void SetTransformation
         //public void SetRotationCenter(Vector3 rotationCenter) => Center = rotationCenter;
         public void TranslateCube(Vector3 translationVector)
         {

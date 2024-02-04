@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace RobotSimulatorApp.Robot.SCARA
 {
@@ -22,6 +23,7 @@ namespace RobotSimulatorApp.Robot.SCARA
 
         private Matrix4 FirstCenter {  get; set; }
         public Matrix4 RotationCenter { get; set; }
+        public Matrix4 DHMatrix { get; set; }
         /// <summary>
         /// Distance between previous and current joint center, used to keep the model rigid after rotation.
         /// </summary>
@@ -45,7 +47,7 @@ namespace RobotSimulatorApp.Robot.SCARA
             if (type == JointTypes.Revolute)
             {
                 Axis = Axis.Y;
-            }
+            }   
         }
 
         /// <summary>
@@ -84,6 +86,13 @@ namespace RobotSimulatorApp.Robot.SCARA
             Cube.UpdateBaseModel();
         }
 
+        public Matrix4 CreateDHMatrix(float theta, float alpha, float a, float d)
+        {
+
+            Matrix4 result = Matrix4.CreateRotationY(theta) * Matrix4.CreateRotationX(alpha) * Matrix4.CreateTranslation(new Vector3(a, 0, d));
+            DHMatrix = result;
+            return result;
+        }
         //public void UpdateCenter(float angle, Vector3 prevCent)
         //{
         //    angle = MathHelper.DegreesToRadians(angle);

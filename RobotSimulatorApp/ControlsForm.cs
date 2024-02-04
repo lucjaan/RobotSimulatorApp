@@ -1,4 +1,5 @@
-﻿using RobotSimulatorApp.Robot.SCARA;
+﻿using OpenTK.Mathematics;
+using RobotSimulatorApp.Robot.SCARA;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -28,8 +29,12 @@ namespace RobotSimulatorApp
                 J1TrackBar.Focus();
             }
 
-            float value = (float)J1TrackBar.Value;
-            Scara.MoveJoint(0, value);
+            SendJointValues();
+            Scara.MoveRobot();
+
+
+            //float value = (float)J1TrackBar.Value;          
+            //Scara.MoveJoint(0, value);
         }
 
         private void J2TrackBar_Scroll(object sender, EventArgs e)
@@ -75,10 +80,10 @@ namespace RobotSimulatorApp
 
         private void J1TrackBar_LostFocus(object sender, EventArgs e)
         {
-            for (int i = 1; i < Scara.RobotJoints.Count; i++)
-            {
-                Scara.RobotJoints[i].UpdateModel((float)J1TrackBar.Value, Scara.RobotJoints[0].RotationCenter);
-            }
+            //for (int i = 1; i < Scara.RobotJoints.Count; i++)
+            //{
+            //    Scara.RobotJoints[i].UpdateModel((float)J1TrackBar.Value, Scara.RobotJoints[0].RotationCenter);
+            //}
         }
 
         private void J2TrackBar_GotFocus(object sender, EventArgs e)
@@ -94,10 +99,10 @@ namespace RobotSimulatorApp
 
         private void J2TrackBar_LostFocus(object sender, EventArgs e)
         {
-            for (int  i = 2; i < Scara.RobotJoints.Count; i++)
-            {
-                Scara.RobotJoints[i].UpdateModel((float)J2TrackBar.Value, Scara.RobotJoints[1].RotationCenter);
-            }
+            //for (int  i = 2; i < Scara.RobotJoints.Count; i++)
+            //{
+            //    Scara.RobotJoints[i].UpdateModel((float)J2TrackBar.Value, Scara.RobotJoints[1].RotationCenter);
+            //}
         }
 
         private void J3TrackBar_GotFocus(object sender, EventArgs e)
@@ -122,6 +127,16 @@ namespace RobotSimulatorApp
             //{
             //    rl.UpdateModel();
             //}
+        }
+
+        private void SendJointValues()
+        {
+            Scara.UpdateJointValues(
+                MathHelper.DegreesToRadians((float)J1TrackBar.Value), 
+                MathHelper.DegreesToRadians((float)J2TrackBar.Value), 
+                (float)J3TrackBar.Value, 
+                MathHelper.DegreesToRadians((float)J4TrackBar.Value)
+           );
         }
     }
 }

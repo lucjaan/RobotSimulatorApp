@@ -23,7 +23,6 @@ namespace RobotSimulatorApp.GlConfig
         private Vector3 Right = Vector3.UnitX;
         private Vector3 Up = Vector3.UnitY;
 
-
         private float Pitch, Yaw;
         public Matrix4 View;
         private bool firstMove = true;

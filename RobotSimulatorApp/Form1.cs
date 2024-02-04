@@ -294,34 +294,6 @@ namespace RobotSimulatorApp
             UpdateTextBoxes();
         }
 
-        private void jointTrackBar_Scroll(object sender, EventArgs e)
-        {
-            float value = (float)jointTrackBar.Value * 90;
-            //scara.RobotBase.RotateCube(value, scara.RobotBase.Center, Axis.Y);
-            //var z = scara.RobotBase.Center;
-            //scara.RobotBase.RotateCube(value, scara.RobotBase.Center, Axis.Y);
-            scara.MoveJoint((int)jointNumeric.Value - 1, value);
-        }
-
-        private void trackBar1_Scroll(object sender, EventArgs e)
-        {
-            float value = (float)trackBar1.Value * 90;
-            //scara.RobotBase.RotateCube(value, scara.RobotBase.Center, Axis.Y);
-            //var z = scara.RobotBase.Center;
-            //scara.RobotBase.RotateCube(value, scara.RobotBase.Center, Axis.Y);
-            //scara.MoveJoint((int)jointNumeric.Value - 1, value);
-            scara.MoveJoint(1, value);
-
-        }
-
-        private void jointNumeric_ValueChanged(object sender, EventArgs e)
-        {
-            //scara.RobotJoints[(int)jointNumeric.Value - 1].Cube.UpdateBaseModel();
-            //scara.RobotJoints[(int)jointNumeric.Value - 1].UpdateCenter((float)jointTrackBar.Value, scara.RobotBase.Center);
-            //jointTrackBar.Value = 0;
-            scara.RobotJoints[(int)jointNumeric.Value - 1].Cube.UpdateBaseModel();
-        }
-
         private void OpenControlsButton_Click(object sender, EventArgs e)
         {
             ControlsForm controlsForm = new ControlsForm(scara);
