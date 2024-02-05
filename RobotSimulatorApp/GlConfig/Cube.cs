@@ -150,7 +150,7 @@ void main()
             PositionBufferObject = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, PositionBufferObject);
             GL.BufferData(BufferTarget.ArrayBuffer, 3 * Vertices.Count * sizeof(float), Vertices.ToArray(), BufferUsageHint.StaticDraw);
-                
+
             int vertexLocation = shader.GetAttribLocation("aPosition");
             GL.EnableVertexAttribArray(vertexLocation);
             GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
@@ -164,6 +164,7 @@ void main()
             GL.VertexAttribPointer(colorLocation, 4, VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
 
             //UpdateBaseModel();
+            //shader.SetMatrix4("model", Transformation);
             shader.SetMatrix4("model", Model * Transformation);
             shader.SetMatrix4("view", view);
             shader.SetMatrix4("projection", projection);
@@ -183,7 +184,8 @@ void main()
                     break;
 
                 case Axis.Y:
-                    Model = BaseModel * CreateRotationYAroundPoint(angle, centerPoint);
+                    Transformation = CreateRotationYAroundPoint(angle, centerPoint);
+                    //Model = BaseModel * CreateRotationYAroundPoint(angle, centerPoint);
                     Debug.WriteLine($"cube {centerOfRotation}");
                     //Model *= CreateRotationYAroundPoint(angle, centerOfRotation);
                     break;
@@ -226,7 +228,7 @@ void main()
                     1);
             }
 
-                ColorData = color;
+            ColorData = color;
         }
 
         private Vector3 SetCenter(Vector3 position) => new Vector3(Size.X / 2, Size.Y / 2, Size.Z / 2) + new Vector3(Model.M41, Model.M42, Model.M43);
@@ -264,7 +266,7 @@ void main()
 
         public static Matrix4 CreateRotationYAroundPoint(float angle, Vector3 centerVector)
              => Matrix4.CreateTranslation(-centerVector) * Matrix4.CreateRotationY(angle) * Matrix4.CreateTranslation(centerVector);
-        
+
         private static Matrix4 CreateRotationZAroundPoint(float angle, Vector3 centerVector)
             => Matrix4.CreateTranslation(-centerVector) * Matrix4.CreateRotationZ(angle) * Matrix4.CreateTranslation(centerVector);
 
@@ -295,7 +297,7 @@ void main()
                     }
                     break;
             }
-            
+
             return result;
         }
 

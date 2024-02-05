@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design.Serialization;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -20,7 +21,7 @@ namespace RobotSimulatorApp.Robot.SCARA
         private Vector3 Position { get; set; }
         //protected Dictionary<int, RobotJoint> RobotJoints { get; set; }
         public List<RobotLimb> RobotJoints = [];
-        public List<Matrix4> DenavitHartenbergTable = [];
+        public List<Matrix4> DenavitHartenbergTable = []; 
         protected Dictionary<int, Vector3> JointCenters { get; set; }
         private GLControl GLControl { get; set; }
         public Cube RobotBase;
@@ -53,10 +54,10 @@ namespace RobotSimulatorApp.Robot.SCARA
             float th1, th2, d3, th4;
             th1 = th2 = d3 = th4 = 0f;
 
-            DenavitHartenbergTable.Add(RobotJoints[0].CreateDHMatrix(th1, 0, 0, 0));
-            DenavitHartenbergTable.Add(RobotJoints[1].CreateDHMatrix(th2, 0, 35, 0));
-            DenavitHartenbergTable.Add(RobotJoints[2].CreateDHMatrix(0, 0, 0, d3));
-            DenavitHartenbergTable.Add(RobotJoints[3].CreateDHMatrix(th4, 0, 0, 0));
+            DenavitHartenbergTable.Add(RobotJoints[0].CreateDHMatrix(th1, 0, 35, 0, Vector3.Zero));
+            DenavitHartenbergTable.Add(RobotJoints[1].CreateDHMatrix(th2, 0, 35, 0, Vector3.Zero));
+            DenavitHartenbergTable.Add(RobotJoints[2].CreateDHMatrix(0, 0, 0, d3, Vector3.Zero));
+            DenavitHartenbergTable.Add(RobotJoints[3].CreateDHMatrix(th4, 0, 0, 0, Vector3.Zero));
 
 
             //RobotJoints.Add(CreateRevoluteJoint(
@@ -122,20 +123,38 @@ namespace RobotSimulatorApp.Robot.SCARA
 
         public void MoveRobot()
         {
+            //Matrix4 rotation = Matrix4.CreateTranslation(-17, -10, -17);
             Matrix4 rotation = Matrix4.Identity;
-            for (int i = 0; i < DenavitHartenbergTable.Count; i++)
+            Matrix4 J1, J2, J3, J4;
+            J1 = J2 = J3 = J4 = Matrix4.Identity;
+            //for (int i = 0; i < DenavitHartenbergTable.Count; i++)
+            //{
+            //    rotation *= DenavitHartenbergTable[i];
+            //    //RobotJoints[i].Cube.SetTransformation(rotation * Matrix4.CreateTranslation(17, 10, 17));
+            //    //RobotJoints[i].SetRotationCenter(rotation * Matrix4.CreateTranslation(17, 10, 17));
+            //    RobotJoints[i].SetRotationCenter(rotation * Matrix4.CreateTranslation(52, 10, 17));
+            //}
+
+            J1 = DenavitHartenbergTable[0] * Matrix4.CreateTranslation(17, 10, 17);
+            J2 = DenavitHartenbergTable[0] * DenavitHartenbergTable[1] * Matrix4.CreateTranslation(17, 10, 17);
+            J3 = DenavitHartenbergTable[0] * DenavitHartenbergTable[1] * DenavitHartenbergTable[2] * Matrix4.CreateTranslation(17, 10, 17);
+
+            RobotJoints[0].SetRotationCenter(J1);
+            List<Matrix4> centers = new List<Matrix4>();
+            foreach(RobotLimb limb in RobotJoints)
             {
-                rotation *= RobotJoints[i].DHMatrix;
-                RobotJoints[i].Cube.SetTransformation(rotation);
+                centers.Add(limb.RotationCenter);
             }
+            var z = centers;
         }
 
         public void UpdateJointValues(float th1, float th2, float d3, float th4)
         {
-            DenavitHartenbergTable[0] = RobotJoints[0].CreateDHMatrix(th1, 0f, 0f, 0f);
-            DenavitHartenbergTable[1] = RobotJoints[1].CreateDHMatrix(th2, 0f, 35f, 0f);
-            DenavitHartenbergTable[2] = RobotJoints[2].CreateDHMatrix(0f, 0f, 30f, d3);
-            DenavitHartenbergTable[3] = RobotJoints[1].CreateDHMatrix(th4, 0f, 0f, 0f);
+            DenavitHartenbergTable[0] = RobotJoints[0].CreateDHMatrix(90, 0f, 0f, 0f, new Vector3(17,10,17));
+            DenavitHartenbergTable[1] = RobotJoints[1].CreateDHMatrix(th2, 0f, 35f, 0f, new Vector3(RobotJoints[0].DHMatrix.M41, RobotJoints[0].DHMatrix.M42, RobotJoints[0].DHMatrix.M43));
+            DenavitHartenbergTable[2] = RobotJoints[2].CreateDHMatrix(0f, 0f, 30f, d3, new Vector3(RobotJoints[1].DHMatrix.M41, RobotJoints[1].DHMatrix.M42, RobotJoints[1].DHMatrix.M43));
+            DenavitHartenbergTable[3] = RobotJoints[3].CreateDHMatrix(th4, 0f, 0f, 0f, new Vector3(RobotJoints[2].DHMatrix.M41, RobotJoints[2].DHMatrix.M42, RobotJoints[2].DHMatrix.M43));
+
             var x = DenavitHartenbergTable;
         }
 

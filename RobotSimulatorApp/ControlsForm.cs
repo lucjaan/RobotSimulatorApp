@@ -32,9 +32,11 @@ namespace RobotSimulatorApp
             SendJointValues();
             Scara.MoveRobot();
 
+            float value = (float)J1TrackBar.Value;
+            Scara.MoveJoint(0, value);
 
-            //float value = (float)J1TrackBar.Value;          
-            //Scara.MoveJoint(0, value);
+            // float value = (float)J1TrackBar.Value;
+            // Scara.MoveJoint(0, value);
         }
 
         private void J2TrackBar_Scroll(object sender, EventArgs e)
@@ -44,8 +46,15 @@ namespace RobotSimulatorApp
                 J2TrackBar.Focus();
             }
 
+            SendJointValues();
+            Scara.MoveRobot();
+
+
             float value = (float)J2TrackBar.Value;
             Scara.MoveJoint(1, value);
+
+            //float value = (float)J2TrackBar.Value;
+            //Scara.MoveJoint(1, value);
         }
 
         private void J3TrackBar_Scroll(object sender, EventArgs e)

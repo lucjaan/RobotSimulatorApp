@@ -74,9 +74,14 @@ namespace RobotSimulatorApp.Robot.SCARA
         //    RotationCenter = new(X, RotationCenter.Y, Z);
         //}
 
-        public void UpdateCenter(float angle, Matrix4 prevCent)
+        //public void UpdateCenter(float angle, Matrix4 prevCent)
+        //{
+        //    RotationCenter = FirstCenter * Cube.CreateRotationYAroundPoint(angle, new Vector3(prevCent.M41, prevCent.M42, prevCent.M43));
+        //}
+
+        public void SetRotationCenter(Matrix4 rot)
         {
-            RotationCenter = FirstCenter * Cube.CreateRotationYAroundPoint(angle, new Vector3(prevCent.M41, prevCent.M42, prevCent.M43));
+            RotationCenter = rot;
         }
 
         public void UpdateModel(float angle, Matrix4 prevCent)
@@ -86,10 +91,15 @@ namespace RobotSimulatorApp.Robot.SCARA
             Cube.UpdateBaseModel();
         }
 
-        public Matrix4 CreateDHMatrix(float theta, float alpha, float a, float d)
+        public Matrix4 CreateDHMatrix(float theta, float alpha, float a, float d, Vector3 prevCenter)
         {
 
-            Matrix4 result = Matrix4.CreateRotationY(theta) * Matrix4.CreateRotationX(alpha) * Matrix4.CreateTranslation(new Vector3(a, 0, d));
+            //Matrix4 result = Matrix4.CreateRotationY(theta) * Matrix4.CreateTranslation(new Vector3(0, 0, d)) * Matrix4.CreateTranslation(new Vector3(0, 0, d)) * Matrix4.CreateRotationX(alpha);
+            Matrix4 result = Matrix4.CreateTranslation(new Vector3(0, 0, d)) * Matrix4.CreateRotationY(theta) * Matrix4.CreateTranslation(new Vector3(a, 0, 0)) * Matrix4.CreateRotationX(alpha);
+            //Matrix4 result = Matrix4.CreateTranslation(-prevCenter) * Matrix4.CreateRotationY(theta) * Matrix4.CreateTranslation(new Vector3(0, 0, d)) * Matrix4.CreateTranslation(new Vector3(0, 0, d)) * Matrix4.CreateRotationX(alpha) * Matrix4.CreateTranslation(prevCenter);
+            //Matrix4 result = Matrix4.CreateTranslation(new Vector3(-17,-10,-17)) * Matrix4.CreateRotationY(theta) * Matrix4.CreateTranslation(new Vector3(0, 0, d)) * Matrix4.CreateTranslation(new Vector3(0, 0, d)) * Matrix4.CreateRotationX(alpha) * Matrix4.CreateTranslation(new Vector3(17,10,17));
+            //Matrix4 result = Matrix4.CreateTranslation(-prevCenter) * Matrix4.CreateRotationY(theta) * Matrix4.CreateTranslation(new Vector3(0, 0, d)) * Matrix4.CreateTranslation(new Vector3(0, 0, d)) * Matrix4.CreateRotationX(alpha) * Matrix4.CreateTranslation(prevCenter);
+
             DHMatrix = result;
             return result;
         }
