@@ -44,11 +44,11 @@ namespace RobotSimulatorApp.Robot.SCARA
             RobotJoints.Add(CreateRevoluteJoint(
                 GLControl, "J1", new Vector3(9f, 20f, 9f), new Vector3(40f, 6f, 14f), 9f, RobotBase.Center));
             RobotJoints.Add(CreateRevoluteJoint(
-                GLControl, "J2", new Vector3(44f, 26f, 6f), new Vector3(35f, 20f, 15f), 30f, RobotBase.Center * Matrix4.CreateTranslation(new Vector3(35f, 0f, 0f))));
+                GLControl, "J2", new Vector3(44f, 26f, 6f), new Vector3(35f, 20f, 15f), 30f, RobotBase.Center + new Vector3(35f, 0f, 0f)));
             RobotJoints.Add(CreateRevoluteJoint(
-                GLControl, "J3", new Vector3(74f, 6.5f, 6f), new Vector3(15f, 68.3f, 10f), 25f, RobotBase.Center * Matrix4.CreateTranslation(new Vector3(65f, 0f, 0f ))));
+                GLControl, "J3", new Vector3(74f, 6.5f, 6f), new Vector3(15f, 68.3f, 10f), 25f, RobotBase.Center + new Vector3(65f, 0f, 0f )));
             RobotJoints.Add(CreateLinearJoint(
-                GLControl, "J4", new Vector3(74f, 6.5f, 6f), new Vector3(3.5f, 4.8f, 2.8f), 21f, RobotBase.Center * Matrix4.CreateTranslation(new Vector3(65f, 0f, 0f))));
+                GLControl, "J4", new Vector3(74f, 6.5f, 6f), new Vector3(3.5f, 4.8f, 2.8f), 21f, RobotBase.Center + new Vector3(65f, 0f, 0f)));
 
             //Placeholders so we know which value is a variable
             float th1, th2, d3, th4;
@@ -139,8 +139,8 @@ namespace RobotSimulatorApp.Robot.SCARA
             J2 = DenavitHartenbergTable[0] * DenavitHartenbergTable[1] * Matrix4.CreateTranslation(17, 10, 17);
             J3 = DenavitHartenbergTable[0] * DenavitHartenbergTable[1] * DenavitHartenbergTable[2] * Matrix4.CreateTranslation(17, 10, 17);
 
-            RobotJoints[0].SetRotationCenter(J1);
-            List<Matrix4> centers = new List<Matrix4>();
+            //RobotJoints[0].SetRotationCenter(J1);
+            List<Vector3> centers = new List<Vector3>();
             foreach(RobotLimb limb in RobotJoints)
             {
                 centers.Add(limb.RotationCenter);
@@ -186,11 +186,11 @@ namespace RobotSimulatorApp.Robot.SCARA
             //TODOs
         }
 
-        public RobotLimb CreateRevoluteJoint(GLControl glc, string name, Vector3 position, Vector3 size, float maximumDistance, Matrix4 movementPoint)
+        public RobotLimb CreateRevoluteJoint(GLControl glc, string name, Vector3 position, Vector3 size, float maximumDistance, Vector3 movementPoint)
             //=> new(new Cube(glc, position, size.X, size.Y, size.Z), name, maximumDistance, RobotJoint.JointTypes.Revolute, movementPoint);
             => new(new Cube(glc, position, size), name, maximumDistance, RobotLimb.JointTypes.Revolute, movementPoint);
 
-        public RobotLimb CreateLinearJoint(GLControl glc, string name, Vector3 position, Vector3 size, float maximumAngle, Matrix4 rotationCenter)
+        public RobotLimb CreateLinearJoint(GLControl glc, string name, Vector3 position, Vector3 size, float maximumAngle, Vector3 rotationCenter)
            //=> new(new Cube(glc, position, size.X, size.Y, size.Z), name, maximumAngle, RobotJoint.JointTypes.Linear, rotationCenter);
            => new(new Cube(glc, position, size), name, maximumAngle, RobotLimb.JointTypes.Linear, rotationCenter);
 

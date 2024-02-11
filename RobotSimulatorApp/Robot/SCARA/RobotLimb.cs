@@ -7,6 +7,7 @@ using System.ComponentModel.Design.Serialization;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
@@ -21,8 +22,8 @@ namespace RobotSimulatorApp.Robot.SCARA
         }
 
 
-        private Matrix4 FirstCenter {  get; set; }
-        public Matrix4 RotationCenter { get; set; }
+        private Vector3 FirstCenter {  get; set; }
+        public Vector3 RotationCenter { get; set; }
         public Matrix4 DHMatrix { get; set; }
         /// <summary>
         /// Distance between previous and current joint center, used to keep the model rigid after rotation.
@@ -36,7 +37,7 @@ namespace RobotSimulatorApp.Robot.SCARA
         /// </summary>
         public float MaximumMovement { get; set; }
         public JointTypes JointType { get; set; }
-        public RobotLimb(Cube cube, string name, float maximumMovement, JointTypes type, Matrix4 rotationCenter)
+        public RobotLimb(Cube cube, string name, float maximumMovement, JointTypes type, Vector3 rotationCenter)
         {
             Name = name;
             Cube = cube;
@@ -53,7 +54,7 @@ namespace RobotSimulatorApp.Robot.SCARA
         /// <summary>
         /// When we move one revolute joint, all joints higher on kinematic chain get rotated in relation to it's axis
         /// </summary>
-        public void MoveJoint_Angular(float angle, Matrix4 centerOfRotation, Axis axis)
+        public void MoveJoint_Angular(float angle, Vector3 centerOfRotation, Axis axis)
         {
             Debug.WriteLine($"MJ_A {centerOfRotation}");
             Cube.RotateCube(angle, centerOfRotation, axis);
@@ -79,17 +80,17 @@ namespace RobotSimulatorApp.Robot.SCARA
         //    RotationCenter = FirstCenter * Cube.CreateRotationYAroundPoint(angle, new Vector3(prevCent.M41, prevCent.M42, prevCent.M43));
         //}
 
-        public void SetRotationCenter(Matrix4 rot)
+        public void SetRotationCenter(Vector3 rot)
         {
             RotationCenter = rot;
         }
 
-        public void UpdateModel(float angle, Matrix4 prevCent)
-        {
-            RotationCenter = FirstCenter * Cube.CreateRotationYAroundPoint(angle, new Vector3(prevCent.M41, prevCent.M42, prevCent.M43));
-            //FirstCenter = RotationCenter;
-            Cube.UpdateBaseModel();
-        }
+        //public void UpdateModel(float angle, Matrix4 prevCent)
+        //{
+        //    RotationCenter = FirstCenter * Cube.CreateRotationYAroundPoint(angle, new Vector3(prevCent.M41, prevCent.M42, prevCent.M43));
+        //    //FirstCenter = RotationCenter;
+        //    Cube.UpdateBaseModel();
+        //}
 
         public Matrix4 CreateDHMatrix(float theta, float alpha, float a, float d, Vector3 prevCenter)
         {
@@ -103,6 +104,7 @@ namespace RobotSimulatorApp.Robot.SCARA
             DHMatrix = result;
             return result;
         }
+
         //public void UpdateCenter(float angle, Vector3 prevCent)
         //{
         //    angle = MathHelper.DegreesToRadians(angle);

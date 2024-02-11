@@ -51,12 +51,18 @@ namespace RobotSimulatorApp
             positionTextBox = new TextBox();
             frontTextBox = new TextBox();
             OpenControlsButton = new Button();
+            trackBar1 = new TrackBar();
+            numericUpDown1 = new NumericUpDown();
+            trackBar2 = new TrackBar();
             ((System.ComponentModel.ISupportInitialize)FrontXtrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)FrontYtrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)FrontZtrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)PosXTrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)PosYTrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)PosZTrackBar).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)trackBar1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)trackBar2).BeginInit();
             SuspendLayout();
             // 
             // glControl
@@ -247,11 +253,43 @@ namespace RobotSimulatorApp
             OpenControlsButton.UseVisualStyleBackColor = true;
             OpenControlsButton.Click += OpenControlsButton_Click;
             // 
+            // trackBar1
+            // 
+            trackBar1.Location = new Point(1121, 392);
+            trackBar1.Maximum = 360;
+            trackBar1.Name = "trackBar1";
+            trackBar1.Size = new Size(208, 45);
+            trackBar1.TabIndex = 38;
+            trackBar1.Scroll += trackBar1_Scroll;
+            // 
+            // numericUpDown1
+            // 
+            numericUpDown1.Location = new Point(1128, 478);
+            numericUpDown1.Maximum = new decimal(new int[] { 3, 0, 0, 0 });
+            numericUpDown1.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            numericUpDown1.Name = "numericUpDown1";
+            numericUpDown1.Size = new Size(43, 23);
+            numericUpDown1.TabIndex = 39;
+            numericUpDown1.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            numericUpDown1.ValueChanged += numericUpDown1_ValueChanged;
+            // 
+            // trackBar2
+            // 
+            trackBar2.Location = new Point(1121, 427);
+            trackBar2.Maximum = 360;
+            trackBar2.Name = "trackBar2";
+            trackBar2.Size = new Size(208, 45);
+            trackBar2.TabIndex = 40;
+            trackBar2.Scroll += trackBar2_Scroll;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1341, 654);
+            Controls.Add(trackBar2);
+            Controls.Add(numericUpDown1);
+            Controls.Add(trackBar1);
             Controls.Add(OpenControlsButton);
             Controls.Add(frontTextBox);
             Controls.Add(positionTextBox);
@@ -279,6 +317,9 @@ namespace RobotSimulatorApp
             ((System.ComponentModel.ISupportInitialize)PosXTrackBar).EndInit();
             ((System.ComponentModel.ISupportInitialize)PosYTrackBar).EndInit();
             ((System.ComponentModel.ISupportInitialize)PosZTrackBar).EndInit();
+            ((System.ComponentModel.ISupportInitialize)trackBar1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)trackBar2).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -304,5 +345,8 @@ namespace RobotSimulatorApp
         private TextBox positionTextBox;
         private TextBox frontTextBox;
         private Button OpenControlsButton;
+        private TrackBar trackBar1;
+        private NumericUpDown numericUpDown1;
+        private TrackBar trackBar2;
     }
 }
