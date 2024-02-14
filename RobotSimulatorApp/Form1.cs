@@ -46,6 +46,10 @@ namespace RobotSimulatorApp
             base.OnLoad(e);
             //glControl.Paint += glControl_Paint;
             SetUpOpenGL();
+
+            ControlsForm controlsForm = new ControlsForm(scara);
+            controlsForm.Show();
+
         }
 
         private void SetUpOpenGL()
@@ -64,7 +68,7 @@ namespace RobotSimulatorApp
             cube.SetColor(Color4.Olive);
 
             grid = new Grid(glControl);
-            scara = new SCARA_Robot(glControl, "tomek");
+            scara = new SCARA_Robot(glControl, "scara");
             timer = new Timer();
             timer.Tick += (sender, e) =>
             {
@@ -113,7 +117,7 @@ namespace RobotSimulatorApp
             //cube.UpdateBaseModel();
             //cube2.UpdateBaseModel();
 
-            //scara.RenderRobot(camera.View, projection);
+            scara.RenderRobot(camera.View, projection);
             grid.RenderWorld(camera.View, projection);
             glControl.SwapBuffers();
         }
@@ -124,7 +128,7 @@ namespace RobotSimulatorApp
 
             if (glControl.ClientSize.Height == 0)
             {
-                glControl.ClientSize = new System.Drawing.Size(glControl.ClientSize.Width, 1);
+                glControl.ClientSize = new Size(glControl.ClientSize.Width, 1);
             }
 
             GL.Viewport(0, 0, glControl.ClientSize.Width, glControl.ClientSize.Height);
@@ -303,7 +307,8 @@ namespace RobotSimulatorApp
         private void OpenControlsButton_Click(object sender, EventArgs e)
         {
             ControlsForm controlsForm = new ControlsForm(scara);
-            controlsForm.Show();
+            if (!controlsForm.Visible)
+                controlsForm.Show();
         }
 
         private void trackBar1_Scroll(object sender, EventArgs e)

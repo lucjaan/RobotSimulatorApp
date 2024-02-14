@@ -16,10 +16,18 @@ namespace RobotSimulatorApp
     {
         public SCARA_Robot Scara { get; set; }
 
+
+
         public ControlsForm(SCARA_Robot scara)
         {
             InitializeComponent();
             Scara = scara;
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
         }
 
         private void J1TrackBar_Scroll(object sender, EventArgs e)
@@ -28,12 +36,13 @@ namespace RobotSimulatorApp
             {
                 J1TrackBar.Focus();
             }
-
-            SendJointValues();
-            Scara.MoveRobot();
-
             float value = (float)J1TrackBar.Value;
+
+            //SendJointValues();
+            //Scara.MoveRobot(value);
+
             Scara.MoveJoint(0, value);
+            SendJointValues();
 
             // float value = (float)J1TrackBar.Value;
             // Scara.MoveJoint(0, value);
@@ -46,12 +55,13 @@ namespace RobotSimulatorApp
                 J2TrackBar.Focus();
             }
 
-            SendJointValues();
-            Scara.MoveRobot();
-
+            //SendJointValues();
+            //Scara.MoveRobot();
+            //Scara.RobotJoints[1].SetRotationCenter()
 
             float value = (float)J2TrackBar.Value;
             Scara.MoveJoint(1, value);
+            SendJointValues();
 
             //float value = (float)J2TrackBar.Value;
             //Scara.MoveJoint(1, value);
@@ -66,6 +76,8 @@ namespace RobotSimulatorApp
 
             float value = (float)J3TrackBar.Value;
             Scara.MoveJoint(2, value);
+            SendJointValues();
+
         }
 
         private void J4TrackBar_Scroll(object sender, EventArgs e)
@@ -75,13 +87,17 @@ namespace RobotSimulatorApp
                 J4TrackBar.Focus();
             }
             float value = (float)J4TrackBar.Value;
-            Scara.MoveJoint(3, value);
+           Scara.MoveJoint(3, value);
+           SendJointValues();
+
         }
 
         private void J1TrackBar_GotFocus(object sender, EventArgs e)
         {
+            //Scara.CalculateCenters();
+            Scara.UpdateModels();
             //Scara.RobotJoints[0].Cube.UpdateBaseModel();
-                
+
             //Scara.RobotJoints[0].UpdateModel();
             //Scara.RobotJoints[0].ce;
 
@@ -97,6 +113,8 @@ namespace RobotSimulatorApp
 
         private void J2TrackBar_GotFocus(object sender, EventArgs e)
         {
+            Scara.CalculateCenters();
+            Scara.UpdateModels();
             ////Scara.RobotJoints[1].Cube.UpdateBaseModel();
             //Scara.RobotJoints[1].UpdateModel();
 
@@ -108,6 +126,7 @@ namespace RobotSimulatorApp
 
         private void J2TrackBar_LostFocus(object sender, EventArgs e)
         {
+            Scara.CalculateCenters();
             //for (int  i = 2; i < Scara.RobotJoints.Count; i++)
             //{
             //    Scara.RobotJoints[i].UpdateModel((float)J2TrackBar.Value, Scara.RobotJoints[1].RotationCenter);
@@ -116,6 +135,7 @@ namespace RobotSimulatorApp
 
         private void J3TrackBar_GotFocus(object sender, EventArgs e)
         {
+            Scara.CalculateCenters();
             //Scara.RobotJoints[2].Cube.UpdateBaseModel();
             //Scara.RobotJoints[2].UpdateModel();
 
@@ -129,6 +149,7 @@ namespace RobotSimulatorApp
 
         private void J4TrackBar_GotFocus(object sender, EventArgs e)
         {
+            Scara.CalculateCenters();
             //Scara.RobotJoints[3].Cube.UpdateBaseModel();
             //Scara.RobotJoints[3].UpdateModel();
 
@@ -141,10 +162,14 @@ namespace RobotSimulatorApp
         private void SendJointValues()
         {
             Scara.UpdateJointValues(
-                MathHelper.DegreesToRadians((float)J1TrackBar.Value), 
-                MathHelper.DegreesToRadians((float)J2TrackBar.Value), 
-                (float)J3TrackBar.Value, 
-                MathHelper.DegreesToRadians((float)J4TrackBar.Value)
+                (float)J1TrackBar.Value,
+                (float)J2TrackBar.Value,
+                (float)J3TrackBar.Value,
+                (float)J4TrackBar.Value
+                //MathHelper.DegreesToRadians((float)J1TrackBar.Value), 
+                //MathHelper.DegreesToRadians((float)J2TrackBar.Value), 
+                //(float)J3TrackBar.Value, 
+                //MathHelper.DegreesToRadians((float)J4TrackBar.Value)
            );
         }
     }

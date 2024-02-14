@@ -188,17 +188,19 @@ void main()
             shader.Dispose();
         }
 
-        public void RotateCube(float angle, Vector3 centerOfRotation, Axis axis)
+        public Matrix4 RotateCube(float angle, Vector3 centerOfRotation, Axis axis)
         {
             angle = MathHelper.DegreesToRadians(angle);
+            Matrix4 result = Matrix4.Zero;
             switch (axis)
             {
                 case Axis.X:
+                    result = CreateRotationXAroundPoint(angle, centerOfRotation);
                     Model = BaseModel * CreateRotationXAroundPoint(angle, centerOfRotation);
                     break;
 
                 case Axis.Y:
-                    Transformation = CreateRotationYAroundPoint(angle, centerOfRotation);
+                    result = Transformation = CreateRotationYAroundPoint(angle, centerOfRotation);
                     //Model = BaseModel * CreateRotationYAroundPoint(angle, centerPoint);
                     //Debug.WriteLine($"cube {centerOfRotation}");
                     //Model *= CreateRotationYAroundPoint(angle, centerOfRotation);
@@ -208,6 +210,7 @@ void main()
                     Model = BaseModel * CreateRotationZAroundPoint(angle, centerOfRotation);
                     break;
             }
+            return result;
         }
 
         public void UpdateBaseModel()

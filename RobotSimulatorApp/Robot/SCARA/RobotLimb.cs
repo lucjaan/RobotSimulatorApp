@@ -1,4 +1,5 @@
-﻿using OpenTK.Mathematics;
+﻿using OpenTK.Graphics.ES20;
+using OpenTK.Mathematics;
 using OpenTK.WinForms;
 using RobotSimulatorApp.GlConfig;
 using System;
@@ -56,9 +57,14 @@ namespace RobotSimulatorApp.Robot.SCARA
         /// </summary>
         public void MoveJoint_Angular(float angle, Vector3 centerOfRotation, Axis axis)
         {
-            Debug.WriteLine($"MJ_A {centerOfRotation}");
+            //Debug.WriteLine($"MJ_A {centerOfRotation}");
             Cube.RotateCube(angle, centerOfRotation, axis);
             //UpdateCenter(angle, RotationCenter);
+        }
+
+        public void MoveJoint(Matrix4 dhMatrix)
+        {
+            Cube.Transformation = dhMatrix;
         }
 
         /// <summary>
@@ -104,6 +110,9 @@ namespace RobotSimulatorApp.Robot.SCARA
             DHMatrix = result;
             return result;
         }
+
+        //public void UpdateCenter(float angle, Vector3 prevCent)
+
 
         //public void UpdateCenter(float angle, Vector3 prevCent)
         //{
