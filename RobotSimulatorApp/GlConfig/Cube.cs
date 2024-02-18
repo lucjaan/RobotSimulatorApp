@@ -27,7 +27,9 @@ namespace RobotSimulatorApp.GlConfig
         public Matrix4 Translation { get; set; }
         public Matrix4 Rotation { get; set; }
         public Matrix4 Transformation { get; set; }
+        public Matrix4 PrevTransformation { get; set; }
         public Matrix4 BaseModel { get; set; }
+        public Matrix4 Identity { get; set; }
         public float Angle { get; set; }
         private Trace Trace { get; set; }
 
@@ -124,10 +126,11 @@ void main()
             Size = size;
             //FirstCenter = Center = Matrix4.CreateTranslation(new Vector3(size.X / 2, size.Y / 2, size.Z / 2) + position);
             FirstCenter = Center = new Vector3(size.X / 2, size.Y / 2, size.Z / 2) + position;
-            Transformation = Matrix4.Identity;
+            PrevTransformation = Transformation = Matrix4.Identity;
             Rotation = Translation = Model = Matrix4.Identity;
             BaseModel = Model = Matrix4.CreateTranslation(position);
             isTraceSet = false;
+            Angle = 0f;
             ////Create vertices responsible for generating a cube and add them for later use:
             Vertices.AddRange(CreateWall(size.X, size.Y, 0, Axis.Z));
             Vertices.AddRange(CreateWall(size.X, 0, size.Z, Axis.Y));
@@ -135,18 +138,6 @@ void main()
             Vertices.AddRange(CreateWall(size.X, size.Y, size.Z, Axis.Z));
             Vertices.AddRange(CreateWall(size.X, size.Y, size.Z, Axis.Y));
             Vertices.AddRange(CreateWall(size.X, size.Y, size.Z, Axis.X));
-
-            //BaseModel = Model = Matrix4.CreateTranslation(position);
-            //Rotation = Translation = Matrix4.Identity;
-            //FirstCenter = Center = new Vector3(size.X / 2, size.Y / 2, size.Z / 2) + position;
-
-            ////Create vertices responsible for generating a cube and add them for later use:
-            //Vertices.AddRange(CreateWall(size.X / 2, size.Y / 2, -size.Z / 2, Axis.Z));
-            //Vertices.AddRange(CreateWall(size.X / 2, -size.Y / 2, size.Z / 2, Axis.Y));
-            //Vertices.AddRange(CreateWall(-size.X / 2, size.Y / 2, size.Z / 2, Axis.X));
-            //Vertices.AddRange(CreateWall(size.X / 2, size.Y / 2, size.Z / 2, Axis.Z));
-            //Vertices.AddRange(CreateWall(size.X / 2, size.Y / 2, size.Z / 2, Axis.Y));
-            //Vertices.AddRange(CreateWall(size.X / 2, size.Y / 2, size.Z / 2, Axis.X));
         }
 
         public void RenderCube(Matrix4 view, Matrix4 projection)
@@ -176,10 +167,12 @@ void main()
             int colorLocation = shader.GetAttribLocation("aColor");
             GL.EnableVertexAttribArray(colorLocation);
             GL.VertexAttribPointer(colorLocation, 4, VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
+            //Debug.WriteLine($"============== Model * Transformation ======================");
+            //Debug.WriteLine($"{Model * Transformation}");
+            //Debug.WriteLine($"=================== Transformation ============================");
+            //Debug.WriteLine($"{Transformation}");
 
-            //UpdateBaseModel();
-            //shader.SetMatrix4("model", Transformation);
-            var x = Model * Transformation;
+            //shader.SetMatrix4("model", BaseModel * Transformation);
             shader.SetMatrix4("model", Model * Transformation);
             shader.SetMatrix4("view", view);
             shader.SetMatrix4("projection", projection);
@@ -195,36 +188,64 @@ void main()
             switch (axis)
             {
                 case Axis.X:
-                    result = CreateRotationXAroundPoint(angle, centerOfRotation);
-                    Model = BaseModel * CreateRotationXAroundPoint(angle, centerOfRotation);
+                    //result = Helpers.CreateRotationXAroundPoint(angle, centerOfRotation);
+                    //Model = BaseModel * Helpers.CreateRotationXAroundPoint(angle, centerOfRotation);
                     break;
 
                 case Axis.Y:
-                    result = Transformation = CreateRotationYAroundPoint(angle, centerOfRotation);
+                    //result = Transformation = Helpers.CreateRotationYAroundPoint(angle, centerOfRotation);
+                    result = Helpers.CreateRotationYAroundPoint(angle, centerOfRotation);
                     //Model = BaseModel * CreateRotationYAroundPoint(angle, centerPoint);
                     //Debug.WriteLine($"cube {centerOfRotation}");
                     //Model *= CreateRotationYAroundPoint(angle, centerOfRotation);
                     break;
 
                 case Axis.Z:
-                    Model = BaseModel * CreateRotationZAroundPoint(angle, centerOfRotation);
+                    //Model = BaseModel * Helpers.CreateRotationZAroundPoint(angle, centerOfRotation);
                     break;
             }
+            //Transformation = result;
             return result;
         }
 
         public void UpdateBaseModel()
         {
+
             //BaseModel = Model;
+            //Model *= PrevTransformation;
+            var x = Transformation;
+            //Model = BaseModel * PrevTransformation * Transformation;
+            var z = BaseModel;
             Model = Model * Transformation;
+            //Model = BaseModel * Transformation;
+            //Debug.WriteLine(Transformation);
+            //Debug.WriteLine("------------------");
+            //if (Transformation != Matrix4.Identity)
+            //    PrevTransformation = Transformation;
+            //Debug.WriteLine(PrevTransformation);
+            //Debug.WriteLine("------------------");
+
+            PrevTransformation = Matrix4.Identity;
             Transformation = Matrix4.Identity;
+
+            //Matrix4 test = Model * Matrix4.Invert(PrevTransformation);
+            //Model = Model * Matrix4.Invert(PrevTransformation);
+            ////Matrix4 test = Transformation * Matrix4.Invert(Transformation);
+            ////PrevTransformation = Transformation;
+            //PrevTransformation = Transformation;
+        }
+
+        public void UpdateBaseModel(Matrix4 transformation)
+        {
+            //Model = BaseModel * transformation;
+            //Transformation = Matrix4.Identity;
+            Transformation = transformation;
         }
 
         public void SetTransformation(Matrix4 hgm)
         {
             Transformation = hgm;
         }
-
 
         public void SetColor(Color4 colorData)
         {
@@ -250,78 +271,33 @@ void main()
             ColorData = color;
         }
 
-        //private Vector3 SetCenter(Vector3 position) => new Vector3(Size.X / 2, Size.Y / 2, Size.Z / 2) + new Vector3(Model.M41, Model.M42, Model.M43);
-
-        //public void UpdateCenter(float angle)
-        //{
-        //    float testx = ((Size.X / 2) * MathF.Cos(angle)) - ((Size.Z / 2) * MathF.Sin(angle)) + Model.M41;
-        //    float testz = ((Size.X / 2) * MathF.Sin(angle)) + ((Size.Z / 2) * MathF.Cos(angle)) + Model.M43;
-
-
-        //    Vector3 updated = new(
-        //        ((Size.X / 2) * MathF.Cos(angle)) - ((Size.X / 2) * MathF.Sin(angle)) + Model.M41,
-        //        Center.Y,
-        //        ((Size.Z / 2) * MathF.Sin(angle)) + ((Size.Z / 2) * MathF.Cos(angle)) + Model.M43
-        //        );
-        //    Center = updated;
-        //}
-
-
-        //Center = new Vector3(Size.X / 2, Size.Y / 2, Size.Z / 2) + new Vector3(Model.M41, Model.M42, Model.M43);
-
-        //public void UpdateCenter()
-        //{
-        //    Matrix4 mv = BaseModel * Transformation;
-        //    Center = new Vector3(mv.M41 + Size.X / 2, mv.M42 + Size.Y / 2, mv.M43 + Size.Z / 2);
-        //}
-
         public void RotateCenter(float angle, Vector3 center)
         {
             angle = MathHelper.DegreesToRadians(angle);
             float cenX = FirstCenter.X - center.X;
             float cenZ = FirstCenter.Z - center.Z;
 
-
-
-            //float x = cenX * (float)MathHelper.Cos(angle) - cenZ * (float)MathHelper.Sin(angle);
-            //float z = cenX * (float)MathHelper.Sin(angle) + cenZ * (float)MathHelper.Cos(angle);
-
-
             float x = cenX * (float)MathHelper.Cos(angle) + cenZ * (float)MathHelper.Sin(angle);
             float z = -(cenX * (float)MathHelper.Sin(angle)) + cenZ * (float)MathHelper.Cos(angle);
 
-            //Center = FirstCenter +  new Vector3(x, 0, z);
             Center = center + new Vector3(x, 0, z);
-            //float cenX = center.X;
-            //float cenZ = center.Z;
-            //float resultX = FirstCenter.X - cenX;
-            //float resultZ = FirstCenter.Z - cenZ;
-            //float x = resultX * (float)MathHelper.Cos(angle) - resultZ * (float)MathHelper.Sin(angle);
-            //float z = resultX * (float)MathHelper.Sin(angle) + resultZ * (float)MathHelper.Cos(angle);
-            //x = x + cenX;
-            //z = z + cenZ;
-            //Center = new Vector3(x, center.Y, z);
-            //Vector3 centerPoint = new(center.M41, center.M41, center.M43);
-            //Center = FirstCenter * CreateRotationYAroundPoint(angle, center);
-            //TODO
+
         }
         public void SetTrace(bool isSet) => isTraceSet = isSet;
         public void SetPosition(Vector3 position) => Model = Matrix4.CreateTranslation(position);
-        //public void SetTransformation
-        //public void SetRotationCenter(Vector3 rotationCenter) => Center = rotationCenter;
         public void TranslateCube(Vector3 translationVector)
         {
             Position += translationVector;
             Model *= Matrix4.CreateTranslation(translationVector);
         }
-        private static Matrix4 CreateRotationXAroundPoint(float angle, Vector3 centerVector)
-            => Matrix4.CreateTranslation(-centerVector) * Matrix4.CreateRotationX(angle) * Matrix4.CreateTranslation(centerVector);
+        //private static Matrix4 CreateRotationXAroundPoint(float angle, Vector3 centerVector)
+        //    => Matrix4.CreateTranslation(-centerVector) * Matrix4.CreateRotationX(angle) * Matrix4.CreateTranslation(centerVector);
 
-        public static Matrix4 CreateRotationYAroundPoint(float angle, Vector3 centerVector)
-             => Matrix4.CreateTranslation(-centerVector) * Matrix4.CreateRotationY(angle) * Matrix4.CreateTranslation(centerVector);
+        //public static Matrix4 CreateRotationYAroundPoint(float angle, Vector3 centerVector)
+        //     => Matrix4.CreateTranslation(-centerVector) * Matrix4.CreateRotationY(angle) * Matrix4.CreateTranslation(centerVector);
 
-        private static Matrix4 CreateRotationZAroundPoint(float angle, Vector3 centerVector)
-            => Matrix4.CreateTranslation(-centerVector) * Matrix4.CreateRotationZ(angle) * Matrix4.CreateTranslation(centerVector);
+        //private static Matrix4 CreateRotationZAroundPoint(float angle, Vector3 centerVector)
+        //    => Matrix4.CreateTranslation(-centerVector) * Matrix4.CreateRotationZ(angle) * Matrix4.CreateTranslation(centerVector);
 
         private List<Vector3> CreateWall(float x, float y, float z, Axis axis)
         {
@@ -350,7 +326,6 @@ void main()
                     }
                     break;
             }
-
             return result;
         }
 

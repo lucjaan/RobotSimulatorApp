@@ -71,14 +71,12 @@ namespace RobotSimulatorApp.Robot.SCARA
             RobotJoints.Add(CreateLinearJoint(
                 GLControl, "J4", new Vector3(74f, 6.5f, 6f), new Vector3(3.5f, 4.8f, 2.8f), 21f, RobotBase.Center + new Vector3(65f, 0f, 0f)));
 
-
             for (int i = 0; i < RobotJoints.Count; i++)
             {
                 RobotJoints[i].Cube.SetColor(Color4.LightSlateGray);
                 DenavitHartenbergTable.Add(Matrix4.Identity);
             }
             CreateJointCenters();
-
         }
 
         public void MoveJoint(int jointId, float value)
@@ -87,15 +85,29 @@ namespace RobotSimulatorApp.Robot.SCARA
 
             if (joint.JointType == RobotLimb.JointTypes.Revolute)
             {
+                //Debug.WriteLine($"Joint: {0} angle: {value - RobotJoints[0].Distance} ");
+                //Debug.WriteLine($"Joint: {1} angle: {value - RobotJoints[1].Distance} ");
+                //Debug.WriteLine($"Joint: {2} angle: {value - RobotJoints[2].Distance} ");
+                //Debug.WriteLine($"Joint: {3} angle: {value - RobotJoints[3].Distance} ");
 
-                for (int i = jointId; i < RobotJoints.Count; i++)
-                {
-                    RobotJoints[i].MoveJoint_Angular(value, JointCenters[jointId], joint.Axis);
-                }
                 marker.SetPosition(JointCenters[0]);
                 marker1.SetPosition(JointCenters[1]);
                 marker2.SetPosition(JointCenters[2]);
                 marker3.SetPosition(JointCenters[3]);
+
+                for (int i = jointId; i < RobotJoints.Count; i++)
+                {
+                    RobotJoints[i].MoveJoint_Angular(value - RobotJoints[jointId].Distance, JointCenters[jointId], joint.Axis);
+
+                    //RobotJoints[i].MoveJoint_Angular(value, JointCenters[jointId], joint.Axis);
+                    //RobotJoints[i].MoveJoint_Angular(value - RobotJoints[jointId].Distance, JointCenters[jointId], joint.Axis);
+                    Debug.WriteLine($"Joint: {i} angle: {value - RobotJoints[jointId].Distance} value {value} Disance {RobotJoints[jointId].Distance}");
+
+                    //RobotJoints[0].MoveJoint_Angular(value, JointCenters[jointId], joint.Axis);
+                }
+                //RobotJoints[0].MoveJoint_Angular(value, JointCenters[jointId], joint.Axis);
+
+
             }
             CalculateCenters();
         }
@@ -138,103 +150,6 @@ namespace RobotSimulatorApp.Robot.SCARA
             }
         }
 
-        public Vector3 CalculateCenter(int jointID)
-        {
-
-            Vector4 dh = DHParameters[jointID];
-            //float angleY, distanceY, angleX, distanceX;
-            //angleY = distanceY = angleX = distanceX = 0;
-            //angleY = 90;
-            float aY = MathHelper.DegreesToRadians(dh.X);
-            Vector3 dY = new(0, dh.Y, 0);
-            Vector3 dX = new(dh.Z, 0, 0);
-            float aX = MathHelper.DegreesToRadians(dh.W);
-
-            Matrix4 baseMinus = Matrix4.CreateTranslation(-RobotBase.Center);
-            Matrix4 basePlus = Matrix4.CreateTranslation(RobotBase.Center);
-            //Matrix4 dhMatrix = Matrix4.Identity;
-
-            //if (jointID == 0)
-            //{
-            //    dhMatrix = RobotBase.RotateCube(dh.X, RobotBase.Center, Axis.Y) * Matrix4.CreateTranslation(dY) * Matrix4.CreateTranslation(dX) * RobotBase.RotateCube(dh.W, RobotBase.Center, Axis.X);
-            //}
-            //else
-            //{
-            //    Matrix4 oldM = DenavitHartenbergTable[jointID - 1];
-            //    Vector3 oldV = new(
-            //    oldM.M41 * oldM.M11 + oldM.M42 * oldM.M21 + oldM.M43 * oldM.M31,
-            //    oldM.M41 * oldM.M12 + oldM.M42 * oldM.M22 + oldM.M43 * oldM.M32,
-            //    oldM.M41 * oldM.M13 + oldM.M42 * oldM.M23 + oldM.M43 * oldM.M33
-            //    );
-            //    dhMatrix = RobotBase.RotateCube(dh.X, oldV, Axis.Y) * Matrix4.CreateTranslation(dY) * Matrix4.CreateTranslation(dX) * RobotBase.RotateCube(dh.W, oldV, Axis.X);
-            //}
-
-
-            //Matrix4 dhMatrix = Matrix4.CreateRotationY(aY) * Matrix4.CreateTranslation(dY) * Matrix4.CreateTranslation(dX) * Matrix4.CreateRotationX(aX);
-            Matrix4 dhMatrix = Matrix4.CreateTranslation(dY);
-            dhMatrix *= Matrix4.CreateRotationY(aY);
-            dhMatrix *= Matrix4.CreateTranslation(dX);
-            dhMatrix *= Matrix4.CreateRotationX(aX);
-
-            float sinT = (float)MathHelper.Sin(aY);
-            float cosT = (float)MathHelper.Cos(aY);
-            float sinA = (float)MathHelper.Sin(aX);
-            float cosA = (float)MathHelper.Cos(aX);
-
-            var dh1 = dhMatrix;
-
-            Matrix4 dh2 = new Matrix4(
-                cosT, -sinT * cosA, sinT * sinA, dh.Z * cosT,
-                sinT, cosT * cosA, -cosT * sinA, dh.Z * sinT,
-                0, sinA, cosA, dh.Y,
-                0, 0, 0, 1
-                );
-            //dh2.Transpose();
-            //dhMatrix = dh2;
-            //dhMatrix *= Matrix4.CreateTranslation(dY);
-            //dhMatrix *= Matrix4.CreateTranslation(dX)
-            if (jointID == 0)
-            {
-                dhMatrix = basePlus * dhMatrix;
-            }
-            else
-            {
-                dhMatrix = DenavitHartenbergTable[jointID - 1] * dhMatrix;
-            }
-
-            DenavitHartenbergTable[jointID] = dhMatrix;
-            var dhx = DenavitHartenbergTable;
-            //DenavitHartenbergTable[jointID] = dhMatrix * basePlus;
-
-
-            Matrix4 rM = dhMatrix;
-            //Matrix4 rM = basePlus * dhMatrix * baseMinus;
-
-            //substract
-            float vX = (float)Math.Round(rM.M41, 2);
-            float vY = (float)Math.Round(rM.M42, 2);
-            float vZ = (float)Math.Round(rM.M43, 2);
-            float newX = vX * (float)Math.Round(rM.M11, 2) + vY * (float)Math.Round(rM.M21, 2) + vZ * (float)Math.Round(rM.M31, 2);
-            float newY = vX * (float)Math.Round(rM.M12, 2) + vY * (float)Math.Round(rM.M22, 2) + vZ * (float)Math.Round(rM.M32, 2);
-            float newZ = vX * (float)Math.Round(rM.M13, 2) + vY * (float)Math.Round(rM.M23, 2) + vZ * (float)Math.Round(rM.M33, 2);
-
-            Vector3 cen = JointCenters[jointID] - RobotBase.Center;
-            newX = cen.X * (float)MathHelper.Cos(aY) + cen.Z * (float)MathHelper.Sin(aY);
-            newZ = cen.X * -(float)MathHelper.Sin(aY) + cen.Z * (float)MathHelper.Cos(aY);
-            //float newX = rM.M41 * rM.M11 + rM.M42 * rM.M21 + rM.M43 * rM.M31;
-            //float newY = rM.M41 * rM.M12 + rM.M42 * rM.M22 + rM.M43 * rM.M32;
-            //float newZ = rM.M41 * rM.M13 + rM.M42 * rM.M23 + rM.M43 * rM.M33;
-            //addd
-
-            Vector3 result = new Vector3(cen.X, 0, cen.Z) + RobotBase.Center;
-            Vector3 xcv = new Vector3(rM.M41, rM.M42, rM.M43);
-            //Debug.WriteLine($"{xcv} ID {jointID}");
-
-            //return new Vector3(newX, newY, newZ);
-            return result;
-            //return new Vector3(rM.M41, rM.M42, rM.M43);
-        }
-
         public Vector3 UpdateCenter(int jointID)
         {
             Vector4 dh = DHParameters[jointID - 1];
@@ -265,94 +180,76 @@ namespace RobotSimulatorApp.Robot.SCARA
             return vec;
         }
 
-        //public void MoveJoint(int jointId, float value)
-        //{
-        //    //value = MathHelper.Clamp(value, -RobotJoints[jointId].MaximumMovement / 2, RobotJoints[jointId].MaximumMovement / 2);
-        //    var joint = RobotJoints[jointId];
-
-        //    if (joint.JointType == RobotLimb.JointTypes.Revolute)
-        //    {
-        //        joint.MoveJoint_Angular(value, joint.RotationCenter, joint.Axis);
-        //        for (int i = jointId + 1; i < 2; i++)
-        //        {
-        //            RobotJoints[i].MoveJoint_Angular(value, joint.RotationCenter, joint.Axis);
-        //        }
-        //    }
-        //}
-
-        //public void MoveRobot()
-        //{
-        //    //Matrix4 rotation = Matrix4.CreateTranslation(-17, -10, -17);
-        //    Matrix4 rotation = Matrix4.Identity;
-        //    Matrix4 J0, J1, J2, J3, J4;
-        //    J1 = J2 = J3 = J4 = Matrix4.Identity;
-        //    //for (int i = 0; i < DenavitHartenbergTable.Count; i++)
-        //    //{
-        //    //    rotation *= DenavitHartenbergTable[i];
-        //    //    //RobotJoints[i].Cube.SetTransformation(rotation * Matrix4.CreateTranslation(17, 10, 17));
-        //    //    //RobotJoints[i].SetRotationCenter(rotation * Matrix4.CreateTranslation(17, 10, 17));
-        //    //    RobotJoints[i].SetRotationCenter(rotation * Matrix4.CreateTranslation(52, 10, 17));
-        //    //}
-        //    J0 = Matrix4.CreateTranslation(RobotBase.Center);
-        //    J1 = DenavitHartenbergTable[0] * Matrix4.CreateTranslation(17, 10, 17);
-        //    J2 = DenavitHartenbergTable[0] * DenavitHartenbergTable[1] * Matrix4.CreateTranslation(17, 10, 17);
-        //    J3 = DenavitHartenbergTable[0] * DenavitHartenbergTable[1] * DenavitHartenbergTable[2] * Matrix4.CreateTranslation(17, 10, 17);
-
-        //    List<Vector3> centers = new List<Vector3>();
-        //    List<Matrix4> rotM = new List<Matrix4>() { J0, J1, J2, J3 };
-        //    int i = 0;
-        //    foreach(RobotLimb limb in RobotJoints)
-        //    {
-        //        //centers.Add(limb.RotationCenter);
-        //        limb.MoveJoint(rotM[i]);
-        //        i++;
-        //    }
-
-        //    var z = centers;
-        //}
-
-        //public void MoveRobot(int jointID, float angle)
-        public void MoveRobot(float angle1, float angle2 = 0)
-        {
-            //float angleY, float distanceY, float angleX, float distanceX
-            angle1 = MathHelper.DegreesToRadians(angle1);
-            angle2 = MathHelper.DegreesToRadians(angle2);
-            float angleY, distanceY, angleX, distanceX;
-            angleY = angle1;
-            //angleY = MathHelper.DegreesToRadians(180);
-            distanceY = angleX = distanceX = 0;
-            Matrix4 j0 = Matrix4.CreateTranslation(-RobotBase.Center);
-            Matrix4 j0DH = Matrix4.CreateRotationY(angleY) * Matrix4.CreateTranslation(new Vector3(0, distanceY, 0)) * 
-                Matrix4.CreateTranslation(new Vector3(distanceX, 0, 0)) * Matrix4.CreateRotationX(angleX);
-            j0 = j0 * j0DH * Matrix4.CreateTranslation(RobotBase.Center);
-            RobotJoints[0].Cube.SetTransformation(j0);
-
-            angleY = angle2;
-            Matrix4 j1 = Matrix4.CreateTranslation(-(RobotBase.Center.X +35), -RobotBase.Center.Y, -RobotBase.Center.Z);
-            Matrix4 j1DH = j0DH * Matrix4.CreateRotationY(angleY) * Matrix4.CreateTranslation(new Vector3(0, distanceY, 0)) *
-                Matrix4.CreateTranslation(new Vector3(35f, 0, 0)) * Matrix4.CreateRotationX(angleX);
-            j1 = j1 * j1DH * Matrix4.CreateTranslation(RobotBase.Center.X + 35, RobotBase.Center.Y, RobotBase.Center.Z);
-            RobotJoints[1].Cube.SetTransformation(j1);
-
-        }
-
-
         public void UpdateJointValues(float th1, float th2, float d3, float th4)
         {
+            RobotJoints[0].Distance = th1;
+            RobotJoints[1].Distance = th2;
+            RobotJoints[2].Distance = d3;
+            RobotJoints[3].Distance = th4;
 
             DHParameters[0] = new Vector4(th1, 0, 0, 0);
             DHParameters[1] = new Vector4(th2, 0, 0, 0);
             DHParameters[2] = new Vector4(0, 0, d3, 0);
             DHParameters[3] = new Vector4(th4, 0, 0, 0);
+            //UpdateModels([th1, th2, d3, th4]);
+            //UpdateModels();
+        }
+        
+        public Matrix4 CalculateTransformation(int jointId)
+        {
+            Matrix4 t1, t2, t3, t4;
+            t1 = t2 = t3 = t4 = Matrix4.Identity;
+            Matrix4 transformation = Matrix4.Identity;  
 
+            //transformation = Helpers.CreateRotationYAroundPoint(DHParameters[0].X, JointCenters[0]);
+            t1 = Helpers.CreateRotationYAroundPoint(DHParameters[0].X, JointCenters[0]);
+            t2 = Helpers.CreateRotationYAroundPoint(DHParameters[1].X, JointCenters[1]);
+            t3 = Helpers.CreateRotationYAroundPoint(DHParameters[2].X, JointCenters[2]);
+            t4 = Helpers.CreateRotationYAroundPoint(DHParameters[3].X, JointCenters[3]);
+
+            for (int i = 0; i < DHParameters.Count; i++)
+            {
+                //transformation *= Helpers.CreateRotationYAroundPoint(DHParameters[i].X, JointCenters[i]);
+                transformation *= Helpers.CreateRotationYAroundPoint(MathHelper.DegreesToRadians(DHParameters[i].X), JointCenters[i]);
+            }
+
+            //transformation = Helpers.CreateRotationYAroundPoint(MathHelper.DegreesToRadians(176f), JointCenters[1]);
+            return transformation;
         }
 
         public void UpdateModels()
         {
-            foreach(RobotLimb joint in RobotJoints)
+            //int i = 0;
+            //RobotJoints[0].Cube.UpdateBaseModel(DHParameters[i].X);
+            //RobotJoints[1].Cube.UpdateBaseModel(DHParameters[i].Y);
+            //RobotJoints[2].Cube.UpdateBaseModel(DHParameters[i].Z);
+            //RobotJoints[3].Cube.UpdateBaseModel(DHParameters[i].W);
+            //RobotJoints[jointId].Cube.UpdateBaseModel();
+
+            //Matrix4[] trans = {
+            //RobotJoints[0].Cube.Transformation,
+            //RobotJoints[1].Cube.Transformation,
+            //RobotJoints[2].Cube.Transformation,
+            //RobotJoints[3].Cube.Transformation,
+            //};
+
+            Matrix4 transformation = Matrix4.Identity;
+            for (int i = 0; i < RobotJoints.Count; i++)
             {
-                joint.Cube.UpdateBaseModel();
+                //transformation *= RobotJoints[i].Cube.Transformation;
+                //RobotJoints[i].Cube.Transformation = transformation;
+                //Debug.WriteLine(i);
+                //RobotJoints[i].Cube.UpdateBaseModel(CalculateTransformation(i));
+                RobotJoints[i].Cube.UpdateBaseModel();
+                //RobotJoints[1].Cube.UpdateBaseModel(CalculateTransformation(1));
             }
+
+//Debug.WriteLine(RobotJoints[1].Cube.Transformation);
+
+            //foreach (RobotLimb joint in RobotJoints)
+            //{
+            //    joint.Cube.UpdateBaseModel(transformation);
+            //}
         }
 
         public void RenderRobot(Matrix4 view, Matrix4 projection)
@@ -386,19 +283,6 @@ namespace RobotSimulatorApp.Robot.SCARA
         public RobotLimb CreateLinearJoint(GLControl glc, string name, Vector3 position, Vector3 size, float maximumAngle, Vector3 rotationCenter)
            //=> new(new Cube(glc, position, size.X, size.Y, size.Z), name, maximumAngle, RobotJoint.JointTypes.Linear, rotationCenter);
            => new(new Cube(glc, position, size), name, maximumAngle, RobotLimb.JointTypes.Linear, rotationCenter);
-
-        //Cube cube = new Cube(glc, position, length, height, width);
-        //RobotJoints.Add(RobotJoints.Keys.Count, rj);
-
-
-        //public RobotJoint CreateLinearJoint(GLControl glc, string name, Vector3 position, float length, float height, float width, float maximumAngle, Vector3 rotationCenter)
-        //{
-        //    RobotJoint rj = CreateJoint(glc, name, position, length, height, width, maximumAngle);
-        //    rj.RotationCenter = rotationCenter;
-        //    return rj;
-        //}
-
-        //        public RobotJoint(GLControl glc, Vector3 position, int x, int y, int z, float maximumAngle, Vector3 rotationCenter)
 
     }
 }

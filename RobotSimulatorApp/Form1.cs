@@ -56,16 +56,16 @@ namespace RobotSimulatorApp
         {
             GL.Enable(EnableCap.DepthTest);
 
-            cube = new(glControl, new Vector3(-5f, -1f, -5f), new Vector3(2f, 22f, 2f));
-            cube2 = new(glControl, new Vector3(-7f, 0f, 9f), new Vector3(6f, 8f, 10f));
-            //cube2 = new(glControl, new Vector3(15f, 0f, 9f), new Vector3(6f, 8f, 10f));
-            cube0 = new(glControl, new Vector3(0f, -3f, -7f), new Vector3(6f, 6f, 6f));
-            marker = new(glControl, new Vector3(0f, 0, 0), new Vector3(1f, 30f, 1f));
-            //cube0 = new(glControl, new Vector3(0f, -3f, 0f), new Vector3(6f, 6f, 6f));
-            marker.SetColor(Color4.Red);
-            cube0.SetColor(Color4.LimeGreen);
-            cube2.SetColor(Color4.MediumVioletRed);
-            cube.SetColor(Color4.Olive);
+            //cube = new(glControl, new Vector3(-5f, -1f, -5f), new Vector3(2f, 22f, 2f));
+            //cube2 = new(glControl, new Vector3(-7f, 0f, 9f), new Vector3(6f, 8f, 10f));
+            ////cube2 = new(glControl, new Vector3(15f, 0f, 9f), new Vector3(6f, 8f, 10f));
+            //cube0 = new(glControl, new Vector3(0f, -3f, -7f), new Vector3(6f, 6f, 6f));
+            //marker = new(glControl, new Vector3(0f, 0, 0), new Vector3(1f, 30f, 1f));
+            ////cube0 = new(glControl, new Vector3(0f, -3f, 0f), new Vector3(6f, 6f, 6f));
+            //marker.SetColor(Color4.Red);
+            //cube0.SetColor(Color4.LimeGreen);
+            //cube2.SetColor(Color4.MediumVioletRed);
+            //cube.SetColor(Color4.Olive);
 
             grid = new Grid(glControl);
             scara = new SCARA_Robot(glControl, "scara");
@@ -108,10 +108,10 @@ namespace RobotSimulatorApp
                 camera.Move(input);
             }
 
-            cube2.RenderCube(camera.View, projection);
-            cube.RenderCube(camera.View, projection);
-            cube0.RenderCube(camera.View, projection);
-            marker.RenderCube(camera.View, projection);
+            //cube2.RenderCube(camera.View, projection);
+            //cube.RenderCube(camera.View, projection);
+            //cube0.RenderCube(camera.View, projection);
+            //marker.RenderCube(camera.View, projection);
 
             //cube2.UpdateBaseModel();
             //cube.UpdateBaseModel();
@@ -316,43 +316,39 @@ namespace RobotSimulatorApp
             float value = (float)trackBar1.Value;
             float value2 = (float)trackBar2.Value;
 
-            Vector3 center = Vector3.Zero;
-            if (numericUpDown1.Value == 1)
-            {
-                center = cube.Center;
-                marker.SetPosition(center);
+            //Vector3 center = Vector3.Zero;
+            //if (numericUpDown1.Value == 1)
+            //{
+            //    center = cube.Center;
+            //    marker.SetPosition(center);
 
-                cube.RotateCube(value, center, Axis.Y);
-                cube2.RotateCube(value, center, Axis.Y);
-                cube0.RotateCube(value, center, Axis.Y);
-                cube2.RotateCenter(value, cube.Center);
+            //    cube.RotateCube(value, center, Axis.Y);
+            //    cube2.RotateCube(value, center, Axis.Y);
+            //    cube0.RotateCube(value, center, Axis.Y);
+            //    cube2.RotateCenter(value, cube.Center);
 
 
-                Matrix4 m = cube2.Model;
-                Matrix4 t = cube2.Transformation;
-                Matrix4 mv = cube2.Model * cube2.Transformation;
-                Debug.WriteLine($"Model: {new Vector3(mv.M41, mv.M42, mv.M43)} ");
-                Debug.WriteLine($"Center: {cube2.Center} ");
-            }
+            //    Matrix4 m = cube2.Model;
+            //    Matrix4 t = cube2.Transformation;
+            //    Matrix4 mv = cube2.Model * cube2.Transformation;
+            //}
 
-            if (numericUpDown1.Value == 2)
-            {
-                center = cube2.Center;
-                marker.SetPosition(center);
+            //if (numericUpDown1.Value == 2)
+            //{
+            //    center = cube2.Center;
+            //    marker.SetPosition(center);
 
-                //cube.RotateCube(value, center, Axis.Y);
-                cube2.RotateCube(value + value2, center, Axis.Y);
-                cube0.RotateCube(value, center, Axis.Y);
+            //    //cube.RotateCube(value, center, Axis.Y);
+            //    cube2.RotateCube(value + value2, center, Axis.Y);
+            //    cube0.RotateCube(value, center, Axis.Y);
 
-                Matrix4 mv = cube2.Model * cube2.Transformation;
-                Debug.WriteLine($"Model: {new Vector3(mv.M41, mv.M42, mv.M43)} ");
-                Debug.WriteLine($"Center: {cube2.Center} ");
-            }
+            //    Matrix4 mv = cube2.Model * cube2.Transformation;
+            //}
 
-            if (numericUpDown1.Value == 3)
-            {
-                center = cube0.Center;
-            }
+            //if (numericUpDown1.Value == 3)
+            //{
+            //    center = cube0.Center;
+            //}
 
 
             //Debug.WriteLine($"C: {center}, A:{value}");
@@ -382,12 +378,8 @@ namespace RobotSimulatorApp
                 //cube2.UpdateCenter();
                 trackBar2.Value = trackBar1.Value;
                 trackBar1.Value = 0;
-                cube2.UpdateBaseModel();
+                //cube2.UpdateBaseModel();
                 Matrix4 mv = cube2.Model * cube2.Transformation;
-                Debug.WriteLine($"Model: {new Vector3(mv.M41, mv.M42, mv.M43)} ");
-                Debug.WriteLine($"Center: {cube2.Center} ");
-                
-
             }
 
             if (numericUpDown1.Value == 3)
@@ -396,7 +388,6 @@ namespace RobotSimulatorApp
                 //cube0.UpdateCenter();
 
             }
-            Debug.WriteLine($"------------------------");
         }
 
         private void trackBar2_Scroll(object sender, EventArgs e)
@@ -414,8 +405,6 @@ namespace RobotSimulatorApp
                 cube0.RotateCube(value2, center, Axis.Y);
 
                 Matrix4 mv = cube2.Model * cube2.Transformation;
-                Debug.WriteLine($"Model: {new Vector3(mv.M41, mv.M42, mv.M43)} ");
-                Debug.WriteLine($"Center: {cube2.Center} ");
             }
         }
     }

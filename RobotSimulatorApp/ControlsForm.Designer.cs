@@ -81,6 +81,7 @@ namespace RobotSimulatorApp
             J3TrackBar.TabIndex = 2;
             J3TrackBar.Scroll += J3TrackBar_Scroll;
             J3TrackBar.GotFocus += J3TrackBar_GotFocus;
+            J3TrackBar.LostFocus += J3TrackBar_LostFocus;
             // 
             // J4TrackBar
             // 
@@ -91,6 +92,7 @@ namespace RobotSimulatorApp
             J4TrackBar.TabIndex = 3;
             J4TrackBar.Scroll += J4TrackBar_Scroll;
             J4TrackBar.GotFocus += J4TrackBar_GotFocus;
+            J4TrackBar.LostFocus += J4TrackBar_LostFocus;
             // 
             // TitleLabel
             // 

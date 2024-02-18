@@ -36,16 +36,18 @@ namespace RobotSimulatorApp.Robot.SCARA
         /// <summary>
         /// In linear joints it's the distance in one of the axes, in revolute joints it's maximum angle from starting postition
         /// </summary>
-        public float MaximumMovement { get; set; }
+        public float MaximumDistance { get; set; }
+        public float Distance { get ; set; }
         public JointTypes JointType { get; set; }
         public RobotLimb(Cube cube, string name, float maximumMovement, JointTypes type, Vector3 rotationCenter)
         {
             Name = name;
             Cube = cube;
-            MaximumMovement = maximumMovement;
+            MaximumDistance = maximumMovement;
             JointType = type;
             FirstCenter = RotationCenter = rotationCenter;
-
+            Distance = 0;
+            
             if (type == JointTypes.Revolute)
             {
                 Axis = Axis.Y;
@@ -57,9 +59,12 @@ namespace RobotSimulatorApp.Robot.SCARA
         /// </summary>
         public void MoveJoint_Angular(float angle, Vector3 centerOfRotation, Axis axis)
         {
-            //Debug.WriteLine($"MJ_A {centerOfRotation}");
-            Cube.RotateCube(angle, centerOfRotation, axis);
-            //UpdateCenter(angle, RotationCenter);
+            //Cube.RotateCube(angle - Distance, centerOfRotation, axis);
+            float angleDelta = MathHelper.DegreesToRadians(angle - Distance);
+            angle = MathHelper.DegreesToRadians(angle);
+            Cube.Transformation = Helpers.CreateRotationYAroundPoint(angle, centerOfRotation);
+           // Cube.Transformation = Helpers.CreateRotationYAroundPoint(angleDelta, centerOfRotation);
+            //Cube.RotateCube(angle, centerOfRotation, axis);
         }
 
         public void MoveJoint(Matrix4 dhMatrix)
