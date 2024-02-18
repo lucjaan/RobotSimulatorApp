@@ -101,7 +101,6 @@ namespace RobotSimulatorApp
         private void J2TrackBar_GotFocus(object sender, EventArgs e)
         {
             SendJointValues();
-
             Scara.UpdateModels();
             Scara.CalculateCenters();
             //Scara.CalculateCenters();
@@ -119,9 +118,9 @@ namespace RobotSimulatorApp
 
         private void J3TrackBar_GotFocus(object sender, EventArgs e)
         {
-            Scara.CalculateCenters();
             SendJointValues();
-            Scara.UpdateModels();            //Scara.RobotJoints[2].Cube.UpdateBaseModel();
+            Scara.UpdateModels();
+            Scara.CalculateCenters();          //Scara.RobotJoints[2].Cube.UpdateBaseModel();
             //Scara.RobotJoints[2].UpdateModel();
 
             //foreach (RobotLimb rl in Scara.RobotJoints)
@@ -132,9 +131,9 @@ namespace RobotSimulatorApp
 
         private void J4TrackBar_GotFocus(object sender, EventArgs e)
         {
-            Scara.CalculateCenters();
             SendJointValues();
-            Scara.UpdateModels();            //Scara.RobotJoints[3].Cube.UpdateBaseModel();
+            Scara.UpdateModels();
+            Scara.CalculateCenters();         //Scara.RobotJoints[3].Cube.UpdateBaseModel();
             //Scara.RobotJoints[3].UpdateModel();
 
             //foreach (RobotLimb rl in Scara.RobotJoints)

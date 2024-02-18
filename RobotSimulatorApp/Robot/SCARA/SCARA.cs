@@ -101,7 +101,6 @@ namespace RobotSimulatorApp.Robot.SCARA
 
                     //RobotJoints[i].MoveJoint_Angular(value, JointCenters[jointId], joint.Axis);
                     //RobotJoints[i].MoveJoint_Angular(value - RobotJoints[jointId].Distance, JointCenters[jointId], joint.Axis);
-                    Debug.WriteLine($"Joint: {i} angle: {value - RobotJoints[jointId].Distance} value {value} Disance {RobotJoints[jointId].Distance}");
 
                     //RobotJoints[0].MoveJoint_Angular(value, JointCenters[jointId], joint.Axis);
                 }
@@ -120,6 +119,7 @@ namespace RobotSimulatorApp.Robot.SCARA
             Vector3 j3 = new(j2.X, j2.Y, j2.Z);
             Vector3 j4 = new(j3.X, j3.Y, j3.Z);
 
+            //j1 = j2 = j3 = j3 = j4 =  j0;
             float th1, th2, d3, th4;
             th1 = th2 = d3 = th4 = 0;
 
@@ -153,31 +153,54 @@ namespace RobotSimulatorApp.Robot.SCARA
         public Vector3 UpdateCenter(int jointID)
         {
             Vector4 dh = DHParameters[jointID - 1];
+
+            //Vector4 dh1 = DHParameters[jointID - 1];
+            //Vector4 dh = new Vector4(0, 0, 0, 0);
+            //float dhX, dhY, dhZ, dhW;
+            //dhX = dhY = dhZ = dhW = 0;
+
+            //for (int i = jointID - 1; i >= 0; i--)
+            //{
+            //    dh.X += DHParameters[i].X;
+            //    dh.Y += DHParameters[i].Y;
+            //    dh.Z += DHParameters[i].Z;
+            //    dh.W += DHParameters[i].W;
+            //}
+
             float aY = MathHelper.DegreesToRadians(dh.X);
             Vector3 dY = new(0, dh.Y, 0);
             Vector3 dX = new(dh.Z, 0, 0);
             float aX = MathHelper.DegreesToRadians(dh.W);
-            Vector3 prevCent = JointCenters[jointID - 1];
+            Vector3 vec = Vector3.Zero;
+            Vector3 sumvec = Vector3.Zero;
 
-            //Move point to origin
-            Vector3 vec = FirstJointCenters[jointID] - prevCent;
-            //Translate Y
-            vec += dY;
-            //Rotate around Y axis
-            float x = vec.X * (float)MathHelper.Cos(aY) + vec.Z * (float)MathHelper.Sin(aY);
-            float y = vec.Y;
-            float z = vec.X * -(float)MathHelper.Sin(aY) + vec.Z * (float)MathHelper.Cos(aY);
-            vec = new Vector3(x, y, z);
-            //Translate X
-            vec += dX;
-            //Rotate around X axis
-            x = vec.X;
-            y = vec.Y * (float)MathHelper.Cos(aX) * vec.Z * -(float)MathHelper.Sin(aX);
-            z = vec.Y * (float)MathHelper.Sin(aX) * vec.Z * (float)MathHelper.Cos(aX);
-            vec = new Vector3(x, vec.Y + y, vec.Z + z);
-            //Return from origin
-            vec += prevCent;
-            return vec;
+            for (int i = 0; i < jointID; i++)
+            {
+                //Move point to origin
+                //Vector3 vec = FirstJointCenters[jointID] - prevCent;
+                Vector3 prevCent = JointCenters[jointID - 1];
+                vec = FirstJointCenters[jointID] - prevCent;
+                //Translate Y
+                vec += dY;
+                //Rotate around Y axis
+                float x = vec.X * (float)MathHelper.Cos(aY) + vec.Z * (float)MathHelper.Sin(aY);
+                float y = vec.Y;
+                float z = vec.X * -(float)MathHelper.Sin(aY) + vec.Z * (float)MathHelper.Cos(aY);
+                vec = new Vector3(x, y, z);
+                //Translate X
+                vec += dX;
+                vec += new Vector3((float)MathHelper.Cos(aY) * dX.X, 0, (float)MathHelper.Sin(aY) * dX.X);
+                //Rotate around X axis
+                x = vec.X;
+                y = vec.Y * (float)MathHelper.Cos(aX) * vec.Z * -(float)MathHelper.Sin(aX);
+                z = vec.Y * (float)MathHelper.Sin(aX) * vec.Z * (float)MathHelper.Cos(aX);
+                vec = new Vector3(x, vec.Y + y, vec.Z + z);
+                //Return from origin
+                vec += prevCent;
+            }
+            sumvec += vec;
+
+            return sumvec;
         }
 
         public void UpdateJointValues(float th1, float th2, float d3, float th4)
@@ -189,7 +212,7 @@ namespace RobotSimulatorApp.Robot.SCARA
 
             DHParameters[0] = new Vector4(th1, 0, 0, 0);
             DHParameters[1] = new Vector4(th2, 0, 0, 0);
-            DHParameters[2] = new Vector4(0, 0, d3, 0);
+            DHParameters[2] = new Vector4(0, d3, 0, 0);
             DHParameters[3] = new Vector4(th4, 0, 0, 0);
             //UpdateModels([th1, th2, d3, th4]);
             //UpdateModels();
