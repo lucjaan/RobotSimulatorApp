@@ -174,13 +174,15 @@ namespace RobotSimulatorApp.Robot.SCARA
             Vector3 vec = Vector3.Zero;
             Vector3 sumvec = Vector3.Zero;
 
-            for (int i = 0; i < jointID; i++)
-            {
+            //for (int i = 0; i < jointID; i++)
+            //{
                 //Move point to origin
                 //Vector3 vec = FirstJointCenters[jointID] - prevCent;
                 Vector3 prevCent = JointCenters[jointID - 1];
-                vec = FirstJointCenters[jointID] - prevCent;
-                //Translate Y
+                Vector3 currCent = JointCenters[jointID];
+            //vec = FirstJointCenters[jointID] - prevCent;
+                vec = currCent - prevCent;
+            //Translate Y
                 vec += dY;
                 //Rotate around Y axis
                 float x = vec.X * (float)MathHelper.Cos(aY) + vec.Z * (float)MathHelper.Sin(aY);
@@ -197,18 +199,32 @@ namespace RobotSimulatorApp.Robot.SCARA
                 vec = new Vector3(x, vec.Y + y, vec.Z + z);
                 //Return from origin
                 vec += prevCent;
-            }
+            //}
             sumvec += vec;
 
             return sumvec;
         }
+        public void UpdateCenter2()
+        {
+
+        }
 
         public void UpdateJointValues(float th1, float th2, float d3, float th4)
         {
+            float j1 = th1 - RobotJoints[0].Distance;
+            float j2 = th2 - RobotJoints[1].Distance;
+            float j3 = d3 - RobotJoints[2].Distance;
+            float j4 = th4 -RobotJoints[3].Distance;
+
             RobotJoints[0].Distance = th1;
             RobotJoints[1].Distance = th2;
             RobotJoints[2].Distance = d3;
             RobotJoints[3].Distance = th4;
+
+            //DHParameters[0] = new Vector4(th1, 0, 0, 0);
+            //DHParameters[1] = new Vector4(th2, 0, 0, 0);
+            //DHParameters[2] = new Vector4(0, d3, 0, 0);
+            //DHParameters[3] = new Vector4(th4, 0, 0, 0);
 
             DHParameters[0] = new Vector4(th1, 0, 0, 0);
             DHParameters[1] = new Vector4(th2, 0, 0, 0);

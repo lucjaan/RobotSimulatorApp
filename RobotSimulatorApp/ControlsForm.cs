@@ -25,7 +25,13 @@ namespace RobotSimulatorApp
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
+
+            J1TextBox.Text = J1TrackBar.Value.ToString();
+            J2TextBox.Text = J2TrackBar.Value.ToString();
+            J3TextBox.Text = J3TrackBar.Value.ToString();
+            J4TextBox.Text = J4TrackBar.Value.ToString();
         }
+
 
         private void J1TrackBar_Scroll(object sender, EventArgs e)
         {
@@ -39,6 +45,7 @@ namespace RobotSimulatorApp
             //Scara.MoveRobot(value);
 
             Scara.MoveJoint(0, value);
+            J1TextBox.Text = value.ToString();
             //SendJointValues();
 
             // float value = (float)J1TrackBar.Value;
@@ -58,6 +65,8 @@ namespace RobotSimulatorApp
 
             float value = (float)J2TrackBar.Value;
             Scara.MoveJoint(1, value);
+            J2TextBox.Text = value.ToString();
+
             //SendJointValues();
 
             //float value = (float)J2TrackBar.Value;
@@ -73,6 +82,8 @@ namespace RobotSimulatorApp
 
             float value = (float)J3TrackBar.Value;
             Scara.MoveJoint(2, value);
+            J3TextBox.Text = value.ToString();
+
             //SendJointValues();
 
         }
@@ -85,7 +96,9 @@ namespace RobotSimulatorApp
             }
            float value = (float)J4TrackBar.Value;
            Scara.MoveJoint(3, value);
-           //SendJointValues();
+           J4TextBox.Text = value.ToString();
+
+            //SendJointValues();
 
         }
 

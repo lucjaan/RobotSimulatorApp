@@ -290,14 +290,6 @@ void main()
             Position += translationVector;
             Model *= Matrix4.CreateTranslation(translationVector);
         }
-        //private static Matrix4 CreateRotationXAroundPoint(float angle, Vector3 centerVector)
-        //    => Matrix4.CreateTranslation(-centerVector) * Matrix4.CreateRotationX(angle) * Matrix4.CreateTranslation(centerVector);
-
-        //public static Matrix4 CreateRotationYAroundPoint(float angle, Vector3 centerVector)
-        //     => Matrix4.CreateTranslation(-centerVector) * Matrix4.CreateRotationY(angle) * Matrix4.CreateTranslation(centerVector);
-
-        //private static Matrix4 CreateRotationZAroundPoint(float angle, Vector3 centerVector)
-        //    => Matrix4.CreateTranslation(-centerVector) * Matrix4.CreateRotationZ(angle) * Matrix4.CreateTranslation(centerVector);
 
         private List<Vector3> CreateWall(float x, float y, float z, Axis axis)
         {
