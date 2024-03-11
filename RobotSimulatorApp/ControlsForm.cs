@@ -32,7 +32,6 @@ namespace RobotSimulatorApp
             J4TextBox.Text = J4TrackBar.Value.ToString();
         }
 
-
         private void J1TrackBar_Scroll(object sender, EventArgs e)
         {
             if (!J1TrackBar.Focused)

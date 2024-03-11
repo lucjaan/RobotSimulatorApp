@@ -30,6 +30,10 @@ namespace RobotSimulatorApp.GlConfig
         public Matrix4 PrevTransformation { get; set; }
         public Matrix4 BaseModel { get; set; }
         public Matrix4 Identity { get; set; }
+        public Matrix4 Point { get; set; }
+        public Matrix4 CenterPoint { get; set; }
+        public Matrix4 Buffer1 { get; set; }
+        public Matrix4 Buffer2 { get; set; }
         public float Angle { get; set; }
         private Trace Trace { get; set; }
 
@@ -39,6 +43,7 @@ namespace RobotSimulatorApp.GlConfig
         private int ElementBufferObject { get; set; }
         private int PositionBufferObject { get; set; }
         private int ColorBufferObject { get; set; }
+        private int calls = 0;
 
         private readonly List<Vector3> Vertices = [];
         private static readonly int[] IndexData =
@@ -51,43 +56,7 @@ namespace RobotSimulatorApp.GlConfig
             20, 21, 22, 22, 23, 20,
         };
 
-        //private Color4[] ColorData =
-        //[
-        //    Color4.Silver, Color4.Silver, Color4.Silver, Color4.Silver,
-        //    Color4.Honeydew, Color4.Honeydew, Color4.Honeydew, Color4.Honeydew,
-        //    Color4.Moccasin, Color4.Moccasin, Color4.Moccasin, Color4.Moccasin,
-        //    Color4.IndianRed, Color4.IndianRed, Color4.IndianRed, Color4.IndianRed,
-        //    Color4.PaleVioletRed, Color4.PaleVioletRed, Color4.PaleVioletRed, Color4.PaleVioletRed,
-        //    Color4.ForestGreen, Color4.ForestGreen, Color4.ForestGreen, Color4.ForestGreen,
-        //];
-
-        private Color4[] ColorData =
-        [
-            Color4.DarkRed,
-            Color4.DarkRed,
-            Color4.DarkRed,
-            Color4.DarkRed,
-            Color4.WhiteSmoke,
-            Color4.WhiteSmoke,
-            Color4.WhiteSmoke,
-            Color4.WhiteSmoke,
-            Color4.Yellow,
-            Color4.Yellow,
-            Color4.Yellow,
-            Color4.Yellow,
-            Color4.Orange,
-            Color4.Orange,
-            Color4.Orange,
-            Color4.Orange,
-            Color4.Black,
-            Color4.Black,
-            Color4.Black,
-            Color4.Black,
-            Color4.ForestGreen,
-            Color4.ForestGreen,
-            Color4.ForestGreen,
-            Color4.ForestGreen,
-        ];
+        private Color4[] ColorData = new Color4[36];
 
         public static readonly string VertexShader =
            @"#version 330 core
@@ -127,10 +96,14 @@ void main()
             //FirstCenter = Center = Matrix4.CreateTranslation(new Vector3(size.X / 2, size.Y / 2, size.Z / 2) + position);
             FirstCenter = Center = new Vector3(size.X / 2, size.Y / 2, size.Z / 2) + position;
             PrevTransformation = Transformation = Matrix4.Identity;
-            Rotation = Translation = Model = Matrix4.Identity;
+            Rotation = Translation = Model = Point = CenterPoint = Matrix4.Identity;
+            Buffer1 = Buffer2 = Matrix4.Identity;
+
             BaseModel = Model = Matrix4.CreateTranslation(position);
             isTraceSet = false;
             Angle = 0f;
+            CenterPoint = Matrix4.CreateTranslation(size.X / 2, size.Y / 2, size.Z / 2) * Matrix4.CreateTranslation(position);
+            Buffer1 = CenterPoint;
             ////Create vertices responsible for generating a cube and add them for later use:
             Vertices.AddRange(CreateWall(size.X, size.Y, 0, Axis.Z));
             Vertices.AddRange(CreateWall(size.X, 0, size.Z, Axis.Y));
@@ -173,6 +146,9 @@ void main()
             //Debug.WriteLine($"{Transformation}");
 
             //shader.SetMatrix4("model", BaseModel * Transformation);
+            Point = Point * Transformation;
+            CenterPoint = Buffer1 * Transformation;
+            //Debug.WriteLine(Helpers.GetPositionFromMatrix(CenterPoint));
             shader.SetMatrix4("model", Model * Transformation);
             shader.SetMatrix4("view", view);
             shader.SetMatrix4("projection", projection);
@@ -181,42 +157,21 @@ void main()
             shader.Dispose();
         }
 
-        public Matrix4 RotateCube(float angle, Vector3 centerOfRotation, Axis axis)
-        {
-            angle = MathHelper.DegreesToRadians(angle);
-            Matrix4 result = Matrix4.Zero;
-            switch (axis)
-            {
-                case Axis.X:
-                    //result = Helpers.CreateRotationXAroundPoint(angle, centerOfRotation);
-                    //Model = BaseModel * Helpers.CreateRotationXAroundPoint(angle, centerOfRotation);
-                    break;
-
-                case Axis.Y:
-                    //result = Transformation = Helpers.CreateRotationYAroundPoint(angle, centerOfRotation);
-                    result = Helpers.CreateRotationYAroundPoint(angle, centerOfRotation);
-                    //Model = BaseModel * CreateRotationYAroundPoint(angle, centerPoint);
-                    //Debug.WriteLine($"cube {centerOfRotation}");
-                    //Model *= CreateRotationYAroundPoint(angle, centerOfRotation);
-                    break;
-
-                case Axis.Z:
-                    //Model = BaseModel * Helpers.CreateRotationZAroundPoint(angle, centerOfRotation);
-                    break;
-            }
-            //Transformation = result;
-            return result;
-        }
+        public void SetPoint(Vector3 point) => Point = Matrix4.CreateTranslation(point) * Matrix4.CreateTranslation(Position);
 
         public void UpdateBaseModel()
         {
-
             //BaseModel = Model;
             //Model *= PrevTransformation;
+            calls++;
+            Debug.WriteLine($"Calls {calls}");
             var x = Transformation;
             //Model = BaseModel * PrevTransformation * Transformation;
             var z = BaseModel;
             Model = Model * Transformation;
+            Point = Point * Transformation;
+            Buffer1 = Buffer1 * Transformation;
+            //Buffer1 = Buffer1 * Transformation;
             //Model = BaseModel * Transformation;
             //Debug.WriteLine(Transformation);
             //Debug.WriteLine("------------------");
@@ -281,8 +236,8 @@ void main()
             float z = -(cenX * (float)MathHelper.Sin(angle)) + cenZ * (float)MathHelper.Cos(angle);
 
             Center = center + new Vector3(x, 0, z);
-
         }
+
         public void SetTrace(bool isSet) => isTraceSet = isSet;
         public void SetPosition(Vector3 position) => Model = Matrix4.CreateTranslation(position);
         public void TranslateCube(Vector3 translationVector)
