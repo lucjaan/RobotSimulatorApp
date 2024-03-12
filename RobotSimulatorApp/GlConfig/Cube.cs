@@ -1,49 +1,28 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.WinForms;
-//using Matrix4Extensions;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.DirectoryServices;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace RobotSimulatorApp.GlConfig
 {
     public class Cube
     {
         public Vector3 Center { get; set; }
-        public Vector3 FirstCenter { get; set; }
         public Vector3 Position { get; set; }
         public Vector3 Size { get; set; }
         public Matrix4 Model { get; set; }
-        public Matrix4 Translation { get; set; }
-        public Matrix4 Rotation { get; set; }
         public Matrix4 Transformation { get; set; }
-        public Matrix4 PrevTransformation { get; set; }
-        public Matrix4 BaseModel { get; set; }
-        public Matrix4 Identity { get; set; }
         public Matrix4 Point { get; set; }
         public Matrix4 CenterPoint { get; set; }
         public Matrix4 Buffer1 { get; set; }
         public Matrix4 Buffer2 { get; set; }
-        public float Angle { get; set; }
         private Trace Trace { get; set; }
 
         private readonly GLControl GlControl;
-        private bool isTraceSet;
         private int VertexArrayObject { get; set; }
         private int ElementBufferObject { get; set; }
         private int PositionBufferObject { get; set; }
         private int ColorBufferObject { get; set; }
-        private int calls = 0;
 
         private readonly List<Vector3> Vertices = [];
         private static readonly int[] IndexData =
@@ -93,15 +72,11 @@ void main()
             Position = position;
             GlControl = glControl;
             Size = size;
-            //FirstCenter = Center = Matrix4.CreateTranslation(new Vector3(size.X / 2, size.Y / 2, size.Z / 2) + position);
-            FirstCenter = Center = new Vector3(size.X / 2, size.Y / 2, size.Z / 2) + position;
-            PrevTransformation = Transformation = Matrix4.Identity;
-            Rotation = Translation = Model = Point = CenterPoint = Matrix4.Identity;
+            Center = new Vector3(size.X / 2, size.Y / 2, size.Z / 2) + position;
+            Transformation = Point = Matrix4.Identity;
             Buffer1 = Buffer2 = Matrix4.Identity;
 
-            BaseModel = Model = Matrix4.CreateTranslation(position);
-            isTraceSet = false;
-            Angle = 0f;
+            Model = Matrix4.CreateTranslation(position);
             CenterPoint = Matrix4.CreateTranslation(size.X / 2, size.Y / 2, size.Z / 2) * Matrix4.CreateTranslation(position);
             Buffer1 = CenterPoint;
             ////Create vertices responsible for generating a cube and add them for later use:
@@ -140,15 +115,9 @@ void main()
             int colorLocation = shader.GetAttribLocation("aColor");
             GL.EnableVertexAttribArray(colorLocation);
             GL.VertexAttribPointer(colorLocation, 4, VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
-            //Debug.WriteLine($"============== Model * Transformation ======================");
-            //Debug.WriteLine($"{Model * Transformation}");
-            //Debug.WriteLine($"=================== Transformation ============================");
-            //Debug.WriteLine($"{Transformation}");
 
-            //shader.SetMatrix4("model", BaseModel * Transformation);
             Point = Buffer2 * Transformation;
             CenterPoint = Buffer1 * Transformation;
-            //Debug.WriteLine(Helpers.GetPositionFromMatrix(CenterPoint));
             shader.SetMatrix4("model", Model * Transformation);
             shader.SetMatrix4("view", view);
             shader.SetMatrix4("projection", projection);
@@ -163,45 +132,10 @@ void main()
 
         public void UpdateBaseModel()
         {
-            //BaseModel = Model;
-            //Model *= PrevTransformation;
-            calls++;
-            Debug.WriteLine($"Calls {calls}");
-            var x = Transformation;
-            //Model = BaseModel * PrevTransformation * Transformation;
-            var z = BaseModel;
             Model = Model * Transformation;
-            Buffer2 = Buffer2 * Transformation;
-            Buffer1 = Buffer1 * Transformation;
-            //Buffer1 = Buffer1 * Transformation;
-            //Model = BaseModel * Transformation;
-            //Debug.WriteLine(Transformation);
-            //Debug.WriteLine("------------------");
-            //if (Transformation != Matrix4.Identity)
-            //    PrevTransformation = Transformation;
-            //Debug.WriteLine(PrevTransformation);
-            //Debug.WriteLine("------------------");
-
-            PrevTransformation = Matrix4.Identity;
+            Buffer2 *= Transformation;
+            Buffer1 *= Buffer1 * Transformation;
             Transformation = Matrix4.Identity;
-
-            //Matrix4 test = Model * Matrix4.Invert(PrevTransformation);
-            //Model = Model * Matrix4.Invert(PrevTransformation);
-            ////Matrix4 test = Transformation * Matrix4.Invert(Transformation);
-            ////PrevTransformation = Transformation;
-            //PrevTransformation = Transformation;
-        }
-
-        public void UpdateBaseModel(Matrix4 transformation)
-        {
-            //Model = BaseModel * transformation;
-            //Transformation = Matrix4.Identity;
-            Transformation = transformation;
-        }
-
-        public void SetTransformation(Matrix4 hgm)
-        {
-            Transformation = hgm;
         }
 
         public void SetColor(Color4 colorData)
@@ -226,26 +160,6 @@ void main()
             }
 
             ColorData = color;
-        }
-
-        public void RotateCenter(float angle, Vector3 center)
-        {
-            angle = MathHelper.DegreesToRadians(angle);
-            float cenX = FirstCenter.X - center.X;
-            float cenZ = FirstCenter.Z - center.Z;
-
-            float x = cenX * (float)MathHelper.Cos(angle) + cenZ * (float)MathHelper.Sin(angle);
-            float z = -(cenX * (float)MathHelper.Sin(angle)) + cenZ * (float)MathHelper.Cos(angle);
-
-            Center = center + new Vector3(x, 0, z);
-        }
-
-        public void SetTrace(bool isSet) => isTraceSet = isSet;
-        public void SetPosition(Vector3 position) => Model = Matrix4.CreateTranslation(position);
-        public void TranslateCube(Vector3 translationVector)
-        {
-            Position += translationVector;
-            Model *= Matrix4.CreateTranslation(translationVector);
         }
 
         private List<Vector3> CreateWall(float x, float y, float z, Axis axis)
@@ -279,7 +193,6 @@ void main()
         }
 
         private static Vector2[] CreateWallRectangle(float a, float b)
-            //=> new Vector2[] { new(-a / 2, -b / 2 ), new(a/2 , -b/2), new(a/2, b/2), new(-a/2, b/2) };
             => new Vector2[] { new(0, 0), new(a, 0), new(a, b), new(0, b) };
     }
 }

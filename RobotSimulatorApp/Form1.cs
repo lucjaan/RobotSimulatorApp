@@ -247,7 +247,6 @@ namespace RobotSimulatorApp
             {
                 positionTextBox.Text = $"{camera.Position}";
                 frontTextBox.Text = $"{FrontXtrackBar.Value}, {FrontYtrackBar.Value}, {FrontZtrackBar.Value}";
-                //frontTextBox.Text = $"{camera.Front}";
             }
         }
 

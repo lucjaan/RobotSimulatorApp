@@ -1,16 +1,5 @@
-﻿using OpenTK.Graphics.ES20;
-using OpenTK.Mathematics;
-using OpenTK.WinForms;
+﻿using OpenTK.Mathematics;
 using RobotSimulatorApp.GlConfig;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Design.Serialization;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
 
 namespace RobotSimulatorApp.Robot.SCARA
 {
@@ -22,8 +11,6 @@ namespace RobotSimulatorApp.Robot.SCARA
             Revolute
         }
 
-
-        private Vector3 FirstCenter {  get; set; }
         public Vector3 RotationCenter { get; set; }
         public Matrix4 DHMatrix { get; set; }
         /// <summary>
@@ -45,7 +32,7 @@ namespace RobotSimulatorApp.Robot.SCARA
             Cube = cube;
             MaximumDistance = maximumMovement;
             JointType = type;
-            FirstCenter = RotationCenter = rotationCenter;
+            RotationCenter = rotationCenter;
             Distance = 0;
             
             if (type == JointTypes.Revolute)
@@ -59,91 +46,29 @@ namespace RobotSimulatorApp.Robot.SCARA
         /// </summary>
         public void MoveJoint_Angular(float angle, Vector3 centerOfRotation, Axis axis)
         {
-            //Cube.RotateCube(angle - Distance, centerOfRotation, axis);
-            float angleDelta = MathHelper.DegreesToRadians(angle - Distance);
             angle = MathHelper.DegreesToRadians(angle);
             Cube.Transformation = Helpers.CreateRotationYAroundPoint(angle, centerOfRotation);
-           // Cube.Transformation = Helpers.CreateRotationYAroundPoint(angleDelta, centerOfRotation);
-            //Cube.RotateCube(angle, centerOfRotation, axis);
-        }
-
-        public void MoveJoint(Matrix4 dhMatrix)
-        {
-            Cube.Transformation = dhMatrix;
         }
 
         /// <summary>
         /// When we move one linear joint, all joints higher on kinematic chain get transposed through the same values
         /// </summary>
-        public void MoveJoint_Linear(Vector3 translationVector) => Cube.TranslateCube(translationVector);
-
-        //public void UpdateCenter(float angle, Vector3 prevCent)
-        //{
-        //    float d = MathF.Sqrt(MathF.Pow(prevCent.X - RotationCenter.X, 2) + MathF.Pow(prevCent.Z - RotationCenter.Z, 2));
-        //    angle = MathHelper.DegreesToRadians(angle);
-        //    float X = prevCent.X + d * (float)Math.Cos(angle);
-        //    float Z = prevCent.Z + d * (float)Math.Sin(angle);
-        //    RotationCenter = new(X, RotationCenter.Y, Z);
-        //}
-
-        //public void UpdateCenter(float angle, Matrix4 prevCent)
-        //{
-        //    RotationCenter = FirstCenter * Cube.CreateRotationYAroundPoint(angle, new Vector3(prevCent.M41, prevCent.M42, prevCent.M43));
-        //}
+        public void MoveJoint_Linear(Vector3 translationVector)
+        {
+            //TODO
+        }
 
         public void SetRotationCenter(Vector3 rot)
         {
             RotationCenter = rot;
         }
 
-        //public void UpdateModel(float angle, Matrix4 prevCent)
-        //{
-        //    RotationCenter = FirstCenter * Cube.CreateRotationYAroundPoint(angle, new Vector3(prevCent.M41, prevCent.M42, prevCent.M43));
-        //    //FirstCenter = RotationCenter;
-        //    Cube.UpdateBaseModel();
-        //}
-
         public Matrix4 CreateDHMatrix(float theta, float alpha, float a, float d, Vector3 prevCenter)
         {
 
-            //Matrix4 result = Matrix4.CreateRotationY(theta) * Matrix4.CreateTranslation(new Vector3(0, 0, d)) * Matrix4.CreateTranslation(new Vector3(0, 0, d)) * Matrix4.CreateRotationX(alpha);
             Matrix4 result = Matrix4.CreateTranslation(new Vector3(0, 0, d)) * Matrix4.CreateRotationY(theta) * Matrix4.CreateTranslation(new Vector3(a, 0, 0)) * Matrix4.CreateRotationX(alpha);
-            //Matrix4 result = Matrix4.CreateTranslation(-prevCenter) * Matrix4.CreateRotationY(theta) * Matrix4.CreateTranslation(new Vector3(0, 0, d)) * Matrix4.CreateTranslation(new Vector3(0, 0, d)) * Matrix4.CreateRotationX(alpha) * Matrix4.CreateTranslation(prevCenter);
-            //Matrix4 result = Matrix4.CreateTranslation(new Vector3(-17,-10,-17)) * Matrix4.CreateRotationY(theta) * Matrix4.CreateTranslation(new Vector3(0, 0, d)) * Matrix4.CreateTranslation(new Vector3(0, 0, d)) * Matrix4.CreateRotationX(alpha) * Matrix4.CreateTranslation(new Vector3(17,10,17));
-            //Matrix4 result = Matrix4.CreateTranslation(-prevCenter) * Matrix4.CreateRotationY(theta) * Matrix4.CreateTranslation(new Vector3(0, 0, d)) * Matrix4.CreateTranslation(new Vector3(0, 0, d)) * Matrix4.CreateRotationX(alpha) * Matrix4.CreateTranslation(prevCenter);
-
             DHMatrix = result;
             return result;
         }
-
-        //public void UpdateCenter(float angle, Vector3 prevCent)
-
-
-        //public void UpdateCenter(float angle, Vector3 prevCent)
-        //{
-        //    angle = MathHelper.DegreesToRadians(angle);
-        //    Vector3 oldRot = FirstCenter;
-        //    float tX = RotationCenter.X - prevCent.X;
-        //    float tZ = RotationCenter.Z - prevCent.Z;
-
-        //    //float tX = - prevCent.X;
-        //    //float tZ = - prevCent.Z;
-
-        //    //float rX = tX * MathF.Cos(angle) - tZ * MathF.Sin(angle);
-        //    //float rZ = tX * MathF.Sin(angle) + tZ * MathF.Cos(angle);
-
-        //    float rX = tX * MathF.Cos(angle) + tZ * MathF.Sin(angle);
-        //    float rZ = tX * -MathF.Sin(angle) + tZ * MathF.Cos(angle);
-
-        //    rX = (float)Math.Round(rX, 3);
-        //    rZ = (float)Math.Round(rZ, 3);
-        //    RotationCenter = new(rX + prevCent.X, FirstCenter.Y, rZ + prevCent.Z);
-        //    //RotationCenter = new(rX + prevCent.X, FirstCenter.Y, rZ + prevCent.Z);
-        //    //Cube.Model = Cube.BaseModel * Matrix4.CreateTranslation(oldRot - RotationCenter) * Cube.Model;
-        //   // Cube.Model = Matrix4.Identity;
-        //    Debug.WriteLine($"rot {RotationCenter}");
-
-        //    //RotationCenter = new Vector3(17f, 10f, 52f);
-        //}
     }
 }
