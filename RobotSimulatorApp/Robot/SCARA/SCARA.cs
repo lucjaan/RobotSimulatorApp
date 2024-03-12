@@ -78,20 +78,20 @@ namespace RobotSimulatorApp.Robot.SCARA
             pM3 = new(GLControl, Vector3.Zero, new Vector3(1, 70f, 1));
             pM4 = new(GLControl, Vector3.Zero, new Vector3(1, 70f, 1));
 
-            cM1 = new(GLControl, Vector3.Zero, new Vector3(1, 70f, 1));
-            cM2 = new(GLControl, Vector3.Zero, new Vector3(1, 70f, 1));
-            cM3 = new(GLControl, Vector3.Zero, new Vector3(1, 70f, 1));
-            cM4 = new(GLControl, Vector3.Zero, new Vector3(1, 70f, 1));
+            //cM1 = new(GLControl, Vector3.Zero, new Vector3(1, 70f, 1));
+            //cM2 = new(GLControl, Vector3.Zero, new Vector3(1, 70f, 1));
+            //cM3 = new(GLControl, Vector3.Zero, new Vector3(1, 70f, 1));
+            //cM4 = new(GLControl, Vector3.Zero, new Vector3(1, 70f, 1));
 
             pM1.SetColor(Color4.Yellow);
             pM2.SetColor(Color4.Yellow);
             pM3.SetColor(Color4.Yellow);
             pM4.SetColor(Color4.Yellow);
-            
-            cM1.SetColor(Color4.Magenta);
-            cM2.SetColor(Color4.Magenta);
-            cM3.SetColor(Color4.Magenta);
-            cM4.SetColor(Color4.Magenta);
+
+            //cM1.SetColor(Color4.Magenta);
+            //cM2.SetColor(Color4.Magenta);
+            //cM3.SetColor(Color4.Magenta);
+            //cM4.SetColor(Color4.Magenta);
 
             RobotBase = new(GLControl, Vector3.Zero, new Vector3(34f, 20f, 34f));
             RobotBase.SetColor(Color4.DarkOrange);
@@ -132,52 +132,51 @@ namespace RobotSimulatorApp.Robot.SCARA
 
                 for(int i = 0; i < RobotJoints.Count; i++)
                 {
-                    SecondJointCenters[i + 1] = Helpers.GetPositionFromMatrix(RobotJoints[i].Cube.CenterPoint);
+                    SecondJointCenters[i + 1] = Helpers.GetPositionFromMatrix(RobotJoints[i].Cube.Point);
                 }
 
-                cM1.SetPosition(Helpers.GetPositionFromMatrix(RobotJoints[0].Cube.CenterPoint));
-                cM2.SetPosition(Helpers.GetPositionFromMatrix(RobotJoints[1].Cube.CenterPoint));
-                cM3.SetPosition(Helpers.GetPositionFromMatrix(RobotJoints[2].Cube.CenterPoint));
-                cM4.SetPosition(Helpers.GetPositionFromMatrix(RobotJoints[3].Cube.CenterPoint));
+                //cM1.SetPosition(Helpers.GetPositionFromMatrix(RobotJoints[0].Cube.CenterPoint));
+                //cM2.SetPosition(Helpers.GetPositionFromMatrix(RobotJoints[1].Cube.CenterPoint));
+                //cM3.SetPosition(Helpers.GetPositionFromMatrix(RobotJoints[2].Cube.CenterPoint));
+                //cM4.SetPosition(Helpers.GetPositionFromMatrix(RobotJoints[3].Cube.CenterPoint));
 
-                pM1.SetPoint(Helpers.GetPositionFromMatrix(RobotJoints[0].Cube.Point));
-                pM2.SetPoint(Helpers.GetPositionFromMatrix(RobotJoints[1].Cube.Point));
-                pM3.SetPoint(Helpers.GetPositionFromMatrix(RobotJoints[2].Cube.Point));
-                pM4.SetPoint(Helpers.GetPositionFromMatrix(RobotJoints[3].Cube.Point));
+                
+
+                pM1.SetPosition(Helpers.GetPositionFromMatrix(RobotJoints[0].Cube.Point));
+                pM2.SetPosition(Helpers.GetPositionFromMatrix(RobotJoints[1].Cube.Point));
+                pM3.SetPosition(Helpers.GetPositionFromMatrix(RobotJoints[2].Cube.Point));
+                pM4.SetPosition(Helpers.GetPositionFromMatrix(RobotJoints[3].Cube.Point));
 
                 for (int i = jointId; i < RobotJoints.Count; i++)
                 {
                     //RobotJoints[i].MoveJoint_Angular(value - RobotJoints[jointId].Distance, JointCenters[jointId], joint.Axis);
                     RobotJoints[i].MoveJoint_Angular(value - RobotJoints[jointId].Distance, SecondJointCenters[jointId], joint.Axis);
-                    switch(jointId)
+                    switch(jointId) 
                     {
                         case 0:
-                            cM1.SetColor(Color4.OrangeRed);
-                            cM2.SetColor(Color4.Yellow);
-                            cM3.SetColor(Color4.Yellow);
-                            cM4.SetColor(Color4.Yellow); 
+                            //pM1.SetColor(Color4.OrangeRed);
+                            pM2.SetColor(Color4.White);
+                            pM3.SetColor(Color4.Yellow);
+                            pM4.SetColor(Color4.DarkCyan); 
                             break;
                         case 1:
-                            cM1.SetColor(Color4.Yellow);
-                            cM2.SetColor(Color4.OrangeRed);
-                            cM3.SetColor(Color4.Yellow);
-                            cM4.SetColor(Color4.Yellow);
+                            pM1.SetColor(Color4.OrangeRed);
+                            pM2.SetColor(Color4.Gold);
+                            pM3.SetColor(Color4.Yellow);
+                            pM4.SetColor(Color4.DarkCyan);
                             break;
                         case 2:
-                            cM1.SetColor(Color4.Yellow);
-                            cM2.SetColor(Color4.Yellow);
-                            cM3.SetColor(Color4.OrangeRed);
-                            cM4.SetColor(Color4.Yellow);
+                            pM1.SetColor(Color4.Gold);
+                            pM2.SetColor(Color4.OrangeRed);
+                            pM3.SetColor(Color4.Yellow);
+                            pM4.SetColor(Color4.DarkCyan);
                             break;
                         case 3:
-                            cM1.SetColor(Color4.Yellow);
-                            cM2.SetColor(Color4.Yellow);
-                            cM3.SetColor(Color4.Yellow);
-                            cM4.SetColor(Color4.OrangeRed);
+                            pM1.SetColor(Color4.Gold);
+                            pM2.SetColor(Color4.White);
+                            pM3.SetColor(Color4.OrangeRed);
+                            pM4.SetColor(Color4.DarkCyan);
                             break;
-
-
-
                     }
                     //RobotJoints[i].MoveJoint_Angular(value, JointCenters[jointId], joint.Axis);
                     //RobotJoints[i].MoveJoint_Angular(value - RobotJoints[jointId].Distance, JointCenters[jointId], joint.Axis);
@@ -240,16 +239,16 @@ namespace RobotSimulatorApp.Robot.SCARA
             //SecondJointCenters.Add(Helpers.GetPositionFromMatrix(m3));
             //SecondJointCenters.Add(Helpers.GetPositionFromMatrix(m4)); 
 
-            SecondJointCenters.Add(j0);
-            SecondJointCenters.Add(Helpers.GetPositionFromMatrix(RobotJoints[0].Cube.CenterPoint));
-            SecondJointCenters.Add(Helpers.GetPositionFromMatrix(RobotJoints[1].Cube.CenterPoint));
-            SecondJointCenters.Add(Helpers.GetPositionFromMatrix(RobotJoints[2].Cube.CenterPoint));
-            SecondJointCenters.Add(Helpers.GetPositionFromMatrix(RobotJoints[3].Cube.CenterPoint));
-
             RobotJoints[0].Cube.SetPoint(new Vector3(40f, RobotJoints[0].Cube.Size.Y / 2, RobotJoints[0].Cube.Size.Z / 2));
             RobotJoints[1].Cube.SetPoint(new Vector3(35f, RobotJoints[1].Cube.Size.Y / 2, RobotJoints[1].Cube.Size.Z / 2));
             RobotJoints[2].Cube.SetPoint(new Vector3(RobotJoints[2].Cube.Size.X / 2, RobotJoints[2].Cube.Size.Y / 2, RobotJoints[2].Cube.Size.Z / 2));
             RobotJoints[3].Cube.SetPoint(new Vector3(RobotJoints[3].Cube.Size.X / 2, RobotJoints[3].Cube.Size.Y / 2, RobotJoints[3].Cube.Size.Z / 2));
+
+            SecondJointCenters.Add(j0);
+            SecondJointCenters.Add(Helpers.GetPositionFromMatrix(RobotJoints[0].Cube.Point));
+            SecondJointCenters.Add(Helpers.GetPositionFromMatrix(RobotJoints[1].Cube.Point));
+            SecondJointCenters.Add(Helpers.GetPositionFromMatrix(RobotJoints[2].Cube.Point));
+            SecondJointCenters.Add(Helpers.GetPositionFromMatrix(RobotJoints[3].Cube.Point));
         }
 
         public void CalculateCenters()
@@ -313,10 +312,6 @@ namespace RobotSimulatorApp.Robot.SCARA
             sumvec += vec;
 
             return sumvec;
-        }
-        public void UpdateCenter2()
-        {
-
         }
 
         public void UpdateJointValues(float th1, float th2, float d3, float th4)
@@ -408,10 +403,10 @@ namespace RobotSimulatorApp.Robot.SCARA
             //marker2.RenderCube(view, projection);
             //marker3.RenderCube(view, projection);
 
-            cM1.RenderCube(view, projection);
-            cM2.RenderCube(view, projection);
-            cM3.RenderCube(view, projection);
-            cM4.RenderCube(view, projection);
+            //cM1.RenderCube(view, projection);
+            //cM2.RenderCube(view, projection);
+            //cM3.RenderCube(view, projection);
+            //cM4.RenderCube(view, projection);
 
             pM1.RenderCube(view, projection);
             pM2.RenderCube(view, projection);

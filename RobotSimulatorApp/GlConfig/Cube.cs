@@ -146,7 +146,7 @@ void main()
             //Debug.WriteLine($"{Transformation}");
 
             //shader.SetMatrix4("model", BaseModel * Transformation);
-            Point = Point * Transformation;
+            Point = Buffer2 * Transformation;
             CenterPoint = Buffer1 * Transformation;
             //Debug.WriteLine(Helpers.GetPositionFromMatrix(CenterPoint));
             shader.SetMatrix4("model", Model * Transformation);
@@ -157,7 +157,9 @@ void main()
             shader.Dispose();
         }
 
-        public void SetPoint(Vector3 point) => Point = Matrix4.CreateTranslation(point) * Matrix4.CreateTranslation(Position);
+        public void SetPoint(Vector3 point) {
+           Buffer2 = Point = Matrix4.CreateTranslation(point) * Matrix4.CreateTranslation(Position);
+        } 
 
         public void UpdateBaseModel()
         {
@@ -169,7 +171,7 @@ void main()
             //Model = BaseModel * PrevTransformation * Transformation;
             var z = BaseModel;
             Model = Model * Transformation;
-            Point = Point * Transformation;
+            Buffer2 = Buffer2 * Transformation;
             Buffer1 = Buffer1 * Transformation;
             //Buffer1 = Buffer1 * Transformation;
             //Model = BaseModel * Transformation;
