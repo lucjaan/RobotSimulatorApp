@@ -31,6 +31,8 @@ namespace RobotSimulatorApp.OpenGL
         private List<Vector3> TopVertices = [];
         private List<Vector3> BottomVertices = [];
         private List<int> BaseIndexData = [];
+        private List<int> SidesIndexData = [];
+        private List<Vector3> SidesVertices = [];
 
         private int Sides { get; set; }
 
@@ -75,56 +77,35 @@ void main()
             Model = Matrix4.CreateTranslation(position);
 
             Sides = 90;
-            BottomVertices = CreateRoundBase(50).ToList();
+            TopVertices = CreateRoundBase(50).ToList();
+            BottomVertices = CreateRoundBase(10).ToList();
+            SidesVertices.AddRange(BottomVertices);
+            SidesVertices.AddRange(TopVertices);
             GenerateBaseIndices();
-            //CenterPoint = Matrix4.CreateTranslation(size.X / 2, size.Y / 2, size.Z / 2) * Matrix4.CreateTranslation(position);
+            GenerateSideIndices();
 
-            ////Create vertices responsible for generating a cube and add them for later use:
-            //Vertices.AddRange(CreateWall(size.X, size.Y, 0, Axis.Z));
-            //Vertices.AddRange(CreateWall(size.X, 0, size.Z, Axis.Y));
-            //Vertices.AddRange(CreateWall(0, size.Y, size.Z, Axis.X));
-            //Vertices.AddRange(CreateWall(size.X, size.Y, size.Z, Axis.Z));
-            //Vertices.AddRange(CreateWall(size.X, size.Y, size.Z, Axis.Y));
-            //Vertices.AddRange(CreateWall(size.X, size.Y, size.Z, Axis.X));
         }
 
-        //public void RenderCylinder(Matrix4 view, Matrix4 projection)
-        //{
-        //    Shader shader = new(VertexShader, FragmentShader);
-        //    shader.Use();
+        public void RenderCylinder(Matrix4 view, Matrix4 projection)
+        {
+            Color4[] color = new Color4[BaseIndexData.Count];
+            for (int i  = 0; i < BaseIndexData.Count; i++)
+            {
+                color[i] = Color4.DeepSkyBlue;
+            }
 
-        //    VertexArrayObject = GL.GenVertexArray();
-        //    GL.BindVertexArray(VertexArrayObject);
+            Color4[] color2 = new Color4[SidesIndexData.Count];
+            for (int i = 0; i < SidesIndexData.Count; i++)
+            {
+                color2[i] = Color4.ForestGreen;
+            }
 
-        //    ElementBufferObject = GL.GenBuffer();
-        //    GL.BindBuffer(BufferTarget.ElementArrayBuffer, ElementBufferObject);
-        //    GL.BufferData(BufferTarget.ElementArrayBuffer, IndexData.Length * sizeof(int), IndexData, BufferUsageHint.StaticDraw);
+            Render(view, projection, BaseIndexData.ToArray(), TopVertices.ToArray(), ColorData);
+            Render(view, projection, BaseIndexData.ToArray(), BottomVertices.ToArray(), color);
+            Render(view, projection, SidesIndexData.ToArray(), SidesVertices.ToArray(), color2);
+        }
 
-        //    PositionBufferObject = GL.GenBuffer();
-        //    GL.BindBuffer(BufferTarget.ArrayBuffer, PositionBufferObject);
-        //    GL.BufferData(BufferTarget.ArrayBuffer, 3 * Vertices.Count * sizeof(float), Vertices.ToArray(), BufferUsageHint.StaticDraw);
-
-        //    int vertexLocation = shader.GetAttribLocation("aPosition");
-        //    GL.EnableVertexAttribArray(vertexLocation);
-        //    GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
-
-        //    ColorBufferObject = GL.GenBuffer();
-        //    GL.BindBuffer(BufferTarget.ArrayBuffer, ColorBufferObject);
-        //    GL.BufferData(BufferTarget.ArrayBuffer, ColorData.Length * sizeof(float) * 4, ColorData, BufferUsageHint.StaticDraw);
-
-        //    int colorLocation = shader.GetAttribLocation("aColor");
-        //    GL.EnableVertexAttribArray(colorLocation);
-        //    GL.VertexAttribPointer(colorLocation, 4, VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
-
-        //    shader.SetMatrix4("model", Model * Transformation);
-        //    shader.SetMatrix4("view", view);
-        //    shader.SetMatrix4("projection", projection);
-
-        //    GL.DrawElements(BeginMode.Triangles, IndexData.Length, DrawElementsType.UnsignedInt, 0);
-        //    shader.Dispose();
-        //}
-
-        public void RenderBase(Matrix4 view, Matrix4 projection)
+        public void Render(Matrix4 view, Matrix4 projection, int[] indexData, Vector3[] vertices, Color4[] colorData)
         {
             Shader shader = new(VertexShader, FragmentShader);
             shader.Use();
@@ -134,11 +115,11 @@ void main()
 
             ElementBufferObject = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ElementBufferObject);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, BaseIndexData.Count * sizeof(int), BaseIndexData.ToArray(), BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, indexData.Length * sizeof(int), indexData, BufferUsageHint.StaticDraw);
 
             PositionBufferObject = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, PositionBufferObject);
-            GL.BufferData(BufferTarget.ArrayBuffer, 3 * BottomVertices.Count * sizeof(float), BottomVertices.ToArray(), BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, 3 * vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw);
 
             int vertexLocation = shader.GetAttribLocation("aPosition");
             GL.EnableVertexAttribArray(vertexLocation);
@@ -146,7 +127,7 @@ void main()
 
             ColorBufferObject = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, ColorBufferObject);
-            GL.BufferData(BufferTarget.ArrayBuffer, ColorData.Length * sizeof(float) * 4, ColorData, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, colorData.Length * sizeof(float) * 4, colorData, BufferUsageHint.StaticDraw);
 
             int colorLocation = shader.GetAttribLocation("aColor");
             GL.EnableVertexAttribArray(colorLocation);
@@ -156,7 +137,7 @@ void main()
             shader.SetMatrix4("view", view);
             shader.SetMatrix4("projection", projection);
 
-            GL.DrawElements(BeginMode.Triangles, BaseIndexData.Count, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(BeginMode.Triangles, indexData.Length, DrawElementsType.UnsignedInt, 0);
             shader.Dispose();
         }
 
@@ -181,10 +162,30 @@ void main()
                 BaseIndexData.Add(i);
                 BaseIndexData.Add(i + 1);
             }
-            //BaseIndexData.Add(0);
             BaseIndexData.Add(0);
             BaseIndexData.Add(Sides - 1);
             BaseIndexData.Add(1);
+        }
+
+        private void GenerateSideIndices()
+        {
+            int c = TopVertices.Count;
+            for (int i = 1; i < Sides ; i++)
+            {
+                SidesIndexData.Add(i);
+                SidesIndexData.Add(i + 1);
+                SidesIndexData.Add(i + c);
+                SidesIndexData.Add(i + c);
+                SidesIndexData.Add(i + c + 1);
+                SidesIndexData.Add(i + 1);
+            }
+
+            SidesIndexData.Add(1);
+            SidesIndexData.Add(c - 1);
+            SidesIndexData.Add(c + 1);
+            SidesIndexData.Add(c + 1);
+            SidesIndexData.Add(c + Sides);
+            SidesIndexData.Add(c - 1);
         }
     }
 }

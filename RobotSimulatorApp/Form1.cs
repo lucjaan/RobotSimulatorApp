@@ -122,7 +122,7 @@ namespace RobotSimulatorApp
             //cube2.UpdateBaseModel();
 
             //scara.RenderRobot(camera.View, projection);
-            cylinder.RenderBase(camera.View, projection);
+            cylinder.RenderCylinder(camera.View, projection);
             grid.RenderWorld(camera.View, projection);
             glControl.SwapBuffers();
         }
