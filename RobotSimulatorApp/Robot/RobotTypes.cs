@@ -1,4 +1,4 @@
-﻿enum RobotTypes
+﻿public enum RobotTypes
 {
     SCARA,
     Cartesian

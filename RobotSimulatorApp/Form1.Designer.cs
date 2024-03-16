@@ -50,16 +50,13 @@ namespace RobotSimulatorApp
             PosZTrackBar = new TrackBar();
             positionTextBox = new TextBox();
             frontTextBox = new TextBox();
-            jointNumeric = new NumericUpDown();
-            jointTrackBar = new TrackBar();
+            OpenControlsButton = new Button();
             ((System.ComponentModel.ISupportInitialize)FrontXtrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)FrontYtrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)FrontZtrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)PosXTrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)PosYTrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)PosZTrackBar).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)jointNumeric).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)jointTrackBar).BeginInit();
             SuspendLayout();
             // 
             // glControl
@@ -116,7 +113,7 @@ namespace RobotSimulatorApp
             // 
             // getCameraButton
             // 
-            getCameraButton.Location = new Point(1243, 464);
+            getCameraButton.Location = new Point(1243, 523);
             getCameraButton.Name = "getCameraButton";
             getCameraButton.Size = new Size(86, 25);
             getCameraButton.TabIndex = 21;
@@ -126,7 +123,7 @@ namespace RobotSimulatorApp
             // 
             // setCameraButton
             // 
-            setCameraButton.Location = new Point(1243, 495);
+            setCameraButton.Location = new Point(1243, 554);
             setCameraButton.Name = "setCameraButton";
             setCameraButton.Size = new Size(86, 25);
             setCameraButton.TabIndex = 22;
@@ -136,7 +133,7 @@ namespace RobotSimulatorApp
             // 
             // returnDefaultButton
             // 
-            returnDefaultButton.Location = new Point(1110, 464);
+            returnDefaultButton.Location = new Point(1121, 523);
             returnDefaultButton.Name = "returnDefaultButton";
             returnDefaultButton.Size = new Size(86, 56);
             returnDefaultButton.TabIndex = 23;
@@ -240,34 +237,22 @@ namespace RobotSimulatorApp
             frontTextBox.Size = new Size(208, 23);
             frontTextBox.TabIndex = 33;
             // 
-            // jointNumeric
+            // OpenControlsButton
             // 
-            jointNumeric.Location = new Point(1121, 347);
-            jointNumeric.Maximum = new decimal(new int[] { 4, 0, 0, 0 });
-            jointNumeric.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            jointNumeric.Name = "jointNumeric";
-            jointNumeric.Size = new Size(35, 23);
-            jointNumeric.TabIndex = 34;
-            jointNumeric.Value = new decimal(new int[] { 1, 0, 0, 0 });
-            // 
-            // jointTrackBar
-            // 
-            jointTrackBar.AutoSize = false;
-            jointTrackBar.Location = new Point(1166, 347);
-            jointTrackBar.Maximum = 18000;
-            jointTrackBar.Minimum = -18000;
-            jointTrackBar.Name = "jointTrackBar";
-            jointTrackBar.Size = new Size(163, 33);
-            jointTrackBar.TabIndex = 35;
-            jointTrackBar.Scroll += jointTrackBar_Scroll;
+            OpenControlsButton.Location = new Point(1121, 346);
+            OpenControlsButton.Name = "OpenControlsButton";
+            OpenControlsButton.Size = new Size(208, 23);
+            OpenControlsButton.TabIndex = 37;
+            OpenControlsButton.Text = "Open Limb controls";
+            OpenControlsButton.UseVisualStyleBackColor = true;
+            OpenControlsButton.Click += OpenControlsButton_Click;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1341, 654);
-            Controls.Add(jointTrackBar);
-            Controls.Add(jointNumeric);
+            Controls.Add(OpenControlsButton);
             Controls.Add(frontTextBox);
             Controls.Add(positionTextBox);
             Controls.Add(PosZTrackBar);
@@ -294,8 +279,6 @@ namespace RobotSimulatorApp
             ((System.ComponentModel.ISupportInitialize)PosXTrackBar).EndInit();
             ((System.ComponentModel.ISupportInitialize)PosYTrackBar).EndInit();
             ((System.ComponentModel.ISupportInitialize)PosZTrackBar).EndInit();
-            ((System.ComponentModel.ISupportInitialize)jointNumeric).EndInit();
-            ((System.ComponentModel.ISupportInitialize)jointTrackBar).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -320,7 +303,6 @@ namespace RobotSimulatorApp
         private TrackBar PosZTrackBar;
         private TextBox positionTextBox;
         private TextBox frontTextBox;
-        private NumericUpDown jointNumeric;
-        private TrackBar jointTrackBar;
+        private Button OpenControlsButton;
     }
 }

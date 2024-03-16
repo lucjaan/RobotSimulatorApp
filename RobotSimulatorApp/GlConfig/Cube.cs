@@ -1,31 +1,24 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.WinForms;
-//using Matrix4Extensions;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.DirectoryServices;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace RobotSimulatorApp.GlConfig
 {
-    internal class Cube
+    public class Cube
     {
         public Vector3 Center { get; set; }
         public Vector3 Position { get; set; }
-        private Matrix4 Model { get; set; }
+        public Vector3 Size { get; set; }
+        public Matrix4 Model { get; set; }
+        public Matrix4 Transformation { get; set; }
+        public Matrix4 Point { get; set; }
+        public Matrix4 CenterPoint { get; set; }
+        public Matrix4 Buffer1 { get; set; }
+        public Matrix4 Buffer2 { get; set; }
         private Trace Trace { get; set; }
 
         private readonly GLControl GlControl;
-        private bool isTraceSet;
         private int VertexArrayObject { get; set; }
         private int ElementBufferObject { get; set; }
         private int PositionBufferObject { get; set; }
@@ -42,43 +35,7 @@ namespace RobotSimulatorApp.GlConfig
             20, 21, 22, 22, 23, 20,
         };
 
-        //private Color4[] ColorData =
-        //[
-        //    Color4.Silver, Color4.Silver, Color4.Silver, Color4.Silver,
-        //    Color4.Honeydew, Color4.Honeydew, Color4.Honeydew, Color4.Honeydew,
-        //    Color4.Moccasin, Color4.Moccasin, Color4.Moccasin, Color4.Moccasin,
-        //    Color4.IndianRed, Color4.IndianRed, Color4.IndianRed, Color4.IndianRed,
-        //    Color4.PaleVioletRed, Color4.PaleVioletRed, Color4.PaleVioletRed, Color4.PaleVioletRed,
-        //    Color4.ForestGreen, Color4.ForestGreen, Color4.ForestGreen, Color4.ForestGreen,
-        //];
-
-        private Color4[] ColorData =
-        [
-            Color4.DarkRed,
-            Color4.DarkRed,
-            Color4.DarkRed,
-            Color4.DarkRed,
-            Color4.WhiteSmoke,
-            Color4.WhiteSmoke,
-            Color4.WhiteSmoke,
-            Color4.WhiteSmoke,
-            Color4.Yellow,
-            Color4.Yellow,
-            Color4.Yellow,
-            Color4.Yellow,
-            Color4.Orange,
-            Color4.Orange,
-            Color4.Orange,
-            Color4.Orange,
-            Color4.Black,
-            Color4.Black,
-            Color4.Black,
-            Color4.Black,
-            Color4.ForestGreen,
-            Color4.ForestGreen,
-            Color4.ForestGreen,
-            Color4.ForestGreen,
-        ];
+        private Color4[] ColorData = new Color4[36];
 
         public static readonly string VertexShader =
            @"#version 330 core
@@ -114,11 +71,15 @@ void main()
         {
             Position = position;
             GlControl = glControl;
+            Size = size;
             Center = new Vector3(size.X / 2, size.Y / 2, size.Z / 2) + position;
-            Model = Matrix4.CreateTranslation(position);
+            Transformation = Point = Matrix4.Identity;
+            Buffer1 = Buffer2 = Matrix4.Identity;
 
-            isTraceSet = false;
-            //Create vertices responsible for generating a cube and add them for later use:
+            Model = Matrix4.CreateTranslation(position);
+            CenterPoint = Matrix4.CreateTranslation(size.X / 2, size.Y / 2, size.Z / 2) * Matrix4.CreateTranslation(position);
+            Buffer1 = CenterPoint;
+            ////Create vertices responsible for generating a cube and add them for later use:
             Vertices.AddRange(CreateWall(size.X, size.Y, 0, Axis.Z));
             Vertices.AddRange(CreateWall(size.X, 0, size.Z, Axis.Y));
             Vertices.AddRange(CreateWall(0, size.Y, size.Z, Axis.X));
@@ -155,7 +116,9 @@ void main()
             GL.EnableVertexAttribArray(colorLocation);
             GL.VertexAttribPointer(colorLocation, 4, VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
 
-            shader.SetMatrix4("model", Model);
+            Point = Buffer2 * Transformation;
+            CenterPoint = Buffer1 * Transformation;
+            shader.SetMatrix4("model", Model * Transformation);
             shader.SetMatrix4("view", view);
             shader.SetMatrix4("projection", projection);
 
@@ -163,23 +126,16 @@ void main()
             shader.Dispose();
         }
 
-        public void RotateCube(float angle, Vector3 centerOfRotation, Axis axis)
+        public void SetPoint(Vector3 point) {
+           Buffer2 = Point = Matrix4.CreateTranslation(point) * Matrix4.CreateTranslation(Position);
+        } 
+
+        public void UpdateBaseModel()
         {
-            angle = MathHelper.DegreesToRadians(angle);
-            switch (axis)
-            {
-                case Axis.X:
-                    Model *= CreateRotationXAroundPoint(angle, centerOfRotation);
-                    break;
-
-                case Axis.Y:
-                    Model *= CreateRotationYAroundPoint(angle, centerOfRotation);
-                    break;
-
-                case Axis.Z:
-                    Model *= CreateRotationZAroundPoint(angle, centerOfRotation);
-                    break;
-            }
+            Model = Model * Transformation;
+            Buffer2 *= Transformation;
+            Buffer1 *= Buffer1 * Transformation;
+            Transformation = Matrix4.Identity;
         }
 
         public void SetColor(Color4 colorData)
@@ -190,9 +146,9 @@ void main()
                 //very rudimentary shadow simulation
                 color[i + 16] = colorData;
 
-                color[i] =  color[i + 8] = color[i + 12] = color[i + 20]  = new Color4(
-                    MathHelper.Clamp(colorData.R - 0.05f, 0f, 1), 
-                    MathHelper.Clamp(colorData.G - 0.05f, 0f, 1), 
+                color[i] = color[i + 8] = color[i + 12] = color[i + 20] = new Color4(
+                    MathHelper.Clamp(colorData.R - 0.05f, 0f, 1),
+                    MathHelper.Clamp(colorData.G - 0.05f, 0f, 1),
                     MathHelper.Clamp(colorData.B - 0.05f, 0f, 1),
                     1);
 
@@ -205,17 +161,6 @@ void main()
 
             ColorData = color;
         }
-
-        public void SetTrace(bool isSet) => isTraceSet = isSet;
-
-        private static Matrix4 CreateRotationXAroundPoint(float angle, Vector3 centerVector)
-            => Matrix4.CreateTranslation(-centerVector) * Matrix4.CreateRotationX(angle) * Matrix4.CreateTranslation(centerVector);
-
-        private static Matrix4 CreateRotationYAroundPoint(float angle, Vector3 centerVector)
-             => Matrix4.CreateTranslation(-centerVector) * Matrix4.CreateRotationY(angle) * Matrix4.CreateTranslation(centerVector);
-        
-        private static Matrix4 CreateRotationZAroundPoint(float angle, Vector3 centerVector)
-            => Matrix4.CreateTranslation(-centerVector) * Matrix4.CreateRotationZ(angle) * Matrix4.CreateTranslation(centerVector);
 
         private List<Vector3> CreateWall(float x, float y, float z, Axis axis)
         {

@@ -24,8 +24,9 @@ namespace RobotSimulatorApp
         Cube cube;
         Cube cube2;
         Cube cube0;
+        Cube marker;
         Grid grid;
-        SCARA_Robot scara;
+        public SCARA_Robot scara { get; set; }
         public int VertexArrayObject { get; private set; }
         public int ElementBufferObject { get; private set; }
         public int PositionBuffer { get; private set; }
@@ -45,6 +46,10 @@ namespace RobotSimulatorApp
             base.OnLoad(e);
             //glControl.Paint += glControl_Paint;
             SetUpOpenGL();
+
+            ControlsForm controlsForm = new ControlsForm(scara);
+            controlsForm.Show();
+
         }
 
         private void SetUpOpenGL()
@@ -52,12 +57,18 @@ namespace RobotSimulatorApp
             GL.Enable(EnableCap.DepthTest);
 
             //cube = new(glControl, new Vector3(-5f, -1f, -5f), new Vector3(2f, 22f, 2f));
-            //cube2 = new(glControl, new Vector3(15f, 0f, 9f), new Vector3(6f, 8f, 10f));
-            //cube0 = new(glControl, new Vector3(0f, -3f, 0f), new Vector3(6f, 6f, 6f));
+            //cube2 = new(glControl, new Vector3(-7f, 0f, 9f), new Vector3(6f, 8f, 10f));
+            ////cube2 = new(glControl, new Vector3(15f, 0f, 9f), new Vector3(6f, 8f, 10f));
+            //cube0 = new(glControl, new Vector3(0f, -3f, -7f), new Vector3(6f, 6f, 6f));
+            //marker = new(glControl, new Vector3(0f, 0, 0), new Vector3(1f, 30f, 1f));
+            ////cube0 = new(glControl, new Vector3(0f, -3f, 0f), new Vector3(6f, 6f, 6f));
+            //marker.SetColor(Color4.Red);
             //cube0.SetColor(Color4.LimeGreen);
+            //cube2.SetColor(Color4.MediumVioletRed);
+            //cube.SetColor(Color4.Olive);
 
             grid = new Grid(glControl);
-            scara = new SCARA_Robot(glControl, "tomek");
+            scara = new SCARA_Robot(glControl, "scara");
             timer = new Timer();
             timer.Tick += (sender, e) =>
             {
@@ -88,9 +99,9 @@ namespace RobotSimulatorApp
             Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, AspectRatio, 0.1f, 500f);
             //var x = MathHelper.Clamp(_angle, 0, 360);
 
-            //cube.RotateCube(15f, cube.Center, Axis.X);
+            //cube.RotateCube(15f, cube.Center, Axis.Y);
             //cube2.RotateCube(15f, cube2.Center, Axis.Y);
-            //cube0.RotateCube(15f, cube0.Center, Axis.Z);
+            //cube0.RotateCube(15f, cube0.Center, Axis.Y);
 
             if (captureMouseCheckBox.Checked)
             {
@@ -100,6 +111,12 @@ namespace RobotSimulatorApp
             //cube2.RenderCube(camera.View, projection);
             //cube.RenderCube(camera.View, projection);
             //cube0.RenderCube(camera.View, projection);
+            //marker.RenderCube(camera.View, projection);
+
+            //cube2.UpdateBaseModel();
+            //cube.UpdateBaseModel();
+            //cube2.UpdateBaseModel();
+
             scara.RenderRobot(camera.View, projection);
             grid.RenderWorld(camera.View, projection);
             glControl.SwapBuffers();
@@ -111,7 +128,7 @@ namespace RobotSimulatorApp
 
             if (glControl.ClientSize.Height == 0)
             {
-                glControl.ClientSize = new System.Drawing.Size(glControl.ClientSize.Width, 1);
+                glControl.ClientSize = new Size(glControl.ClientSize.Width, 1);
             }
 
             GL.Viewport(0, 0, glControl.ClientSize.Width, glControl.ClientSize.Height);
@@ -230,7 +247,6 @@ namespace RobotSimulatorApp
             {
                 positionTextBox.Text = $"{camera.Position}";
                 frontTextBox.Text = $"{FrontXtrackBar.Value}, {FrontYtrackBar.Value}, {FrontZtrackBar.Value}";
-                //frontTextBox.Text = $"{camera.Front}";
             }
         }
 
@@ -287,11 +303,11 @@ namespace RobotSimulatorApp
             UpdateTextBoxes();
         }
 
-        private void jointTrackBar_Scroll(object sender, EventArgs e)
+        private void OpenControlsButton_Click(object sender, EventArgs e)
         {
-            scara.RobotBase.RotateCube((float)jointTrackBar.Value/1000, scara.RobotBase.Center, Axis.Y);
-            var x = (float)jointTrackBar.Value / 1000;
-            var z = scara.RobotBase.Center;
+            ControlsForm controlsForm = new ControlsForm(scara);
+            if (!controlsForm.Visible)
+                controlsForm.Show();
         }
     }
 }
