@@ -2,13 +2,8 @@
 using OpenTK.Mathematics;
 using OpenTK.WinForms;
 using RobotSimulatorApp.GlConfig;
-using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RobotSimulatorApp.OpenGL
 {
@@ -20,6 +15,7 @@ namespace RobotSimulatorApp.OpenGL
         public Matrix4 Transformation { get; set; }
         public Matrix4 CenterPoint { get; set; }
         public float Radius { get; set; }
+        private int Sides { get; set; }
 
         private readonly GLControl GlControl;
         private int VertexArrayObject { get; set; }
@@ -27,14 +23,12 @@ namespace RobotSimulatorApp.OpenGL
         private int PositionBufferObject { get; set; }
         private int ColorBufferObject { get; set; }
 
-        private Color4[] ColorData = new Color4[36];
-        private List<Vector3> TopVertices = [];
-        private List<Vector3> BottomVertices = [];
-        private List<int> BaseIndexData = [];
-        private List<int> SidesIndexData = [];
-        private List<Vector3> SidesVertices = [];
-
-        private int Sides { get; set; }
+        //private readonly Color4[] ColorData = new Color4[36];
+        private readonly List<Vector3> TopVertices = [];
+        private readonly List<Vector3> BottomVertices = [];
+        private readonly List<int> BaseIndexData = [];
+        private readonly List<int> SidesIndexData = [];
+        private readonly List<Vector3> SidesVertices = [];
 
         public static readonly string VertexShader =
    @"#version 330 core
@@ -66,24 +60,25 @@ void main()
     oColor = fColor;
 }";
 
-        public Cylinder(GLControl glControl, Vector3 position, float radius)
+        public Cylinder(GLControl glControl, Vector3 position, float radius, float height)
         {
-            Position = position;
+            Position = Center = position;
             GlControl = glControl;
             Radius = radius;
+            Sides = 90;
+
             //Center = new Vector3(size.X / 2, size.Y / 2, size.Z / 2) + position;
-            Transformation  = Matrix4.Identity;
+            Transformation = Matrix4.Identity;
             
             Model = Matrix4.CreateTranslation(position);
 
-            Sides = 90;
-            TopVertices = CreateRoundBase(50).ToList();
-            BottomVertices = CreateRoundBase(10).ToList();
+            BottomVertices = CreateRoundBase(position.Z).ToList();
+            BottomVertices = CreateRoundBase(position.Z + height).ToList();
+
             SidesVertices.AddRange(BottomVertices);
             SidesVertices.AddRange(TopVertices);
             GenerateBaseIndices();
             GenerateSideIndices();
-
         }
 
         public void RenderCylinder(Matrix4 view, Matrix4 projection)
@@ -100,7 +95,7 @@ void main()
                 color2[i] = Color4.ForestGreen;
             }
 
-            Render(view, projection, BaseIndexData.ToArray(), TopVertices.ToArray(), ColorData);
+            Render(view, projection, BaseIndexData.ToArray(), TopVertices.ToArray(), color);
             Render(view, projection, BaseIndexData.ToArray(), BottomVertices.ToArray(), color);
             Render(view, projection, SidesIndexData.ToArray(), SidesVertices.ToArray(), color2);
         }

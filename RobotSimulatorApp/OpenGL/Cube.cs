@@ -16,7 +16,6 @@ namespace RobotSimulatorApp.GlConfig
         public Matrix4 CenterPoint { get; set; }
         public Matrix4 Buffer1 { get; set; }
         public Matrix4 Buffer2 { get; set; }
-        private Trace Trace { get; set; }
 
         private readonly GLControl GlControl;
         private int VertexArrayObject { get; set; }
@@ -67,25 +66,25 @@ void main()
     oColor = fColor;
 }";
 
-        public Cube(GLControl glControl, Vector3 position, Vector3 size)
+        public Cube(GLControl glControl, Vector3 position, float sizeX, float sizeY, float sizeZ)
         {
             Position = position;
             GlControl = glControl;
-            Size = size;
-            Center = new Vector3(size.X / 2, size.Y / 2, size.Z / 2) + position;
+            Size = new Vector3(sizeX, sizeY, sizeZ);
+            Center = new Vector3(sizeX / 2, sizeY / 2, sizeZ / 2) + position;
             Transformation = Point = Matrix4.Identity;
             Buffer1 = Buffer2 = Matrix4.Identity;
 
             Model = Matrix4.CreateTranslation(position);
-            CenterPoint = Matrix4.CreateTranslation(size.X / 2, size.Y / 2, size.Z / 2) * Matrix4.CreateTranslation(position);
+            CenterPoint = Matrix4.CreateTranslation(sizeX / 2, sizeY / 2, sizeZ / 2) * Matrix4.CreateTranslation(position);
             Buffer1 = CenterPoint;
             ////Create vertices responsible for generating a cube and add them for later use:
-            Vertices.AddRange(CreateWall(size.X, size.Y, 0, Axis.Z));
-            Vertices.AddRange(CreateWall(size.X, 0, size.Z, Axis.Y));
-            Vertices.AddRange(CreateWall(0, size.Y, size.Z, Axis.X));
-            Vertices.AddRange(CreateWall(size.X, size.Y, size.Z, Axis.Z));
-            Vertices.AddRange(CreateWall(size.X, size.Y, size.Z, Axis.Y));
-            Vertices.AddRange(CreateWall(size.X, size.Y, size.Z, Axis.X));
+            Vertices.AddRange(CreateWall(sizeX, sizeY, 0, Axis.Z));
+            Vertices.AddRange(CreateWall(sizeX, 0, sizeZ, Axis.Y));
+            Vertices.AddRange(CreateWall(0, sizeY, sizeZ, Axis.X));
+            Vertices.AddRange(CreateWall(sizeX, sizeY, sizeZ, Axis.Z));
+            Vertices.AddRange(CreateWall(sizeX, sizeY, sizeZ, Axis.Y));
+            Vertices.AddRange(CreateWall(sizeX, sizeY, sizeZ, Axis.X));
         }
 
         public void RenderCube(Matrix4 view, Matrix4 projection)
@@ -128,7 +127,9 @@ void main()
 
         public void SetPoint(Vector3 point) {
            Buffer2 = Point = Matrix4.CreateTranslation(point) * Matrix4.CreateTranslation(Position);
-        } 
+        }
+
+        public void SetPosition(Vector3 position) => Model = Matrix4.CreateTranslation(position);
 
         public void UpdateBaseModel()
         {

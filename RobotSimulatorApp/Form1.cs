@@ -58,7 +58,7 @@ namespace RobotSimulatorApp
         {
             GL.Enable(EnableCap.DepthTest);
 
-            cylinder = new(glControl, Vector3.Zero, 100);
+            cylinder = new(glControl, Vector3.Zero, 100, 20);
             //cube = new(glControl, new Vector3(-5f, -1f, -5f), new Vector3(2f, 22f, 2f));
             //cube2 = new(glControl, new Vector3(-7f, 0f, 9f), new Vector3(6f, 8f, 10f));
             ////cube2 = new(glControl, new Vector3(15f, 0f, 9f), new Vector3(6f, 8f, 10f));
@@ -121,8 +121,8 @@ namespace RobotSimulatorApp
             //cube.UpdateBaseModel();
             //cube2.UpdateBaseModel();
 
-            //scara.RenderRobot(camera.View, projection);
-            cylinder.RenderCylinder(camera.View, projection);
+            scara.RenderRobot(camera.View, projection);
+            //cylinder.RenderCylinder(camera.View, projection);
             grid.RenderWorld(camera.View, projection);
             glControl.SwapBuffers();
         }
