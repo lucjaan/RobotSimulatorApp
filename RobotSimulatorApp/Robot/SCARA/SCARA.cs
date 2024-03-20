@@ -9,7 +9,7 @@ namespace RobotSimulatorApp.Robot.SCARA
     {
 
         private Vector3 Position { get; set; }
-        public List<RobotLimb3> RobotJoints = [];
+        public List<RobotLimb> RobotJoints = [];
         //public List<RobotLimb2> RobotJoints = [];
         public List<Matrix4> DenavitHartenbergTable = new List<Matrix4>(4);
         /// <summary>
@@ -37,7 +37,6 @@ namespace RobotSimulatorApp.Robot.SCARA
 
         public void CreateRobot()
         {
-            //RobotBase = new(GLControl, Vector3.Zero, 34f, 20f, 34f);
 
             marker1 = new(GLControl, Vector3.Zero, 1, 500, 1);
             marker2 = new(GLControl, Vector3.Zero, 1, 500, 1);
@@ -54,18 +53,8 @@ namespace RobotSimulatorApp.Robot.SCARA
 
             RobotJoints.Add(CreateRectangularLimb("J1", new Vector3(9f, 20f, 9f), 40f, 6f, 14f, 9f));
             RobotJoints.Add(CreateRectangularLimb("J2", new Vector3(44f, 26f, 6f), 35f, 20f, 15f, 30f));
-            RobotJoints.Add(CreateRectangularLimb("J3", new Vector3(74f, 6.5f, 6f), 15f, 68.3f, 10f, 25f));
+            RobotJoints.Add(CreateCylindricalLimb("J3", new Vector3(79f, 6.5f, 13.5f), 7.95f, 68.3f, 25f));
             RobotJoints.Add(CreateRectangularLimb("J4", new Vector3(74f, 6.5f, 6f), 3.5f, 4.8f, 2.8f, 21f));
-
-
-            //RobotJoints.Add(CreateRectangularLimb(
-            //    GLControl, "J1", new Vector3(9f, 20f, 9f), new Vector3(40f, 6f, 14f), 9f, RobotBase.Center));
-            //RobotJoints.Add(CreateRectangularLimb(
-            //    GLControl, "J2", new Vector3(44f, 26f, 6f), new Vector3(35f, 20f, 15f), 30f, RobotBase.Center + new Vector3(35f, 0f, 0f)));
-            //RobotJoints.Add(CreateRectangularLimb(
-            //    GLControl, "J3", new Vector3(74f, 6.5f, 6f), new Vector3(15f, 68.3f, 10f), 25f, RobotBase.Center + new Vector3(65f, 0f, 0f)));
-            //RobotJoints.Add(CreateRectangularLimb(
-            //    GLControl, "J4", new Vector3(74f, 6.5f, 6f), new Vector3(3.5f, 4.8f, 2.8f), 21f, RobotBase.Center + new Vector3(65f, 0f, 0f)));
 
             for (int i = 0; i < RobotJoints.Count; i++)
             {
@@ -77,29 +66,20 @@ namespace RobotSimulatorApp.Robot.SCARA
 
         public void MoveJoint(int jointId, float value)
         {
-            //RobotLimb2 joint = RobotJoints[jointId];
-            RobotLimb3 joint = RobotJoints[jointId];
-
-            //if (joint.JointType == RobotLimb2.JointTypes.Revolute)
-           // {
-
             marker1.SetPosition(RobotJoints[0].GetRotationCenter());
             marker2.SetPosition(RobotJoints[1].GetRotationCenter());
             marker3.SetPosition(RobotJoints[2].GetRotationCenter());
             marker4.SetPosition(RobotJoints[3].GetRotationCenter());
 
-                for (int i = 0; i < RobotJoints.Count; i++)
-                {
-                    //JointCenters[i + 1] = RobotJoints[i].RotationCenter;
-                    JointCenters[i + 1] = RobotJoints[i].GetRotationCenter();
-                    //JointCenters[i + 1] = Helpers.GetPositionFromMatrix(RobotJoints[i].Cube.Point);
-                }
+            for (int i = 0; i < RobotJoints.Count; i++)
+            {
+                JointCenters[i + 1] = RobotJoints[i].GetRotationCenter();
+            }
 
-                for (int i = jointId; i < RobotJoints.Count; i++)
-                {
-                    RobotJoints[i].Move(value - RobotJoints[jointId].Distance, JointCenters[jointId]);
-                }
-           // }
+            for (int i = jointId; i < RobotJoints.Count; i++)
+            {
+                RobotJoints[i].Move(value - RobotJoints[jointId].Distance, JointCenters[jointId]);
+            }
         }
 
         public void CreateJointCenters()
@@ -118,22 +98,10 @@ namespace RobotSimulatorApp.Robot.SCARA
             Vector3 j3 = RobotJoints[2].Center;
             Vector3 j4 = RobotJoints[3].Center;
 
-
             marker1.SetPosition(j1);
             marker2.SetPosition(j2);
             marker3.SetPosition(j3);
             marker4.SetPosition(j4);
-
-            //Vector3 j0 = RobotBase.Center;
-            //Vector3 j1 = new(40f, RobotJoints[0].Cube.Size.Y / 2, RobotJoints[0].Cube.Size.Z / 2);
-            //Vector3 j2 = new(35f, RobotJoints[1].Cube.Size.Y / 2, RobotJoints[1].Cube.Size.Z / 2);
-            //Vector3 j3 = new(RobotJoints[2].Cube.Size.X / 2, RobotJoints[2].Cube.Size.Y / 2, RobotJoints[2].Cube.Size.Z / 2);
-            //Vector3 j4 = new(RobotJoints[3].Cube.Size.X / 2, RobotJoints[3].Cube.Size.Y / 2, RobotJoints[3].Cube.Size.Z / 2);
-
-            //RobotJoints[0].Cube.SetPoint(j1);
-            //RobotJoints[1].Cube.SetPoint(j2);
-            //RobotJoints[2].Cube.SetPoint(j3);
-            //RobotJoints[3].Cube.SetPoint(j4);
 
             RobotJoints[0].SetRotationCenter(j1);
             RobotJoints[1].SetRotationCenter(j2);
@@ -164,7 +132,6 @@ namespace RobotSimulatorApp.Robot.SCARA
         {
             for (int i = 0; i < RobotJoints.Count; i++)
             {
-                //RobotJoints[i].Cube.UpdateBaseModel();
                 RobotJoints[i].UpdateModel();
             }
         }
@@ -173,16 +140,15 @@ namespace RobotSimulatorApp.Robot.SCARA
         {
             RobotBase.RenderCube(view, projection);
 
-            foreach (RobotLimb3 joint in RobotJoints)
+            foreach (RobotLimb joint in RobotJoints)
             {
                 joint.RenderModel(view, projection);
-                //joint.Cube.RenderCube(view, projection);
             }
 
-            marker1.RenderCube(view, projection);
-            marker2.RenderCube(view, projection);
-            marker3.RenderCube(view, projection);
-            marker4.RenderCube(view, projection);
+            //marker1.RenderCube(view, projection);
+            //marker2.RenderCube(view, projection);
+            //marker3.RenderCube(view, projection);
+            //marker4.RenderCube(view, projection);
         }
 
         public void SaveToFile(string filePath)
@@ -195,21 +161,18 @@ namespace RobotSimulatorApp.Robot.SCARA
             //TODOs
         }
 
-        public RobotLimb2 CreateRevoluteJoint(GLControl glc, string name, Vector3 position, float sizeX, float sizeY, float sizeZ, float maximumDistance, Vector3 rotationCenter)
-            => new(new Cube(glc, position, sizeX, sizeY, sizeZ), name, maximumDistance, RobotLimb2.JointTypes.Revolute, rotationCenter);
-        public RobotLimb3 CreateRectangularLimb(string name,  Vector3 position, float sizeX, float sizeY, float sizeZ, float maxMovement)
+        public RobotLimb CreateRectangularLimb(string name,  Vector3 position, float sizeX, float sizeY, float sizeZ, float maxMovement)
         {
-            RobotLimb3 limb = new RobotLimb3(GLControl, name, Geometry.Cube, position, maxMovement);
+            RobotLimb limb = new(GLControl, name, Geometry.Cube, position, maxMovement);
             limb.CreateCube(sizeX, sizeY, sizeZ);
             return limb;
         }
-            //=> new(new Cube(glc, position, sizeX, sizeY, sizeZ), name, maximumDistance, RobotLimb2.JointTypes.Revolute, rotationCenter);
 
-        public RectangularLimb CreateRectangularLimb(GLControl glc, string name, Vector3 position, float sizeX, float sizeY, float sizeZ, float maximumDistance, Vector3 rotationCenter)
-            => new(new Cube(glc, position, sizeX, sizeY, sizeZ), name, maximumDistance, rotationCenter);
-
-        public RobotLimb2 CreateLinearJoint(GLControl glc, string name, Vector3 position, float sizeX, float sizeY, float sizeZ, float maximumAngle, Vector3 rotationCenter)
-           => new(new Cube(glc, position, sizeX, sizeY, sizeZ), name, maximumAngle, RobotLimb2.JointTypes.Linear, rotationCenter);
-
+        public RobotLimb CreateCylindricalLimb(string name, Vector3 position, float radius, float height, float maxMovement)
+        {
+            RobotLimb limb = new(GLControl, name, Geometry.Cylinder, position, maxMovement);
+            limb.CreateCylinder(radius, height);
+            return limb;
+        }
     }
 }

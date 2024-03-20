@@ -30,6 +30,11 @@ namespace RobotSimulatorApp.OpenGL
         private readonly List<int> SidesIndexData = [];
         private readonly List<Vector3> SidesVertices = [];
 
+        private readonly List<Color4> SideColorData = [];
+        private readonly List<Color4> TopColorData = [];
+        private readonly List<Color4> BottomColorData = [];
+
+
         public static readonly string VertexShader =
    @"#version 330 core
 
@@ -73,7 +78,7 @@ void main()
             Model = Matrix4.CreateTranslation(position);
 
             BottomVertices = CreateRoundBase(position.Z).ToList();
-            BottomVertices = CreateRoundBase(position.Z + height).ToList();
+            TopVertices = CreateRoundBase(position.Z + height).ToList();
 
             SidesVertices.AddRange(BottomVertices);
             SidesVertices.AddRange(TopVertices);
@@ -95,9 +100,9 @@ void main()
                 color2[i] = Color4.ForestGreen;
             }
 
-            Render(view, projection, BaseIndexData.ToArray(), TopVertices.ToArray(), color);
-            Render(view, projection, BaseIndexData.ToArray(), BottomVertices.ToArray(), color);
-            Render(view, projection, SidesIndexData.ToArray(), SidesVertices.ToArray(), color2);
+            Render(view, projection, BaseIndexData.ToArray(), TopVertices.ToArray(), TopColorData.ToArray());
+            Render(view, projection, BaseIndexData.ToArray(), BottomVertices.ToArray(), BottomColorData.ToArray());
+            Render(view, projection, SidesIndexData.ToArray(), SidesVertices.ToArray(), SideColorData.ToArray());
         }
 
         public void Render(Matrix4 view, Matrix4 projection, int[] indexData, Vector3[] vertices, Color4[] colorData)
@@ -134,6 +139,58 @@ void main()
 
             GL.DrawElements(BeginMode.Triangles, indexData.Length, DrawElementsType.UnsignedInt, 0);
             shader.Dispose();
+        }
+
+        public void UpdateBaseModel()
+        {
+            Model = Model * Transformation;
+            Transformation = Matrix4.Identity;
+        }
+
+        public void SetColor(Color4 colorData)
+        {
+            if (TopColorData != null || BottomColorData != null || SideColorData != null)
+            {
+                TopColorData.Clear();
+                BottomColorData.Clear();
+                SideColorData.Clear();
+            }
+
+            for (int i = 0; i < SidesIndexData.Count; i++)
+            {
+                SideColorData.Add(colorData);
+            }
+
+            for (int i = 0; i < BaseIndexData.Count; i++)
+            {
+                //TopColorData.Add(new Color4(
+                //       MathHelper.Clamp(colorData.R + 0.05f, 0f, 1),
+                //       MathHelper.Clamp(colorData.G + 0.05f, 0f, 1),
+                //       MathHelper.Clamp(colorData.B + 0.05f, 0f, 1),
+                //       1));
+
+                if (i % 2 == 0)
+                {
+                    TopColorData.Add(new Color4(
+                    MathHelper.Clamp(colorData.R + 0.05f, 0f, 1),
+                    MathHelper.Clamp(colorData.G + 0.05f, 0f, 1),
+                    MathHelper.Clamp(colorData.B + 0.05f, 0f, 1),
+                    1));
+                }
+                else
+                {
+                    TopColorData.Add(Color4.OrangeRed);
+                }
+            }
+
+            for (int i = 0; i < BaseIndexData.Count; i++)
+            {
+                BottomColorData.Add(new Color4(
+                MathHelper.Clamp(colorData.R - 0.05f, 0f, 1),
+                MathHelper.Clamp(colorData.G - 0.05f, 0f, 1),
+                MathHelper.Clamp(colorData.B - 0.05f, 0f, 1),
+                1));
+            }
         }
 
         private Vector3[] CreateRoundBase(float level)
