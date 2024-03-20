@@ -3,6 +3,7 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.WinForms;
 using RobotSimulatorApp.GlConfig;
+using RobotSimulatorApp.OpenGL;
 using RobotSimulatorApp.Robot.SCARA;
 using System;
 using System.Diagnostics;
@@ -26,6 +27,7 @@ namespace RobotSimulatorApp
         Cube cube0;
         Cube marker;
         Grid grid;
+        Cylinder cylinder;
         public SCARA_Robot scara { get; set; }
         public int VertexArrayObject { get; private set; }
         public int ElementBufferObject { get; private set; }
@@ -56,6 +58,7 @@ namespace RobotSimulatorApp
         {
             GL.Enable(EnableCap.DepthTest);
 
+            cylinder = new(glControl, Vector3.Zero, 100, 20);
             //cube = new(glControl, new Vector3(-5f, -1f, -5f), new Vector3(2f, 22f, 2f));
             //cube2 = new(glControl, new Vector3(-7f, 0f, 9f), new Vector3(6f, 8f, 10f));
             ////cube2 = new(glControl, new Vector3(15f, 0f, 9f), new Vector3(6f, 8f, 10f));
@@ -108,6 +111,7 @@ namespace RobotSimulatorApp
                 camera.Move(input);
             }
 
+
             //cube2.RenderCube(camera.View, projection);
             //cube.RenderCube(camera.View, projection);
             //cube0.RenderCube(camera.View, projection);
@@ -118,6 +122,7 @@ namespace RobotSimulatorApp
             //cube2.UpdateBaseModel();
 
             scara.RenderRobot(camera.View, projection);
+            //cylinder.RenderCylinder(camera.View, projection);
             grid.RenderWorld(camera.View, projection);
             glControl.SwapBuffers();
         }

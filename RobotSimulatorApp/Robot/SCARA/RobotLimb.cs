@@ -1,74 +1,151 @@
-﻿using OpenTK.Mathematics;
+﻿
+
 using RobotSimulatorApp.GlConfig;
+using System.Xml.Linq;
+using OpenTK.Mathematics;
+using System;
+using OpenTK.WinForms;
+using RobotSimulatorApp.OpenGL;
 
 namespace RobotSimulatorApp.Robot.SCARA
 {
     public class RobotLimb
     {
-        public enum JointTypes
-        {
-            Linear,
-            Revolute
-        }
-
-        public Vector3 RotationCenter { get; set; }
-        public Matrix4 DHMatrix { get; set; }
-        /// <summary>
-        /// Distance between previous and current joint center, used to keep the model rigid after rotation.
-        /// </summary>
-        public static Vector3 Delta { get; set; }
+        public Geometry Geometry { get; set; }
         public string Name { get; set; }
-        public Cube Cube { get; set; }
-        public Axis Axis { get; set; }
-        /// <summary>
-        /// In linear joints it's the distance in one of the axes, in revolute joints it's maximum angle from starting postition
-        /// </summary>
+        public Vector3 Position { get; set; }
+        public Vector3 RotationCenter { get; set; }
+        public Vector3 Center { get; set; }
+        public float Distance { get; set; }
         public float MaximumDistance { get; set; }
-        public float Distance { get ; set; }
-        public JointTypes JointType { get; set; }
-        public RobotLimb(Cube cube, string name, float maximumMovement, JointTypes type, Vector3 rotationCenter)
+        private GLControl gl;
+        private Cube? Cube;
+        private Cylinder? Cylinder;
+
+        public RobotLimb(GLControl glControl, string name, Geometry shape, Vector3 position, float maxMovement)
         {
+            gl = glControl;
             Name = name;
-            Cube = cube;
-            MaximumDistance = maximumMovement;
-            JointType = type;
-            RotationCenter = rotationCenter;
-            Distance = 0;
-            
-            if (type == JointTypes.Revolute)
+            Geometry = shape;
+            Position = position;
+            MaximumDistance = maxMovement;
+        }
+
+        public void CreateCube(float sizeX, float sizeY, float sizeZ)
+        {
+            if (Geometry != Geometry.Cube)
             {
-                Axis = Axis.Y;
-            }   
+                throw new InvalidOperationException($"Tried to call function for Cube while current geometry is {Geometry}");
+            }
+
+            Cube = new(gl, Position, sizeX, sizeY, sizeZ);
+            Center = Cube.Center;
         }
 
-        /// <summary>
-        /// When we move one revolute joint, all joints higher on kinematic chain get rotated in relation to it's axis
-        /// </summary>
-        public void MoveJoint_Angular(float angle, Vector3 centerOfRotation, Axis axis)
+        public void CreateCylinder(float radius, float height)
         {
-            angle = MathHelper.DegreesToRadians(angle);
-            Cube.Transformation = Helpers.CreateRotationYAroundPoint(angle, centerOfRotation);
+            if (Geometry != Geometry.Cylinder)
+            {
+                throw new InvalidOperationException($"Tried to call function for Cylinder while current geometry is {Geometry}");
+            }
+
+            Cylinder = new(gl, Position, radius, height);
+            Center = Cylinder.Center;
         }
 
-        /// <summary>
-        /// When we move one linear joint, all joints higher on kinematic chain get transposed through the same values
-        /// </summary>
-        public void MoveJoint_Linear(Vector3 translationVector)
+        public void Move(float angle, Vector3 centerOfRotation)
         {
-            //TODO
+            switch (Geometry)
+            {
+                case Geometry.Cube:
+                    Cube.Transformation = Helpers.CreateRotationYAroundPoint(MathHelper.DegreesToRadians(angle), centerOfRotation);
+                    break;
+                case Geometry.Cylinder:
+                    Cylinder.Transformation = Helpers.CreateRotationYAroundPoint(MathHelper.DegreesToRadians(angle), centerOfRotation);
+                    break;
+                case Geometry.Cone:
+                    break;
+
+            }
         }
 
-        public void SetRotationCenter(Vector3 rot)
+        public void SetRotationCenter(Vector3 rotationCenter)
         {
-            RotationCenter = rot;
+            switch (Geometry)
+            {
+                case Geometry.Cube:
+                    Cube.SetPoint(rotationCenter);
+                    break; 
+                case Geometry.Cylinder:
+                case Geometry.Cone:
+                    break;
+            }
+            RotationCenter = rotationCenter;
         }
 
-        public Matrix4 CreateDHMatrix(float theta, float alpha, float a, float d, Vector3 prevCenter)
+        public Vector3 GetRotationCenter()
         {
+            switch (Geometry)
+            {
+                case Geometry.Cube:
+                    return Helpers.GetPositionFromMatrix(Cube.Point);
+                    break;
 
-            Matrix4 result = Matrix4.CreateTranslation(new Vector3(0, 0, d)) * Matrix4.CreateRotationY(theta) * Matrix4.CreateTranslation(new Vector3(a, 0, 0)) * Matrix4.CreateRotationX(alpha);
-            DHMatrix = result;
-            return result;
+                case Geometry.Cylinder:
+                case Geometry.Cone:
+                    return Vector3.Zero;
+                    break;
+
+                default:
+                    return Vector3.Zero;
+                    break;              
+            }
+        }
+
+        public void UpdateModel()
+        {
+            switch (Geometry)
+            {
+                case Geometry.Cube:
+                    Cube.UpdateBaseModel();
+                    break;
+                case Geometry.Cylinder:
+                    Cylinder.UpdateBaseModel();
+                    break;
+                case Geometry.Cone:
+                    break;
+            }
+        }
+
+        public void RenderModel(Matrix4 view, Matrix4 projection)
+        {
+            switch (Geometry)
+            {
+                case Geometry.Cube:
+                    Cube.RenderCube(view, projection);
+                    break;
+                case Geometry.Cylinder:
+                    Cylinder.RenderCylinder(view, projection);
+                    break;
+                case Geometry.Cone:
+                    break;
+            }
+        }
+
+        public void SetColor(Color4 color)
+        {
+            switch (Geometry)
+            {
+                case Geometry.Cube:
+                    Cube.SetColor(color);
+                    break;
+                case Geometry.Cylinder:
+                    Cylinder.SetColor(color);
+                    break;
+
+                case Geometry.Cone:
+                    break;
+            }
         }
     }
 }

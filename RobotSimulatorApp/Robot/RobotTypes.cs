@@ -1,5 +1,8 @@
-﻿public enum RobotTypes
+﻿namespace RobotSimulatorApp.Robot
 {
-    SCARA,
-    Cartesian
+    public enum RobotTypes
+    {
+        SCARA,
+        Cartesian
+    }
 }
