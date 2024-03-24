@@ -51,12 +51,21 @@ namespace RobotSimulatorApp
             positionTextBox = new TextBox();
             frontTextBox = new TextBox();
             OpenControlsButton = new Button();
+            NorthButton = new Button();
+            panel1 = new Panel();
+            StartButton = new Button();
+            BackButton = new Button();
+            TopButton = new Button();
+            SouthButton = new Button();
+            WestButton = new Button();
+            EastButton = new Button();
             ((System.ComponentModel.ISupportInitialize)FrontXtrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)FrontYtrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)FrontZtrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)PosXTrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)PosYTrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)PosZTrackBar).BeginInit();
+            panel1.SuspendLayout();
             SuspendLayout();
             // 
             // glControl
@@ -161,8 +170,8 @@ namespace RobotSimulatorApp
             // 
             FrontXtrackBar.AutoSize = false;
             FrontXtrackBar.Location = new Point(1121, 162);
-            FrontXtrackBar.Maximum = 180;
-            FrontXtrackBar.Minimum = -180;
+            FrontXtrackBar.Maximum = 89;
+            FrontXtrackBar.Minimum = -89;
             FrontXtrackBar.Name = "FrontXtrackBar";
             FrontXtrackBar.Size = new Size(208, 33);
             FrontXtrackBar.TabIndex = 26;
@@ -247,11 +256,96 @@ namespace RobotSimulatorApp
             OpenControlsButton.UseVisualStyleBackColor = true;
             OpenControlsButton.Click += OpenControlsButton_Click;
             // 
+            // NorthButton
+            // 
+            NorthButton.Location = new Point(60, 3);
+            NorthButton.Name = "NorthButton";
+            NorthButton.Size = new Size(51, 27);
+            NorthButton.TabIndex = 38;
+            NorthButton.Text = "North";
+            NorthButton.UseVisualStyleBackColor = true;
+            NorthButton.Click += NorthButton_Click;
+            // 
+            // panel1
+            // 
+            panel1.Controls.Add(StartButton);
+            panel1.Controls.Add(BackButton);
+            panel1.Controls.Add(TopButton);
+            panel1.Controls.Add(SouthButton);
+            panel1.Controls.Add(WestButton);
+            panel1.Controls.Add(EastButton);
+            panel1.Controls.Add(NorthButton);
+            panel1.Location = new Point(1155, 375);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(174, 100);
+            panel1.TabIndex = 39;
+            // 
+            // StartButton
+            // 
+            StartButton.Location = new Point(3, 3);
+            StartButton.Name = "StartButton";
+            StartButton.Size = new Size(51, 27);
+            StartButton.TabIndex = 44;
+            StartButton.Text = "Start";
+            StartButton.UseVisualStyleBackColor = true;
+            StartButton.Click += StartButton_Click;
+            // 
+            // BackButton
+            // 
+            BackButton.Location = new Point(117, 69);
+            BackButton.Name = "BackButton";
+            BackButton.Size = new Size(51, 27);
+            BackButton.TabIndex = 43;
+            BackButton.Text = "Back";
+            BackButton.UseVisualStyleBackColor = true;
+            BackButton.Click += BackButton_Click;
+            // 
+            // TopButton
+            // 
+            TopButton.Location = new Point(60, 36);
+            TopButton.Name = "TopButton";
+            TopButton.Size = new Size(51, 27);
+            TopButton.TabIndex = 42;
+            TopButton.Text = "Top";
+            TopButton.UseVisualStyleBackColor = true;
+            TopButton.Click += TopButton_Click;
+            // 
+            // SouthButton
+            // 
+            SouthButton.Location = new Point(60, 69);
+            SouthButton.Name = "SouthButton";
+            SouthButton.Size = new Size(51, 27);
+            SouthButton.TabIndex = 41;
+            SouthButton.Text = "South";
+            SouthButton.UseVisualStyleBackColor = true;
+            SouthButton.Click += SouthButton_Click;
+            // 
+            // WestButton
+            // 
+            WestButton.Location = new Point(3, 36);
+            WestButton.Name = "WestButton";
+            WestButton.Size = new Size(51, 27);
+            WestButton.TabIndex = 40;
+            WestButton.Text = "West";
+            WestButton.UseVisualStyleBackColor = true;
+            WestButton.Click += WestButton_Click;
+            // 
+            // EastButton
+            // 
+            EastButton.Location = new Point(117, 36);
+            EastButton.Name = "EastButton";
+            EastButton.Size = new Size(51, 27);
+            EastButton.TabIndex = 39;
+            EastButton.Text = "East";
+            EastButton.UseVisualStyleBackColor = true;
+            EastButton.Click += EastButton_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1341, 654);
+            Controls.Add(panel1);
             Controls.Add(OpenControlsButton);
             Controls.Add(frontTextBox);
             Controls.Add(positionTextBox);
@@ -279,6 +373,7 @@ namespace RobotSimulatorApp
             ((System.ComponentModel.ISupportInitialize)PosXTrackBar).EndInit();
             ((System.ComponentModel.ISupportInitialize)PosYTrackBar).EndInit();
             ((System.ComponentModel.ISupportInitialize)PosZTrackBar).EndInit();
+            panel1.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -304,5 +399,13 @@ namespace RobotSimulatorApp
         private TextBox positionTextBox;
         private TextBox frontTextBox;
         private Button OpenControlsButton;
+        private Button NorthButton;
+        private Panel panel1;
+        private Button SouthButton;
+        private Button WestButton;
+        private Button EastButton;
+        private Button TopButton;
+        private Button BackButton;
+        private Button StartButton;
     }
 }

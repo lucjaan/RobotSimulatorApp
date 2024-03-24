@@ -2,6 +2,8 @@
 using OpenTK.WinForms;
 using RobotSimulatorApp.GlConfig;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
+using System.Windows.Forms;
 
 namespace RobotSimulatorApp.Robot.SCARA
 {
@@ -19,6 +21,9 @@ namespace RobotSimulatorApp.Robot.SCARA
         public List<Vector3> JointCenters = [];
         private GLControl GLControl { get; set; }
         public Cube RobotBase;
+        public Vector3 Center;
+        public float Height;
+        public float Radius;
 
         public Cube marker1;
         public Cube marker2;
@@ -33,6 +38,10 @@ namespace RobotSimulatorApp.Robot.SCARA
             Name = name;
             GLControl = glc;
             CreateRobot();
+
+            //WIP
+            Height = 100f;
+            Radius = 150f;
         }
 
         public void CreateRobot()
@@ -49,6 +58,7 @@ namespace RobotSimulatorApp.Robot.SCARA
             marker4.SetColor(Color4.Yellow);
 
             RobotBase = new(GLControl, Vector3.Zero, 34f, 20f, 34f);
+            Center = RobotBase.Center;
             RobotBase.SetColor(Color4.DarkOrange);
 
             RobotJoints.Add(CreateRectangularLimb("J1", new Vector3(9f, 20f, 9f), 40f, 6f, 14f, 9f));

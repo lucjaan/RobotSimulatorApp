@@ -23,7 +23,7 @@ namespace RobotSimulatorApp.GlConfig
         private Vector3 Right = Vector3.UnitX;
         private Vector3 Up = Vector3.UnitY;
 
-        private float Pitch, Yaw;
+        public float Pitch, Yaw;
         public Matrix4 View;
         private bool firstMove = true;
         private Vector2 lastPosition;
@@ -36,6 +36,8 @@ namespace RobotSimulatorApp.GlConfig
             Position = position;
             //Front = new (0f, 0f, -1f);
             View = Matrix4.LookAt(Position, Position + Front, Up);
+            Pitch = 0f;
+            Yaw = 0f;
         }
 
         public void SetView(Vector3 position, Vector3 front)
@@ -43,6 +45,26 @@ namespace RobotSimulatorApp.GlConfig
             Position = position;
             Front = front;
             UpdateVectors();
+
+            //View = Matrix4.LookAt(position, front, Up);
+        }
+
+        public void SetView(Vector3 position, float pitch, float yaw)
+        {
+            Position = position;
+            Pitch = pitch;
+            Yaw = yaw;
+            UpdateVectors();
+
+            //View = Matrix4.LookAt(position, front, Up);
+        }
+
+        public void SetTarget(Vector3 target)
+        {
+            Target = target;
+            UpdateVectors();
+
+           //View = Matrix4.LookAt(position, front, Up);
         }
 
         public void Move(INativeInput input)
@@ -68,7 +90,9 @@ namespace RobotSimulatorApp.GlConfig
 
         public void UpdateVectors()
         {
-
+            Front.X = MathF.Cos(Pitch) * MathF.Cos(Yaw);
+            Front.Y = MathF.Sin(Pitch);
+            Front.Z = MathF.Cos(Pitch) * MathF.Sin(Yaw);
             //Debug.WriteLine($"pre-normal: {Front}");
             Front = Vector3.Normalize(Front);
             //Debug.WriteLine($"normalized: {Front}");
@@ -77,6 +101,8 @@ namespace RobotSimulatorApp.GlConfig
             Up = Vector3.Normalize(Vector3.Cross(Right, Front));
 
             View = Matrix4.LookAt(Position, Position + Front, Up);
+            //View = Matrix4.LookAt(Position, Target, Up);
+
         }
 
         private void LookAround(INativeInput input)
