@@ -101,7 +101,7 @@ void main()
         public void CreateGrid()
         {
             int bounds = 300;
-            int size = 2;
+            int size = 10;
             int rows = bounds / size;
 
             //Creating vertical lines
