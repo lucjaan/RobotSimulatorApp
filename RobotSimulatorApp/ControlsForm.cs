@@ -32,7 +32,7 @@ namespace RobotSimulatorApp
             }
 
             float value = (float)J1TrackBar.Value;
-            Scara.MoveJoint(0, value);
+            Scara.MoveRevoluteJoint(0, value);
             J1TextBox.Text = value.ToString();
         }
 
@@ -44,7 +44,7 @@ namespace RobotSimulatorApp
             }
 
             float value = (float)J2TrackBar.Value;
-            Scara.MoveJoint(1, value);
+            Scara.MoveRevoluteJoint(1, value);
             J2TextBox.Text = value.ToString();
         }
 
@@ -56,7 +56,7 @@ namespace RobotSimulatorApp
             }
 
             float value = (float)J3TrackBar.Value;
-            Scara.MoveJoint(2, value);
+            Scara.MoveLinearJoint(2, value);
             J3TextBox.Text = value.ToString();
         }
 
@@ -67,7 +67,7 @@ namespace RobotSimulatorApp
                 J4TrackBar.Focus();
             }
            float value = (float)J4TrackBar.Value;
-           Scara.MoveJoint(3, value);
+           Scara.MoveRevoluteJoint(3, value);
            J4TextBox.Text = value.ToString();
         }
 

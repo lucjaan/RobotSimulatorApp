@@ -7,14 +7,18 @@ using System.Linq;
 
 namespace RobotSimulatorApp.OpenGL
 {
-    public class Cylinder
+    public class Cone
     {
         public Vector3 Center { get; set; }
         public Vector3 Position { get; set; }
+        public Vector3 ApexPoint { get; set; }
         public Matrix4 Model { get; set; }
         public Matrix4 Transformation { get; set; }
         public float Radius { get; set; }
+        public float Height { get; set; }
         private int Sides { get; set; }
+        private Matrix4 Apex { get; set; }
+        private Matrix4 ApexBuffer { get; set; }
 
         private readonly GLControl GlControl;
         private int VertexArrayObject { get; set; }
@@ -22,15 +26,14 @@ namespace RobotSimulatorApp.OpenGL
         private int PositionBufferObject { get; set; }
         private int ColorBufferObject { get; set; }
 
-        private readonly List<Vector3> TopVertices = [];
-        private readonly List<Vector3> BottomVertices = [];
-        private readonly List<int> BaseIndexData = [];
-        private readonly List<int> SidesIndexData = [];
+        private readonly List<Vector3> BaseVertices = [];
         private readonly List<Vector3> SidesVertices = [];
 
+        private readonly List<int> BaseIndexData = [];
+        private readonly List<int> SidesIndexData = [];
+
         private readonly List<Color4> SideColorData = [];
-        private readonly List<Color4> TopColorData = [];
-        private readonly List<Color4> BottomColorData = [];
+        private readonly List<Color4> BaseColorData = [];
 
         public static readonly string VertexShader =
    @"#version 330 core
@@ -62,30 +65,31 @@ void main()
     oColor = fColor;
 }";
 
-        public Cylinder(GLControl glControl, Vector3 position, float radius, float height)
+        public Cone(GLControl glControl, Vector3 position, float radius, float height)
         {
             Position = Center = position;
             GlControl = glControl;
             Radius = radius;
+            Height = height;
             Sides = 90;
-            Transformation = Matrix4.Identity;       
+            Transformation = Matrix4.Identity;
             Model = Matrix4.CreateTranslation(position);
 
-            BottomVertices = CreateRoundBase(position.Y).ToList();
-            TopVertices = CreateRoundBase(position.Y + height).ToList();
+            Apex = ApexBuffer = Matrix4.CreateTranslation(new Vector3(0, height, 0));
+            ApexPoint = Helpers.GetPositionFromMatrix(Apex);
 
-            SidesVertices.AddRange(BottomVertices);
-            SidesVertices.AddRange(TopVertices);
+            BaseVertices = CreateRoundBase(position.Y).ToList();
+            SidesVertices.Add(ApexPoint);
+            SidesVertices.AddRange(BaseVertices);
             GenerateBaseIndices();
             GenerateSideIndices();
 
-            SetColor(Color4.Green);  
+            Apex = ApexBuffer *= Matrix4.CreateTranslation(position);
         }
 
-        public void RenderCylinder(Matrix4 view, Matrix4 projection)
+        public void RenderCone(Matrix4 view, Matrix4 projection)
         {
-            Render(view, projection, BaseIndexData.ToArray(), TopVertices.ToArray(), TopColorData.ToArray());
-            Render(view, projection, BaseIndexData.ToArray(), BottomVertices.ToArray(), BottomColorData.ToArray());
+            Render(view, projection, BaseIndexData.ToArray(), BaseVertices.ToArray(), BaseColorData.ToArray());
             Render(view, projection, SidesIndexData.ToArray(), SidesVertices.ToArray(), SideColorData.ToArray());
         }
 
@@ -117,6 +121,7 @@ void main()
             GL.EnableVertexAttribArray(colorLocation);
             GL.VertexAttribPointer(colorLocation, 4, VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
 
+            Apex = ApexBuffer * Transformation;
             shader.SetMatrix4("model", Model * Transformation);
             shader.SetMatrix4("view", view);
             shader.SetMatrix4("projection", projection);
@@ -128,53 +133,27 @@ void main()
         public void UpdateBaseModel()
         {
             Model *= Transformation;
+            ApexBuffer *= Transformation;
             Transformation = Matrix4.Identity;
         }
 
+        public Vector3 GetApexPosition() => ApexPoint = Helpers.GetPositionFromMatrix(Apex);
         public Vector3 GetCenterPoint() => Center = Helpers.GetPositionFromMatrix(Model);
+
         public void SetColor(Color4 colorData)
         {
-            if (TopColorData != null || BottomColorData != null || SideColorData != null)
+            for (int i = 0; i < BaseIndexData.Count; i++)
             {
-                TopColorData.Clear();
-                BottomColorData.Clear();
-                SideColorData.Clear();
+                BaseColorData.Add(new Color4(
+                    MathHelper.Clamp(colorData.R - 0.05f, 0f, 1),
+                    MathHelper.Clamp(colorData.G - 0.05f, 0f, 1),
+                    MathHelper.Clamp(colorData.B - 0.05f, 0f, 1),
+                    1));
             }
 
             for (int i = 0; i < SidesIndexData.Count; i++)
             {
                 SideColorData.Add(colorData);
-            }
-
-            for (int i = 0; i < BaseIndexData.Count; i++)
-            {
-                //TopColorData.Add(new Color4(
-                //       MathHelper.Clamp(colorData.R + 0.05f, 0f, 1),
-                //       MathHelper.Clamp(colorData.G + 0.05f, 0f, 1),
-                //       MathHelper.Clamp(colorData.B + 0.05f, 0f, 1),
-                //       1));
-
-                if (i % 2 == 0)
-                {
-                    TopColorData.Add(new Color4(
-                    MathHelper.Clamp(colorData.R + 0.05f, 0f, 1),
-                    MathHelper.Clamp(colorData.G + 0.05f, 0f, 1),
-                    MathHelper.Clamp(colorData.B + 0.05f, 0f, 1),
-                    1));
-                }
-                else
-                {
-                    TopColorData.Add(Color4.OrangeRed);
-                }
-            }
-
-            for (int i = 0; i < BaseIndexData.Count; i++)
-            {
-                BottomColorData.Add(new Color4(
-                MathHelper.Clamp(colorData.R - 0.05f, 0f, 1),
-                MathHelper.Clamp(colorData.G - 0.05f, 0f, 1),
-                MathHelper.Clamp(colorData.B - 0.05f, 0f, 1),
-                1));
             }
         }
 
@@ -206,23 +185,15 @@ void main()
 
         private void GenerateSideIndices()
         {
-            int c = TopVertices.Count;
-            for (int i = 1; i < Sides ; i++)
+            for (int i = 2; i <= Sides; i++)
             {
+                SidesIndexData.Add(0);
                 SidesIndexData.Add(i);
                 SidesIndexData.Add(i + 1);
-                SidesIndexData.Add(i + c);
-                SidesIndexData.Add(i + c);
-                SidesIndexData.Add(i + c + 1);
-                SidesIndexData.Add(i + 1);
             }
-
-            SidesIndexData.Add(1);
-            SidesIndexData.Add(c - 1);
-            SidesIndexData.Add(c + 1);
-            SidesIndexData.Add(c + 1);
-            SidesIndexData.Add(c + Sides);
-            SidesIndexData.Add(c - 1);
+            SidesIndexData.Add(0);
+            SidesIndexData.Add(2);
+            SidesIndexData.Add(Sides + 1);
         }
     }
 }

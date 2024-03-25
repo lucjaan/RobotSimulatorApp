@@ -2,15 +2,12 @@
 using OpenTK.WinForms;
 using RobotSimulatorApp.GlConfig;
 using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
-using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace RobotSimulatorApp.Robot.SCARA
 {
     public class SCARA_Robot : Robot
     {
-
-        private Vector3 Position { get; set; }
         public List<RobotLimb> RobotJoints = [];
         //public List<RobotLimb2> RobotJoints = [];
         public List<Matrix4> DenavitHartenbergTable = new List<Matrix4>(4);
@@ -64,7 +61,8 @@ namespace RobotSimulatorApp.Robot.SCARA
             RobotJoints.Add(CreateRectangularLimb("J1", new Vector3(9f, 20f, 9f), 40f, 6f, 14f, 9f));
             RobotJoints.Add(CreateRectangularLimb("J2", new Vector3(44f, 26f, 6f), 35f, 20f, 15f, 30f));
             RobotJoints.Add(CreateCylindricalLimb("J3", new Vector3(79f, 6.5f, 13.5f), 7.95f, 68.3f, 25f));
-            RobotJoints.Add(CreateRectangularLimb("J4", new Vector3(74f, 6.5f, 6f), 3.5f, 4.8f, 2.8f, 21f));
+            //RobotJoints.Add(CreateCylindricalLimb("J4", new Vector3(79f, 6.5f, 13.5f), 1.35f, 68.3f, 25f));
+            RobotJoints.Add(CreateConicalLimb("Manipulator", new Vector3(79f, 6.5f, 13.5f), 6.3f, -3.8f, 21f));
 
             for (int i = 0; i < RobotJoints.Count; i++)
             {
@@ -74,7 +72,7 @@ namespace RobotSimulatorApp.Robot.SCARA
             CreateJointCenters();
         }
 
-        public void MoveJoint(int jointId, float value)
+        public void MoveRevoluteJoint(int jointId, float value)
         {
             marker1.SetPosition(RobotJoints[0].GetRotationCenter());
             marker2.SetPosition(RobotJoints[1].GetRotationCenter());
@@ -88,8 +86,31 @@ namespace RobotSimulatorApp.Robot.SCARA
 
             for (int i = jointId; i < RobotJoints.Count; i++)
             {
-                RobotJoints[i].Move(value - RobotJoints[jointId].Distance, JointCenters[jointId]);
+                RobotJoints[i].MoveRevolute(value - RobotJoints[jointId].Distance, JointCenters[jointId]);
             }
+            marker1.SetPosition(RobotJoints[3].GetApexPoint());
+            Debug.WriteLine($"{RobotJoints[3].GetApexPoint()}");
+        }
+
+        public void MoveLinearJoint(int jointId, float value)
+        {
+            marker1.SetPosition(RobotJoints[0].GetRotationCenter());
+            marker2.SetPosition(RobotJoints[1].GetRotationCenter());
+            marker3.SetPosition(RobotJoints[2].GetRotationCenter());
+            marker4.SetPosition(RobotJoints[3].GetRotationCenter());
+
+            for (int i = 0; i < RobotJoints.Count; i++)
+            {
+                JointCenters[i + 1] = RobotJoints[i].GetRotationCenter();
+            }
+
+            for (int i = jointId; i < RobotJoints.Count; i++)
+            {
+                RobotJoints[i].MoveLinear(value - RobotJoints[jointId].Distance, JointCenters[jointId]);
+            }
+
+            marker1.SetPosition(RobotJoints[3].GetApexPoint());
+            Debug.WriteLine($"{RobotJoints[3].GetApexPoint()}");
         }
 
         public void CreateJointCenters()
@@ -108,10 +129,10 @@ namespace RobotSimulatorApp.Robot.SCARA
             Vector3 j3 = RobotJoints[2].Center;
             Vector3 j4 = RobotJoints[3].Center;
 
-            marker1.SetPosition(j1);
-            marker2.SetPosition(j2);
-            marker3.SetPosition(j3);
-            marker4.SetPosition(j4);
+            //marker1.SetPosition(j1);
+            //marker2.SetPosition(j2);
+            //marker3.SetPosition(j3);
+            //marker4.SetPosition(j4);
 
             RobotJoints[0].SetRotationCenter(j1);
             RobotJoints[1].SetRotationCenter(j2);
@@ -166,11 +187,6 @@ namespace RobotSimulatorApp.Robot.SCARA
             SaveToFile();
         }
 
-        public override void CreateKinematicChain()
-        {
-            //TODOs
-        }
-
         public RobotLimb CreateRectangularLimb(string name,  Vector3 position, float sizeX, float sizeY, float sizeZ, float maxMovement)
         {
             RobotLimb limb = new(GLControl, name, Geometry.Cube, position, maxMovement);
@@ -182,6 +198,13 @@ namespace RobotSimulatorApp.Robot.SCARA
         {
             RobotLimb limb = new(GLControl, name, Geometry.Cylinder, position, maxMovement);
             limb.CreateCylinder(radius, height);
+            return limb;
+        }
+
+        public RobotLimb CreateConicalLimb(string name, Vector3 position, float radius, float height, float maxMovement)
+        {
+            RobotLimb limb = new(GLControl, name, Geometry.Cone, position, maxMovement);
+            limb.CreateCone(radius, height);
             return limb;
         }
     }
