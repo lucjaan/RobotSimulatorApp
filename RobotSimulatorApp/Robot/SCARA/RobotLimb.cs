@@ -21,6 +21,7 @@ namespace RobotSimulatorApp.Robot.SCARA
         private GLControl gl;
         private Cube? Cube;
         private Cylinder? Cylinder;
+        private Cone? Cone;
 
         public RobotLimb(GLControl glControl, string name, Geometry shape, Vector3 position, float maxMovement)
         {
@@ -53,19 +54,50 @@ namespace RobotSimulatorApp.Robot.SCARA
             Center = Cylinder.Center;
         }
 
-        public void Move(float angle, Vector3 centerOfRotation)
+        public void CreateCone(float radius, float height)
+        {
+            if (Geometry != Geometry.Cone)
+            {
+                throw new InvalidOperationException($"Tried to call function for Cone while current geometry is {Geometry}");
+            }
+
+            Cone = new(gl, Position, radius, height);
+            Center = Cone.Center;
+        }
+
+        public void MoveRevolute(float angle, Vector3 centerOfRotation)
         {
             switch (Geometry)
             {
                 case Geometry.Cube:
                     Cube.Transformation = Helpers.CreateRotationYAroundPoint(MathHelper.DegreesToRadians(angle), centerOfRotation);
                     break;
+
                 case Geometry.Cylinder:
                     Cylinder.Transformation = Helpers.CreateRotationYAroundPoint(MathHelper.DegreesToRadians(angle), centerOfRotation);
                     break;
+
                 case Geometry.Cone:
+                    Cone.Transformation = Helpers.CreateRotationYAroundPoint(MathHelper.DegreesToRadians(angle), centerOfRotation);
+                    break;
+            }
+        }
+
+        public void MoveLinear(float distance, Vector3 centerOfRotation)
+        {
+            switch (Geometry)
+            {
+                case Geometry.Cube:
+                    Cube.Transformation = Matrix4.CreateTranslation(new Vector3(0, distance, 0));
                     break;
 
+                case Geometry.Cylinder:
+                    Cylinder.Transformation = Matrix4.CreateTranslation(new Vector3(0, distance, 0));
+                    break;
+
+                case Geometry.Cone:
+                    Cone.Transformation = Matrix4.CreateTranslation(new Vector3(0, distance, 0));
+                    break;
             }
         }
 
@@ -89,17 +121,26 @@ namespace RobotSimulatorApp.Robot.SCARA
             {
                 case Geometry.Cube:
                     return Helpers.GetPositionFromMatrix(Cube.Point);
-                    break;
 
                 case Geometry.Cylinder:
+                    return Cylinder.GetCenterPoint();
+
                 case Geometry.Cone:
-                    return Vector3.Zero;
-                    break;
+                    return Cone.GetCenterPoint();
 
                 default:
                     return Vector3.Zero;
-                    break;              
             }
+        }
+
+        public Vector3 GetApexPoint()
+        {
+            if (Geometry != Geometry.Cone)
+            {
+                throw new InvalidOperationException($"Tried to call function for Cone while current geometry is {Geometry}");
+            }
+
+            return Cone.GetApexPosition();
         }
 
         public void UpdateModel()
@@ -113,6 +154,7 @@ namespace RobotSimulatorApp.Robot.SCARA
                     Cylinder.UpdateBaseModel();
                     break;
                 case Geometry.Cone:
+                    Cone.UpdateBaseModel();
                     break;
             }
         }
@@ -124,10 +166,13 @@ namespace RobotSimulatorApp.Robot.SCARA
                 case Geometry.Cube:
                     Cube.RenderCube(view, projection);
                     break;
+
                 case Geometry.Cylinder:
                     Cylinder.RenderCylinder(view, projection);
                     break;
+
                 case Geometry.Cone:
+                    Cone.RenderCone(view, projection);
                     break;
             }
         }
@@ -139,11 +184,13 @@ namespace RobotSimulatorApp.Robot.SCARA
                 case Geometry.Cube:
                     Cube.SetColor(color);
                     break;
+
                 case Geometry.Cylinder:
                     Cylinder.SetColor(color);
                     break;
 
                 case Geometry.Cone:
+                    Cone.SetColor(color);
                     break;
             }
         }

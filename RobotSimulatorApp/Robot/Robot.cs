@@ -16,7 +16,7 @@ namespace RobotSimulatorApp.Robot
         //protected Dictionary<int, Vector3> JointRotationPoints { get; set; }
         protected Robot() { }
 
-        public abstract void CreateKinematicChain();
+        //public abstract void CreateKinematicChain();
         //public abstract void CreateJoint();
         //public abstract void MoveJoint(int jointId);
         public void SaveToFile()
