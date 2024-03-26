@@ -66,9 +66,9 @@ namespace RobotSimulatorApp
             {
                 J4TrackBar.Focus();
             }
-           float value = (float)J4TrackBar.Value;
-           Scara.MoveRevoluteJoint(3, value);
-           J4TextBox.Text = value.ToString();
+            float value = (float)J4TrackBar.Value;
+            Scara.MoveRevoluteJoint(3, value);
+            J4TextBox.Text = value.ToString();
         }
 
         private void J1TrackBar_GotFocus(object sender, EventArgs e)
@@ -103,6 +103,52 @@ namespace RobotSimulatorApp
                 (float)J3TrackBar.Value,
                 (float)J4TrackBar.Value
            );
+        }
+
+        private void JointRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            if (JointRadioButton.Checked)
+            {
+                CartesianRadioButton.Checked = false;
+                J1TrackBar.Show();
+                J2TrackBar.Show();
+                J3TrackBar.Show();
+                J4TrackBar.Show();
+                J1label.Show();
+                J2label.Show();
+                J3label.Show();
+                J4label.Show();
+
+                XLabel.Hide();
+                YLabel.Hide();
+                ZLabel.Hide();
+                XTrackBar.Hide();
+                YTrackBar.Hide();
+                ZTrackBar.Hide();
+            }
+        }
+
+        private void CartesianRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            if (CartesianRadioButton.Checked)
+            {
+                JointRadioButton.Checked = false;
+                J1TrackBar.Hide();
+                J2TrackBar.Hide();
+                J3TrackBar.Hide();
+                J4TrackBar.Hide();
+                J1label.Hide();
+                J2label.Hide();
+                J3label.Hide();
+                J4label.Hide();
+
+                XLabel.Show();
+                YLabel.Show();
+                ZLabel.Show();
+                XTrackBar.Show();
+                YTrackBar.Show();
+                ZTrackBar.Show();
+            }
         }
     }
 }
