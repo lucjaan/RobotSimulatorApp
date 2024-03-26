@@ -15,6 +15,7 @@ namespace RobotSimulatorApp
 
         Camera camera;
         Grid grid;
+        Trace trace;
         public SCARA_Robot scara { get; set; }
 
         private Vector3 prevPosition;
@@ -43,6 +44,7 @@ namespace RobotSimulatorApp
 
             grid = new Grid(glControl);
             scara = new SCARA_Robot(glControl, "scara");
+            trace = new Trace();
             Timer timer = new Timer();
             timer.Tick += (sender, e) =>
             {
@@ -69,7 +71,22 @@ namespace RobotSimulatorApp
 
             scara.RenderRobot(camera.View, projection);
             grid.RenderWorld(camera.View, projection);
+
+            if (TraceCheckbox.Checked)
+            {
+                scara.RobotMoved += Form_RobotMoved;
+                trace.RenderTrace(camera.View, projection);
+            }
+
             glControl.SwapBuffers();
+        }
+
+        private void Form_RobotMoved(object? sender, Vector3 position)
+        {
+            if (TraceCheckbox.Checked)
+            {
+                trace.AddToTrace(position);
+            }
         }
 
         private void glControl_Resize(object? sender, EventArgs e)

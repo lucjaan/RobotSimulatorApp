@@ -60,6 +60,7 @@ namespace RobotSimulatorApp
             PositionZTextBox = new TextBox();
             PositionYTextBox = new TextBox();
             PositionXTextBox = new TextBox();
+            TraceCheckbox = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)PitchTrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)YawTrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)PosXTrackBar).BeginInit();
@@ -112,7 +113,7 @@ namespace RobotSimulatorApp
             // PitchTrackBar
             // 
             PitchTrackBar.AutoSize = false;
-            PitchTrackBar.Location = new Point(1109, 316);
+            PitchTrackBar.Location = new Point(1113, 277);
             PitchTrackBar.Maximum = 89;
             PitchTrackBar.Minimum = -89;
             PitchTrackBar.Name = "PitchTrackBar";
@@ -123,29 +124,29 @@ namespace RobotSimulatorApp
             // YawTrackBar
             // 
             YawTrackBar.AutoSize = false;
-            YawTrackBar.Location = new Point(1109, 387);
+            YawTrackBar.Location = new Point(1117, 351);
             YawTrackBar.Maximum = 180;
             YawTrackBar.Minimum = -180;
             YawTrackBar.Name = "YawTrackBar";
-            YawTrackBar.Size = new Size(206, 33);
+            YawTrackBar.Size = new Size(208, 33);
             YawTrackBar.TabIndex = 27;
             YawTrackBar.Scroll += YawTrackBar_Scroll;
             // 
             // PosXTrackBar
             // 
             PosXTrackBar.AutoSize = false;
-            PosXTrackBar.Location = new Point(1109, 114);
+            PosXTrackBar.Location = new Point(1117, 75);
             PosXTrackBar.Maximum = 500;
             PosXTrackBar.Minimum = -500;
             PosXTrackBar.Name = "PosXTrackBar";
-            PosXTrackBar.Size = new Size(212, 33);
+            PosXTrackBar.Size = new Size(208, 33);
             PosXTrackBar.TabIndex = 29;
             PosXTrackBar.Scroll += PosXTrackBar_Scroll;
             // 
             // PosYTrackBar
             // 
             PosYTrackBar.AutoSize = false;
-            PosYTrackBar.Location = new Point(1109, 179);
+            PosYTrackBar.Location = new Point(1113, 140);
             PosYTrackBar.Maximum = 500;
             PosYTrackBar.Minimum = -500;
             PosYTrackBar.Name = "PosYTrackBar";
@@ -156,7 +157,7 @@ namespace RobotSimulatorApp
             // PosZTrackBar
             // 
             PosZTrackBar.AutoSize = false;
-            PosZTrackBar.Location = new Point(1109, 243);
+            PosZTrackBar.Location = new Point(1113, 204);
             PosZTrackBar.Maximum = 500;
             PosZTrackBar.Minimum = -500;
             PosZTrackBar.Name = "PosZTrackBar";
@@ -166,7 +167,7 @@ namespace RobotSimulatorApp
             // 
             // OpenControlsButton
             // 
-            OpenControlsButton.Location = new Point(1121, 440);
+            OpenControlsButton.Location = new Point(1119, 403);
             OpenControlsButton.Name = "OpenControlsButton";
             OpenControlsButton.Size = new Size(208, 23);
             OpenControlsButton.TabIndex = 37;
@@ -262,7 +263,7 @@ namespace RobotSimulatorApp
             // PitchLabel
             // 
             PitchLabel.AutoSize = true;
-            PitchLabel.Location = new Point(1113, 293);
+            PitchLabel.Location = new Point(1117, 254);
             PitchLabel.Name = "PitchLabel";
             PitchLabel.Size = new Size(37, 15);
             PitchLabel.TabIndex = 40;
@@ -271,7 +272,7 @@ namespace RobotSimulatorApp
             // YawLabel
             // 
             YawLabel.AutoSize = true;
-            YawLabel.Location = new Point(1115, 364);
+            YawLabel.Location = new Point(1119, 325);
             YawLabel.Name = "YawLabel";
             YawLabel.Size = new Size(31, 15);
             YawLabel.TabIndex = 41;
@@ -281,7 +282,7 @@ namespace RobotSimulatorApp
             // 
             XLabel.AutoSize = true;
             XLabel.ForeColor = SystemColors.ControlText;
-            XLabel.Location = new Point(1109, 88);
+            XLabel.Location = new Point(1113, 49);
             XLabel.Name = "XLabel";
             XLabel.Size = new Size(17, 15);
             XLabel.TabIndex = 42;
@@ -290,7 +291,7 @@ namespace RobotSimulatorApp
             // YLabel
             // 
             YLabel.AutoSize = true;
-            YLabel.Location = new Point(1113, 156);
+            YLabel.Location = new Point(1117, 117);
             YLabel.Name = "YLabel";
             YLabel.Size = new Size(17, 15);
             YLabel.TabIndex = 43;
@@ -299,7 +300,7 @@ namespace RobotSimulatorApp
             // ZLabel
             // 
             ZLabel.AutoSize = true;
-            ZLabel.Location = new Point(1115, 221);
+            ZLabel.Location = new Point(1119, 182);
             ZLabel.Name = "ZLabel";
             ZLabel.Size = new Size(17, 15);
             ZLabel.TabIndex = 44;
@@ -308,7 +309,7 @@ namespace RobotSimulatorApp
             // YawTextBox
             // 
             YawTextBox.BackColor = SystemColors.Control;
-            YawTextBox.Location = new Point(1148, 361);
+            YawTextBox.Location = new Point(1152, 322);
             YawTextBox.Name = "YawTextBox";
             YawTextBox.ReadOnly = true;
             YawTextBox.Size = new Size(167, 23);
@@ -316,7 +317,7 @@ namespace RobotSimulatorApp
             // 
             // PitchTextBox
             // 
-            PitchTextBox.Location = new Point(1154, 290);
+            PitchTextBox.Location = new Point(1158, 251);
             PitchTextBox.Name = "PitchTextBox";
             PitchTextBox.ReadOnly = true;
             PitchTextBox.Size = new Size(161, 23);
@@ -324,7 +325,7 @@ namespace RobotSimulatorApp
             // 
             // PositionZTextBox
             // 
-            PositionZTextBox.Location = new Point(1132, 218);
+            PositionZTextBox.Location = new Point(1136, 179);
             PositionZTextBox.Name = "PositionZTextBox";
             PositionZTextBox.ReadOnly = true;
             PositionZTextBox.Size = new Size(181, 23);
@@ -332,7 +333,7 @@ namespace RobotSimulatorApp
             // 
             // PositionYTextBox
             // 
-            PositionYTextBox.Location = new Point(1132, 153);
+            PositionYTextBox.Location = new Point(1136, 114);
             PositionYTextBox.Name = "PositionYTextBox";
             PositionYTextBox.ReadOnly = true;
             PositionYTextBox.Size = new Size(183, 23);
@@ -340,17 +341,28 @@ namespace RobotSimulatorApp
             // 
             // PositionXTextBox
             // 
-            PositionXTextBox.Location = new Point(1132, 85);
+            PositionXTextBox.Location = new Point(1136, 46);
             PositionXTextBox.Name = "PositionXTextBox";
             PositionXTextBox.ReadOnly = true;
             PositionXTextBox.Size = new Size(183, 23);
             PositionXTextBox.TabIndex = 50;
+            // 
+            // TraceCheckbox
+            // 
+            TraceCheckbox.AutoSize = true;
+            TraceCheckbox.Location = new Point(1124, 461);
+            TraceCheckbox.Name = "TraceCheckbox";
+            TraceCheckbox.Size = new Size(85, 19);
+            TraceCheckbox.TabIndex = 51;
+            TraceCheckbox.Text = "Show Trace";
+            TraceCheckbox.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1341, 654);
+            Controls.Add(TraceCheckbox);
             Controls.Add(PositionXTextBox);
             Controls.Add(PositionYTextBox);
             Controls.Add(PositionZTextBox);
@@ -421,5 +433,6 @@ namespace RobotSimulatorApp
         private TextBox PositionZTextBox;
         private TextBox PositionYTextBox;
         private TextBox PositionXTextBox;
+        private CheckBox TraceCheckbox;
     }
 }

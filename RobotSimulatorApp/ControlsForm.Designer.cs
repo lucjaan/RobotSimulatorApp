@@ -68,7 +68,6 @@ namespace RobotSimulatorApp
             J2TrackBar.TabIndex = 1;
             J2TrackBar.Scroll += J2TrackBar_Scroll;
             J2TrackBar.GotFocus += J2TrackBar_GotFocus;
-
             // 
             // J3TrackBar
             // 
@@ -173,7 +172,7 @@ namespace RobotSimulatorApp
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new Size(292, 400);
+            ClientSize = new Size(292, 386);
             Controls.Add(J4label);
             Controls.Add(J3label);
             Controls.Add(J2label);

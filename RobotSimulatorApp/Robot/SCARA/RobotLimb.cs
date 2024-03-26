@@ -20,8 +20,8 @@ namespace RobotSimulatorApp.Robot.SCARA
         public float MaximumDistance { get; set; }
         private GLControl gl;
         private Cube? Cube;
-        private Cylinder? Cylinder;
         private Cone? Cone;
+        private Cylinder? Cylinder;
 
         public RobotLimb(GLControl glControl, string name, Geometry shape, Vector3 position, float maxMovement)
         {

@@ -1,6 +1,7 @@
 ﻿using OpenTK.Mathematics;
 using OpenTK.WinForms;
 using RobotSimulatorApp.GlConfig;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -21,7 +22,7 @@ namespace RobotSimulatorApp.Robot.SCARA
         public Vector3 Center;
         public float Height;
         public float Radius;
-
+        public event EventHandler<Vector3> RobotMoved;
         public Cube marker1;
         public Cube marker2;
         public Cube marker3;
@@ -43,7 +44,6 @@ namespace RobotSimulatorApp.Robot.SCARA
 
         public void CreateRobot()
         {
-
             marker1 = new(GLControl, Vector3.Zero, 1, 500, 1);
             marker2 = new(GLControl, Vector3.Zero, 1, 500, 1);
             marker3 = new(GLControl, Vector3.Zero, 1, 500, 1);
@@ -88,8 +88,8 @@ namespace RobotSimulatorApp.Robot.SCARA
             {
                 RobotJoints[i].MoveRevolute(value - RobotJoints[jointId].Distance, JointCenters[jointId]);
             }
-            marker1.SetPosition(RobotJoints[3].GetApexPoint());
-            Debug.WriteLine($"{RobotJoints[3].GetApexPoint()}");
+
+            OnRobotMoved(RobotJoints[RobotJoints.Count - 1].GetApexPoint());
         }
 
         public void MoveLinearJoint(int jointId, float value)
@@ -108,9 +108,12 @@ namespace RobotSimulatorApp.Robot.SCARA
             {
                 RobotJoints[i].MoveLinear(value - RobotJoints[jointId].Distance, JointCenters[jointId]);
             }
+            OnRobotMoved(RobotJoints[RobotJoints.Count -1].GetApexPoint());
+        }
 
-            marker1.SetPosition(RobotJoints[3].GetApexPoint());
-            Debug.WriteLine($"{RobotJoints[3].GetApexPoint()}");
+        public virtual void OnRobotMoved(Vector3 position)
+        {
+            RobotMoved?.Invoke(this, position);
         }
 
         public void CreateJointCenters()
