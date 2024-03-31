@@ -17,6 +17,7 @@ namespace RobotSimulatorApp.Robot.SCARA
         public Vector3 RotationCenter { get; set; }
         public Vector3 Center { get; set; }
         public float Distance { get; set; }
+        public float Length { get; set; }
         public float MaximumDistance { get; set; }
         private GLControl gl;
         private Cube? Cube;
@@ -30,6 +31,7 @@ namespace RobotSimulatorApp.Robot.SCARA
             Geometry = shape;
             Position = position;
             MaximumDistance = maxMovement;
+            Length = 0f;
         }
 
         public void CreateCube(float sizeX, float sizeY, float sizeZ)

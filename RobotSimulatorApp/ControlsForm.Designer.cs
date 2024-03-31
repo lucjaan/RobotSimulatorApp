@@ -36,9 +36,9 @@ namespace RobotSimulatorApp
             J4TrackBar = new System.Windows.Forms.TrackBar();
             TitleLabel = new System.Windows.Forms.Label();
             J1label = new System.Windows.Forms.Label();
+            J3TextBox = new System.Windows.Forms.TextBox();
             J1TextBox = new System.Windows.Forms.TextBox();
             J2TextBox = new System.Windows.Forms.TextBox();
-            J3TextBox = new System.Windows.Forms.TextBox();
             J4TextBox = new System.Windows.Forms.TextBox();
             J2label = new System.Windows.Forms.Label();
             J3label = new System.Windows.Forms.Label();
@@ -57,6 +57,10 @@ namespace RobotSimulatorApp
             XTrackBar = new System.Windows.Forms.TrackBar();
             YTrackBar = new System.Windows.Forms.TrackBar();
             ZTrackBar = new System.Windows.Forms.TrackBar();
+            wipx = new System.Windows.Forms.TextBox();
+            wipy = new System.Windows.Forms.TextBox();
+            wipz = new System.Windows.Forms.TextBox();
+            SendPosition = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)J1TrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)J2TrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)J3TrackBar).BeginInit();
@@ -127,26 +131,26 @@ namespace RobotSimulatorApp
             J1label.TabIndex = 5;
             J1label.Text = "J1";
             // 
+            // J3TextBox
+            // 
+            J3TextBox.Location = new Point(48, 343);
+            J3TextBox.Name = "J3TextBox";
+            J3TextBox.Size = new Size(93, 23);
+            J3TextBox.TabIndex = 6;
+            // 
             // J1TextBox
             // 
-            J1TextBox.Location = new Point(48, 343);
+            J1TextBox.Location = new Point(50, 285);
             J1TextBox.Name = "J1TextBox";
-            J1TextBox.Size = new Size(93, 23);
-            J1TextBox.TabIndex = 6;
+            J1TextBox.Size = new Size(91, 23);
+            J1TextBox.TabIndex = 7;
             // 
             // J2TextBox
             // 
-            J2TextBox.Location = new Point(50, 285);
+            J2TextBox.Location = new Point(50, 314);
             J2TextBox.Name = "J2TextBox";
-            J2TextBox.Size = new Size(91, 23);
-            J2TextBox.TabIndex = 7;
-            // 
-            // J3TextBox
-            // 
-            J3TextBox.Location = new Point(50, 314);
-            J3TextBox.Name = "J3TextBox";
-            J3TextBox.Size = new Size(92, 23);
-            J3TextBox.TabIndex = 8;
+            J2TextBox.Size = new Size(92, 23);
+            J2TextBox.TabIndex = 8;
             // 
             // J4TextBox
             // 
@@ -326,11 +330,46 @@ namespace RobotSimulatorApp
             ZTrackBar.TabIndex = 26;
             ZTrackBar.Visible = false;
             // 
+            // wipx
+            // 
+            wipx.Location = new Point(12, 398);
+            wipx.Name = "wipx";
+            wipx.Size = new Size(42, 23);
+            wipx.TabIndex = 27;
+            // 
+            // wipy
+            // 
+            wipy.Location = new Point(60, 398);
+            wipy.Name = "wipy";
+            wipy.Size = new Size(42, 23);
+            wipy.TabIndex = 28;
+            // 
+            // wipz
+            // 
+            wipz.Location = new Point(108, 398);
+            wipz.Name = "wipz";
+            wipz.Size = new Size(42, 23);
+            wipz.TabIndex = 29;
+            // 
+            // SendPosition
+            // 
+            SendPosition.Location = new Point(162, 398);
+            SendPosition.Name = "SendPosition";
+            SendPosition.Size = new Size(90, 23);
+            SendPosition.TabIndex = 30;
+            SendPosition.Text = "SendPosition";
+            SendPosition.UseVisualStyleBackColor = true;
+            SendPosition.Click += SendPosition_Click;
+            // 
             // ControlsForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new Size(292, 433);
+            Controls.Add(SendPosition);
+            Controls.Add(wipz);
+            Controls.Add(wipy);
+            Controls.Add(wipx);
             Controls.Add(ZTrackBar);
             Controls.Add(YTrackBar);
             Controls.Add(XTrackBar);
@@ -349,9 +388,9 @@ namespace RobotSimulatorApp
             Controls.Add(J3label);
             Controls.Add(J2label);
             Controls.Add(J4TextBox);
-            Controls.Add(J3TextBox);
             Controls.Add(J2TextBox);
             Controls.Add(J1TextBox);
+            Controls.Add(J3TextBox);
             Controls.Add(J1label);
             Controls.Add(TitleLabel);
             Controls.Add(J4TrackBar);
@@ -379,9 +418,9 @@ namespace RobotSimulatorApp
         private System.Windows.Forms.TrackBar J4TrackBar;
         private System.Windows.Forms.Label TitleLabel;
         private System.Windows.Forms.Label J1label;
+        private System.Windows.Forms.TextBox J3TextBox;
         private System.Windows.Forms.TextBox J1TextBox;
         private System.Windows.Forms.TextBox J2TextBox;
-        private System.Windows.Forms.TextBox J3TextBox;
         private System.Windows.Forms.TextBox J4TextBox;
         private System.Windows.Forms.Label J2label;
         private System.Windows.Forms.Label J3label;
@@ -400,5 +439,9 @@ namespace RobotSimulatorApp
         private System.Windows.Forms.TrackBar XTrackBar;
         private System.Windows.Forms.TrackBar YTrackBar;
         private System.Windows.Forms.TrackBar ZTrackBar;
+        private System.Windows.Forms.TextBox wipx;
+        private System.Windows.Forms.TextBox wipy;
+        private System.Windows.Forms.TextBox wipz;
+        private System.Windows.Forms.Button SendPosition;
     }
 }

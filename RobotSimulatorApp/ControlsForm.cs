@@ -1,4 +1,5 @@
-﻿using RobotSimulatorApp.Robot.SCARA;
+﻿using OpenTK.Mathematics;
+using RobotSimulatorApp.Robot.SCARA;
 using System;
 using System.Windows.Forms;
 
@@ -149,6 +150,12 @@ namespace RobotSimulatorApp
                 YTrackBar.Show();
                 ZTrackBar.Show();
             }
+        }
+
+        private void SendPosition_Click(object sender, EventArgs e)
+        {
+            //Scara.MoveToPosition(new Vector3(float.Parse(wipx.Text), float.Parse(wipy.Text), float.Parse(wipz.Text)));
+            Scara.MoveToPosition(Vector3.Zero);
         }
     }
 }

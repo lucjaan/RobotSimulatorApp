@@ -4,6 +4,8 @@ using RobotSimulatorApp.GlConfig;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 
 namespace RobotSimulatorApp.Robot.SCARA
 {
@@ -74,10 +76,10 @@ namespace RobotSimulatorApp.Robot.SCARA
 
         public void MoveRevoluteJoint(int jointId, float value)
         {
-            marker1.SetPosition(RobotJoints[0].GetRotationCenter());
-            marker2.SetPosition(RobotJoints[1].GetRotationCenter());
-            marker3.SetPosition(RobotJoints[2].GetRotationCenter());
-            marker4.SetPosition(RobotJoints[3].GetRotationCenter());
+            //marker1.SetPosition(RobotJoints[0].GetRotationCenter());
+            //marker2.SetPosition(RobotJoints[1].GetRotationCenter());
+            //marker3.SetPosition(RobotJoints[2].GetRotationCenter());
+            //marker4.SetPosition(RobotJoints[3].GetRotationCenter());
 
             for (int i = 0; i < RobotJoints.Count; i++)
             {
@@ -94,10 +96,10 @@ namespace RobotSimulatorApp.Robot.SCARA
 
         public void MoveLinearJoint(int jointId, float value)
         {
-            marker1.SetPosition(RobotJoints[0].GetRotationCenter());
-            marker2.SetPosition(RobotJoints[1].GetRotationCenter());
-            marker3.SetPosition(RobotJoints[2].GetRotationCenter());
-            marker4.SetPosition(RobotJoints[3].GetRotationCenter());
+            //marker1.SetPosition(RobotJoints[0].GetRotationCenter());
+            //marker2.SetPosition(RobotJoints[1].GetRotationCenter());
+            //marker3.SetPosition(RobotJoints[2].GetRotationCenter());
+            //marker4.SetPosition(RobotJoints[3].GetRotationCenter());
 
             for (int i = 0; i < RobotJoints.Count; i++)
             {
@@ -136,6 +138,10 @@ namespace RobotSimulatorApp.Robot.SCARA
             //marker2.SetPosition(j2);
             //marker3.SetPosition(j3);
             //marker4.SetPosition(j4);
+
+            //HEAVY WIP
+            RobotJoints[0].Length = 40f;
+            RobotJoints[1].Length = 35f;
 
             RobotJoints[0].SetRotationCenter(j1);
             RobotJoints[1].SetRotationCenter(j2);
@@ -179,10 +185,54 @@ namespace RobotSimulatorApp.Robot.SCARA
                 joint.RenderModel(view, projection);
             }
 
-            //marker1.RenderCube(view, projection);
+            marker1.RenderCube(view, projection);
             //marker2.RenderCube(view, projection);
             //marker3.RenderCube(view, projection);
             //marker4.RenderCube(view, projection);
+        }
+
+        public void MoveToPosition(Vector3 position)
+        {
+            position = new(-40, 10, 0);
+
+            double d = MathHelper.Sqrt(position.X * position.X + position.Z + position.Z);
+            double a = RobotJoints[0].Length;
+            double b = RobotJoints[1].Length;
+
+            position += RobotBase.Center;
+            marker1.SetPosition(position);
+
+            //double phi = MathHelper.Tan(MathHelper.DegreesToRadians(position.Z / position.X));
+            double phi = MathHelper.RadiansToDegrees(MathHelper.Atan(position.Z / position.X));
+            double beta = MathHelper.RadiansToDegrees(MathHelper.Acos(((a * a) + (d * d) - (b * b)) / (2 * a * d)));
+            double theta = MathHelper.RadiansToDegrees(MathHelper.Acos(((a * a) + (b * b) - (d * d)) / (2 * a * b)));
+            double alpha = MathHelper.RadiansToDegrees(MathHelper.Acos(((b * b) + (d * d) - (a * a)) / (2 * b * d)));
+            double sum = beta + theta + alpha;
+
+            float j1 = (float)(phi + beta);
+            float j2 = (float)(180 - theta);
+            float j3 = position.Y - RobotJoints[2].Position.Y;
+            Debug.WriteLine($"phi:{phi}, beta:{beta}, theta:{theta}");
+            Debug.WriteLine($"j1:{j1}, j2:{j2}, j3:{j3}");
+            SendValues(j1, j2, j3);           
+        }
+
+        public void SendValues(float j1, float j2, float j3, float j4 = -1)
+        {
+            //MoveRevoluteJoint(0, j1);
+            //UpdateJointValues(j1, RobotJoints[1].Distance, RobotJoints[2].Distance, RobotJoints[3].Distance);
+            //UpdateModels();
+
+            //MoveRevoluteJoint(1, j2);
+            ////UpdateModels();
+
+            ////MoveLinearJoint(2, j2);
+            ////UpdateModels();
+
+            //if (j4 != -1)
+            //{
+            //    MoveRevoluteJoint(3 , j4);
+            //}
         }
 
         public void SaveToFile(string filePath)
