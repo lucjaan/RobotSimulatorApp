@@ -130,6 +130,8 @@ void main()
            Buffer2 = Point = Matrix4.CreateTranslation(point) * Matrix4.CreateTranslation(Position);
         }
 
+        public Vector3 GetRotationCenter() => Helpers.GetPositionFromMatrix(Buffer2 * Transformation);
+
         public void SetPosition(Vector3 position) => Model = Matrix4.CreateTranslation(position);
 
         public void UpdateBaseModel()

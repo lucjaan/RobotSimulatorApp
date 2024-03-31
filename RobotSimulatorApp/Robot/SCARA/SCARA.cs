@@ -56,15 +56,22 @@ namespace RobotSimulatorApp.Robot.SCARA
             marker3.SetColor(Color4.Yellow);
             marker4.SetColor(Color4.Yellow);
 
-            RobotBase = new(GLControl, Vector3.Zero, 34f, 20f, 34f);
-            Center = RobotBase.Center;
+            //RobotBase = new(GLControl, Vector3.Zero, 34f, 20f, 34f);
+            RobotBase = new(GLControl, new Vector3(-17f, 0f, -17f), 34f, 20f, 34f);
+            Center = Helpers.GetPositionFromMatrix(RobotBase.CenterPoint);
             RobotBase.SetColor(Color4.DarkOrange);
 
-            RobotJoints.Add(CreateRectangularLimb("J1", new Vector3(9f, 20f, 9f), 40f, 6f, 14f, 9f));
-            RobotJoints.Add(CreateRectangularLimb("J2", new Vector3(44f, 26f, 6f), 35f, 20f, 15f, 30f));
-            RobotJoints.Add(CreateCylindricalLimb("J3", new Vector3(79f, 6.5f, 13.5f), 7.95f, 68.3f, 25f));
+            RobotJoints.Add(CreateRectangularLimb("J1", new Vector3(-6f, 20f, -6f), 40f, 6f, 14f, 9f));
+            RobotJoints.Add(CreateRectangularLimb("J2", new Vector3(27f, 26f, -9f), 35f, 20f, 15f, 30f));
+            RobotJoints.Add(CreateCylindricalLimb("J3", new Vector3(62f, 6.5f, -3.5f), 7.95f, 68.3f, 25f));
+            RobotJoints.Add(CreateConicalLimb("Manipulator", new Vector3(62f, 6.5f, -3.5f), 6.3f, -3.8f, 21f));
+
+
+            //RobotJoints.Add(CreateRectangularLimb("J1", new Vector3(9f, 20f, 9f), 40f, 6f, 14f, 9f));
+            //RobotJoints.Add(CreateRectangularLimb("J2", new Vector3(44f, 26f, 6f), 35f, 20f, 15f, 30f));
+            //RobotJoints.Add(CreateCylindricalLimb("J3", new Vector3(79f, 6.5f, 13.5f), 7.95f, 68.3f, 25f));
             //RobotJoints.Add(CreateCylindricalLimb("J4", new Vector3(79f, 6.5f, 13.5f), 1.35f, 68.3f, 25f));
-            RobotJoints.Add(CreateConicalLimb("Manipulator", new Vector3(79f, 6.5f, 13.5f), 6.3f, -3.8f, 21f));
+            //RobotJoints.Add(CreateConicalLimb("Manipulator", new Vector3(79f, 6.5f, 13.5f), 6.3f, -3.8f, 21f));
 
             for (int i = 0; i < RobotJoints.Count; i++)
             {
@@ -128,7 +135,7 @@ namespace RobotSimulatorApp.Robot.SCARA
             DHParameters.Add(new Vector4(0, d3, 0, 0));
             DHParameters.Add(new Vector4(th4, 0, 0, 0));
 
-            Vector3 j0 = RobotBase.Center;
+            Vector3 j0 = Center;
             Vector3 j1 = new(40f, RobotJoints[0].Center.Y, RobotJoints[0].Center.Z);
             Vector3 j2 = new(35f, RobotJoints[1].Center.Y, RobotJoints[1].Center.Z);
             Vector3 j3 = RobotJoints[2].Center;
@@ -193,24 +200,26 @@ namespace RobotSimulatorApp.Robot.SCARA
 
         public void MoveToPosition(Vector3 position)
         {
-            position = new(-40, 10, 0);
-
             double d = MathHelper.Sqrt(position.X * position.X + position.Z + position.Z);
             double a = RobotJoints[0].Length;
             double b = RobotJoints[1].Length;
 
-            position += RobotBase.Center;
+            //position += RobotBase.Center;
             marker1.SetPosition(position);
 
             //double phi = MathHelper.Tan(MathHelper.DegreesToRadians(position.Z / position.X));
-            double phi = MathHelper.RadiansToDegrees(MathHelper.Atan(position.Z / position.X));
+            //double tt = position.Z / position.X;
+            //double phi = MathHelper.RadiansToDegrees(MathHelper.Atan(position.Z / position.X));
+            //double phi = MathHelper.RadiansToDegrees(MathHelper.Atan2(position.Z, position.X));
+            double tt = MathHelper.Atan2(position.Z, position.X);
+            double phi = MathHelper.RadiansToDegrees(MathHelper.Atan2(position.Z, position.X));
             double beta = MathHelper.RadiansToDegrees(MathHelper.Acos(((a * a) + (d * d) - (b * b)) / (2 * a * d)));
             double theta = MathHelper.RadiansToDegrees(MathHelper.Acos(((a * a) + (b * b) - (d * d)) / (2 * a * b)));
             double alpha = MathHelper.RadiansToDegrees(MathHelper.Acos(((b * b) + (d * d) - (a * a)) / (2 * b * d)));
             double sum = beta + theta + alpha;
 
             float j1 = (float)(phi + beta);
-            float j2 = (float)(180 - theta);
+            float j2 = (float)(180 + theta);
             float j3 = position.Y - RobotJoints[2].Position.Y;
             Debug.WriteLine($"phi:{phi}, beta:{beta}, theta:{theta}");
             Debug.WriteLine($"j1:{j1}, j2:{j2}, j3:{j3}");
@@ -219,20 +228,24 @@ namespace RobotSimulatorApp.Robot.SCARA
 
         public void SendValues(float j1, float j2, float j3, float j4 = -1)
         {
-            //MoveRevoluteJoint(0, j1);
-            //UpdateJointValues(j1, RobotJoints[1].Distance, RobotJoints[2].Distance, RobotJoints[3].Distance);
-            //UpdateModels();
+            MoveRevoluteJoint(0, j1);
+            UpdateModels();
 
-            //MoveRevoluteJoint(1, j2);
-            ////UpdateModels();
+            MoveRevoluteJoint(1, j2);
+            UpdateModels();
 
-            ////MoveLinearJoint(2, j2);
-            ////UpdateModels();
+            MoveLinearJoint(2, j2);
+            UpdateModels();
 
-            //if (j4 != -1)
-            //{
-            //    MoveRevoluteJoint(3 , j4);
-            //}
+            RobotJoints[0].Distance = j1;
+            RobotJoints[1].Distance = j2;
+            RobotJoints[2].Distance = j3;
+
+            if (j4 != -1)
+            {
+                MoveRevoluteJoint(3, j4);
+                RobotJoints[3].Distance = j4;
+            }
         }
 
         public void SaveToFile(string filePath)

@@ -311,6 +311,7 @@ namespace RobotSimulatorApp
             XTrackBar.Size = new Size(213, 45);
             XTrackBar.TabIndex = 24;
             XTrackBar.Visible = false;
+            XTrackBar.Scroll += XTrackBar_Scroll;
             // 
             // YTrackBar
             // 
@@ -320,6 +321,7 @@ namespace RobotSimulatorApp
             YTrackBar.Size = new Size(213, 45);
             YTrackBar.TabIndex = 25;
             YTrackBar.Visible = false;
+            YTrackBar.Scroll += YTrackBar_Scroll;
             // 
             // ZTrackBar
             // 
@@ -329,6 +331,7 @@ namespace RobotSimulatorApp
             ZTrackBar.Size = new Size(213, 45);
             ZTrackBar.TabIndex = 26;
             ZTrackBar.Visible = false;
+            ZTrackBar.Scroll += ZTrackBar_Scroll;
             // 
             // wipx
             // 

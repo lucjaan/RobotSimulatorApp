@@ -96,6 +96,21 @@ namespace RobotSimulatorApp
             Scara.UpdateModels();
         }
 
+        private void XTrackBar_Scroll(object sender, EventArgs e)
+        {
+
+        }
+
+        private void YTrackBar_Scroll(object sender, EventArgs e)
+        {
+
+        }
+
+        private void ZTrackBar_Scroll(object sender, EventArgs e)
+        {
+
+        }
+
         private void SendJointValues()
         {
             Scara.UpdateJointValues(

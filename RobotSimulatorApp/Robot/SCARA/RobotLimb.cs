@@ -122,7 +122,7 @@ namespace RobotSimulatorApp.Robot.SCARA
             switch (Geometry)
             {
                 case Geometry.Cube:
-                    return Helpers.GetPositionFromMatrix(Cube.Point);
+                    return Cube.GetRotationCenter();
 
                 case Geometry.Cylinder:
                     return Cylinder.GetCenterPoint();
