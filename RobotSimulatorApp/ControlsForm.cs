@@ -98,17 +98,17 @@ namespace RobotSimulatorApp
 
         private void XTrackBar_Scroll(object sender, EventArgs e)
         {
-
+            SendCarthesianValues();
         }
 
         private void YTrackBar_Scroll(object sender, EventArgs e)
         {
-
+            SendCarthesianValues();
         }
 
         private void ZTrackBar_Scroll(object sender, EventArgs e)
         {
-
+            SendCarthesianValues();
         }
 
         private void SendJointValues()
@@ -119,6 +119,11 @@ namespace RobotSimulatorApp
                 (float)J3TrackBar.Value,
                 (float)J4TrackBar.Value
            );
+        }
+
+        private void SendCarthesianValues()
+        {
+            Scara.MoveToPosition(new Vector3(XTrackBar.Value, YTrackBar.Value, ZTrackBar.Value));
         }
 
         private void JointRadioButton_CheckedChanged(object sender, EventArgs e)

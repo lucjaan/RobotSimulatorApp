@@ -200,7 +200,7 @@ namespace RobotSimulatorApp.Robot.SCARA
 
         public void MoveToPosition(Vector3 position)
         {
-            double d = MathHelper.Sqrt(position.X * position.X + position.Z + position.Z);
+            double d = MathHelper.Sqrt((position.X * position.X) + (position.Z * position.Z));
             double a = RobotJoints[0].Length;
             double b = RobotJoints[1].Length;
 
@@ -211,18 +211,27 @@ namespace RobotSimulatorApp.Robot.SCARA
             //double tt = position.Z / position.X;
             //double phi = MathHelper.RadiansToDegrees(MathHelper.Atan(position.Z / position.X));
             //double phi = MathHelper.RadiansToDegrees(MathHelper.Atan2(position.Z, position.X));
-            double tt = MathHelper.Atan2(position.Z, position.X);
             double phi = MathHelper.RadiansToDegrees(MathHelper.Atan2(position.Z, position.X));
             double beta = MathHelper.RadiansToDegrees(MathHelper.Acos(((a * a) + (d * d) - (b * b)) / (2 * a * d)));
             double theta = MathHelper.RadiansToDegrees(MathHelper.Acos(((a * a) + (b * b) - (d * d)) / (2 * a * b)));
-            double alpha = MathHelper.RadiansToDegrees(MathHelper.Acos(((b * b) + (d * d) - (a * a)) / (2 * b * d)));
-            double sum = beta + theta + alpha;
+            //double alpha = MathHelper.RadiansToDegrees(MathHelper.Acos(((b * b) + (d * d) - (a * a)) / (2 * b * d)));
+            //double sum = beta + theta + alpha;
 
-            float j1 = (float)(phi + beta);
-            float j2 = (float)(180 + theta);
+            float j1 = (float)(beta - phi);
+            //float j2 = (float)(360 - (180 - theta));
+            //float j2 = (float)(360 - (180 - theta));
+            float j2 = (float)(theta - 180);
             float j3 = position.Y - RobotJoints[2].Position.Y;
+
+            if (double.IsNaN(j1) || double.IsNaN(j2))
+            {
+                SendValues(RobotJoints[0].Distance, RobotJoints[1].Distance, j3);
+                return;
+            }
+
             Debug.WriteLine($"phi:{phi}, beta:{beta}, theta:{theta}");
-            Debug.WriteLine($"j1:{j1}, j2:{j2}, j3:{j3}");
+            Debug.WriteLine($"X:{position.X}, Z:{position.Z}, d:{d}");
+            //Debug.WriteLine($"j1:{j1}, j2:{j2}, j3:{j3}");
             SendValues(j1, j2, j3);           
         }
 
@@ -234,7 +243,7 @@ namespace RobotSimulatorApp.Robot.SCARA
             MoveRevoluteJoint(1, j2);
             UpdateModels();
 
-            MoveLinearJoint(2, j2);
+            MoveLinearJoint(2, j3);
             UpdateModels();
 
             RobotJoints[0].Distance = j1;

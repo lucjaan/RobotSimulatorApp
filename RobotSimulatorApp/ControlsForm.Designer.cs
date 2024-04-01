@@ -92,8 +92,9 @@ namespace RobotSimulatorApp
             // 
             // J3TrackBar
             // 
+            J3TrackBar.LargeChange = 2;
             J3TrackBar.Location = new Point(50, 165);
-            J3TrackBar.Maximum = 360;
+            J3TrackBar.Minimum = -21;
             J3TrackBar.Name = "J3TrackBar";
             J3TrackBar.Size = new Size(213, 45);
             J3TrackBar.TabIndex = 2;
@@ -306,7 +307,8 @@ namespace RobotSimulatorApp
             // XTrackBar
             // 
             XTrackBar.Location = new Point(48, 91);
-            XTrackBar.Maximum = 360;
+            XTrackBar.Maximum = 200;
+            XTrackBar.Minimum = -200;
             XTrackBar.Name = "XTrackBar";
             XTrackBar.Size = new Size(213, 45);
             XTrackBar.TabIndex = 24;
@@ -316,7 +318,7 @@ namespace RobotSimulatorApp
             // YTrackBar
             // 
             YTrackBar.Location = new Point(48, 142);
-            YTrackBar.Maximum = 360;
+            YTrackBar.Minimum = -21;
             YTrackBar.Name = "YTrackBar";
             YTrackBar.Size = new Size(213, 45);
             YTrackBar.TabIndex = 25;
@@ -326,7 +328,8 @@ namespace RobotSimulatorApp
             // ZTrackBar
             // 
             ZTrackBar.Location = new Point(48, 191);
-            ZTrackBar.Maximum = 360;
+            ZTrackBar.Maximum = 200;
+            ZTrackBar.Minimum = -200;
             ZTrackBar.Name = "ZTrackBar";
             ZTrackBar.Size = new Size(213, 45);
             ZTrackBar.TabIndex = 26;
