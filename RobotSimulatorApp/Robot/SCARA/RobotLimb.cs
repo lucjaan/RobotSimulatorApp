@@ -1,9 +1,7 @@
-﻿
-using RobotSimulatorApp.GlConfig;
-using OpenTK.Mathematics;
+﻿using OpenTK.Mathematics;
 using System;
 using OpenTK.WinForms;
-using RobotSimulatorApp.OpenGL;
+using RobotSimulatorApp.Shapes;
 
 namespace RobotSimulatorApp.Robot.SCARA
 {

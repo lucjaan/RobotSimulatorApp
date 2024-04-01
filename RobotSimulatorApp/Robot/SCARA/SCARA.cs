@@ -1,6 +1,7 @@
 ﻿using OpenTK.Mathematics;
 using OpenTK.WinForms;
 using RobotSimulatorApp.GlConfig;
+using RobotSimulatorApp.Shapes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -30,7 +31,6 @@ namespace RobotSimulatorApp.Robot.SCARA
         public Cube marker2;
         public Cube marker3;
         public Cube marker4;
-
         private Cube Manipulator;
 
         public SCARA_Robot(GLControl glc, string name)

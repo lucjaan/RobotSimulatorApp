@@ -1,16 +1,15 @@
-﻿using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
+﻿using OpenTK.Mathematics;
 using OpenTK.WinForms;
 using System.Collections.Generic;
 
-namespace RobotSimulatorApp.GlConfig
+namespace RobotSimulatorApp.Shapes
 {
-    public class Cube
+    public class Cube : Shape
     {
         public Vector3 Center { get; set; }
         public Vector3 Position { get; set; }
         public Matrix4 Model { get; set; }
-        public float Length {get; set; }
+        public float Length { get; set; }
         public Matrix4 Transformation { get; set; }
         public Matrix4 CenterPoint { get; set; }
         public Matrix4 RotationCenter { get; set; }
@@ -26,47 +25,47 @@ namespace RobotSimulatorApp.GlConfig
         private int ColorBufferObject { get; set; }
 
         private readonly List<Vector3> Vertices = [];
-        private static readonly int[] IndexData =
-        {
-             0,  1,  2,  2,  3,  0,
-             4,  5,  6,  6,  7,  4,
-             8,  9, 10, 10, 11,  8,
-            12, 13, 14, 14, 15, 12,
-            16, 17, 18, 18, 19, 16,
-            20, 21, 22, 22, 23, 20,
-        };
+        private readonly List<int> IndexData =
+        [
+             0,
+            1,
+            2,
+            2,
+            3,
+            0,
+            4,
+            5,
+            6,
+            6,
+            7,
+            4,
+            8,
+            9,
+            10,
+            10,
+            11,
+            8,
+            12,
+            13,
+            14,
+            14,
+            15,
+            12,
+            16,
+            17,
+            18,
+            18,
+            19,
+            16,
+            20,
+            21,
+            22,
+            22,
+            23,
+            20
+        ];
+        private List<Color4> ColorData = [];
 
-        private Color4[] ColorData = new Color4[36];
-
-        public static readonly string VertexShader =
-           @"#version 330 core
-
-layout(location = 0) in vec3 aPosition;
-layout(location = 1) in vec4 aColor;
-
-uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
-out vec4 fColor;
-
-void main(void)
-{
-
-    gl_Position = vec4(aPosition, 1.0) * model * view * projection;
-    fColor = aColor;
-
-}";
-
-        public static readonly string FragmentShader =
-           @"#version 330 core
-in vec4 fColor;
-
-out vec4 oColor;
-
-void main()
-{
-    oColor = fColor;
-}";
         /// <summary>
         /// Creates Cube from center, where sizeX/Y/Z is total size in given axis
         /// </summary>
@@ -83,6 +82,7 @@ void main()
             RotationCenter = RotationBuffer = Matrix4.CreateTranslation(new Vector3(0, sizeY, 0));
             Length = 0;
             CreateVertices(sizeX, sizeY, sizeZ);
+            SetColor(Color4.DarkOrange);
         }
 
         /// <summary>
@@ -92,8 +92,8 @@ void main()
         public Cube(GLControl glControl, Vector3 startPoint, float distanceToEndPoint, float paddingX, float sizeY, float sizeZ)
         {
             GlControl = glControl;
-            Position = new Vector3(startPoint.X + (distanceToEndPoint / 2), startPoint.Y, startPoint.Z);
-            float sizeX = distanceToEndPoint + (2 * paddingX);
+            Position = new Vector3(startPoint.X + distanceToEndPoint / 2, startPoint.Y, startPoint.Z);
+            float sizeX = distanceToEndPoint + 2 * paddingX;
             Center = new Vector3(sizeX / 2, sizeY / 2, sizeZ / 2);
             Model = Matrix4.CreateTranslation(Position);
 
@@ -104,53 +104,21 @@ void main()
             Length = distanceToEndPoint;
 
             CreateVertices(sizeX, sizeY, sizeZ);
+            SetColor(Color4.DarkOrange);
         }
 
         public void RenderCube(Matrix4 view, Matrix4 projection)
         {
-            Shader shader = new(VertexShader, FragmentShader);
-            shader.Use();
-
-            VertexArrayObject = GL.GenVertexArray();
-            GL.BindVertexArray(VertexArrayObject);
-
-            ElementBufferObject = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ElementBufferObject);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, IndexData.Length * sizeof(int), IndexData, BufferUsageHint.StaticDraw);
-
-            PositionBufferObject = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, PositionBufferObject);
-            GL.BufferData(BufferTarget.ArrayBuffer, 3 * Vertices.Count * sizeof(float), Vertices.ToArray(), BufferUsageHint.StaticDraw);
-
-            int vertexLocation = shader.GetAttribLocation("aPosition");
-            GL.EnableVertexAttribArray(vertexLocation);
-            GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
-
-            ColorBufferObject = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, ColorBufferObject);
-            GL.BufferData(BufferTarget.ArrayBuffer, ColorData.Length * sizeof(float) * 4, ColorData, BufferUsageHint.StaticDraw);
-
-            int colorLocation = shader.GetAttribLocation("aColor");
-            GL.EnableVertexAttribArray(colorLocation);
-            GL.VertexAttribPointer(colorLocation, 4, VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
-
+            Render(Model, Transformation, view, projection, IndexData.ToArray(), Vertices.ToArray(), ColorData.ToArray());
             RotationCenter = RotationBuffer * Transformation;
             CenterPoint = CenterBuffer * Transformation;
-            shader.SetMatrix4("model", Model * Transformation);
-            shader.SetMatrix4("view", view);
-            shader.SetMatrix4("projection", projection);
-
-            GL.DrawElements(BeginMode.Triangles, IndexData.Length, DrawElementsType.UnsignedInt, 0);
-            shader.Dispose();
         }
 
-        public void SetStartPoint(Vector3 point) => StartBuffer = StartPoint = Matrix4.CreateTranslation(point) * Matrix4.CreateTranslation(Position);
-        public Vector3 GetStartPoint() => Helpers.GetPositionFromMatrix(StartBuffer * Transformation);
         public void SetRotationCenter(Vector3 point) => RotationBuffer = RotationCenter = Matrix4.CreateTranslation(point) * Matrix4.CreateTranslation(Position);
         public Vector3 GetRotationCenter() => Helpers.GetPositionFromMatrix(RotationBuffer * Transformation);
         public void SetPosition(Vector3 position) => Model = Matrix4.CreateTranslation(position);
 
-        public void UpdateBaseModel()
+        public override void UpdateBaseModel()
         {
             Model *= Transformation;
             RotationBuffer *= Transformation;
@@ -159,9 +127,14 @@ void main()
             Transformation = Matrix4.Identity;
         }
 
-        public void SetColor(Color4 colorData)
+        public override void SetColor(Color4 colorData)
         {
-            Color4[] color = new Color4[24];
+            List<Color4> color = new();
+            for (int i = 0; i < 36; i++)
+            {
+                color.Add(Color4.White);
+            }
+
             for (int i = 0; i < 4; i++)
             {
                 color[i + 16] = new Color4(
