@@ -57,10 +57,6 @@ namespace RobotSimulatorApp
             XTrackBar = new System.Windows.Forms.TrackBar();
             YTrackBar = new System.Windows.Forms.TrackBar();
             ZTrackBar = new System.Windows.Forms.TrackBar();
-            wipx = new System.Windows.Forms.TextBox();
-            wipy = new System.Windows.Forms.TextBox();
-            wipz = new System.Windows.Forms.TextBox();
-            SendPosition = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)J1TrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)J2TrackBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)J3TrackBar).BeginInit();
@@ -216,16 +212,17 @@ namespace RobotSimulatorApp
             // 
             // CartesianPositionTextBox
             // 
-            CartesianPositionTextBox.Location = new Point(161, 310);
+            CartesianPositionTextBox.Location = new Point(164, 311);
             CartesianPositionTextBox.Name = "CartesianPositionTextBox";
-            CartesianPositionTextBox.Size = new Size(91, 23);
+            CartesianPositionTextBox.ReadOnly = true;
+            CartesianPositionTextBox.Size = new Size(116, 23);
             CartesianPositionTextBox.TabIndex = 15;
             // 
             // CartesianLabel
             // 
             CartesianLabel.AutoSize = true;
             CartesianLabel.Font = new Font("Segoe UI", 11F);
-            CartesianLabel.Location = new Point(161, 288);
+            CartesianLabel.Location = new Point(172, 288);
             CartesianLabel.Name = "CartesianLabel";
             CartesianLabel.Size = new Size(89, 20);
             CartesianLabel.TabIndex = 16;
@@ -336,46 +333,11 @@ namespace RobotSimulatorApp
             ZTrackBar.Visible = false;
             ZTrackBar.Scroll += ZTrackBar_Scroll;
             // 
-            // wipx
-            // 
-            wipx.Location = new Point(12, 398);
-            wipx.Name = "wipx";
-            wipx.Size = new Size(42, 23);
-            wipx.TabIndex = 27;
-            // 
-            // wipy
-            // 
-            wipy.Location = new Point(60, 398);
-            wipy.Name = "wipy";
-            wipy.Size = new Size(42, 23);
-            wipy.TabIndex = 28;
-            // 
-            // wipz
-            // 
-            wipz.Location = new Point(108, 398);
-            wipz.Name = "wipz";
-            wipz.Size = new Size(42, 23);
-            wipz.TabIndex = 29;
-            // 
-            // SendPosition
-            // 
-            SendPosition.Location = new Point(162, 398);
-            SendPosition.Name = "SendPosition";
-            SendPosition.Size = new Size(90, 23);
-            SendPosition.TabIndex = 30;
-            SendPosition.Text = "SendPosition";
-            SendPosition.UseVisualStyleBackColor = true;
-            SendPosition.Click += SendPosition_Click;
-            // 
             // ControlsForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new Size(292, 433);
-            Controls.Add(SendPosition);
-            Controls.Add(wipz);
-            Controls.Add(wipy);
-            Controls.Add(wipx);
             Controls.Add(ZTrackBar);
             Controls.Add(YTrackBar);
             Controls.Add(XTrackBar);
@@ -445,9 +407,5 @@ namespace RobotSimulatorApp
         private System.Windows.Forms.TrackBar XTrackBar;
         private System.Windows.Forms.TrackBar YTrackBar;
         private System.Windows.Forms.TrackBar ZTrackBar;
-        private System.Windows.Forms.TextBox wipx;
-        private System.Windows.Forms.TextBox wipy;
-        private System.Windows.Forms.TextBox wipz;
-        private System.Windows.Forms.Button SendPosition;
     }
 }

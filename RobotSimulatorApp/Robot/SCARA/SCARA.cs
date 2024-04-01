@@ -22,6 +22,7 @@ namespace RobotSimulatorApp.Robot.SCARA
         private GLControl GLControl { get; set; }
         public Cube RobotBase;
         public Vector3 Center;
+        public Vector3 Tool;
         public float Height;
         public float Radius;
         public event EventHandler<Vector3> RobotMoved;
@@ -56,7 +57,6 @@ namespace RobotSimulatorApp.Robot.SCARA
             marker3.SetColor(Color4.Yellow);
             marker4.SetColor(Color4.Yellow);
 
-            //RobotBase = new(GLControl, Vector3.Zero, 34f, 20f, 34f);
             RobotBase = new(GLControl, new Vector3(-17f, 0f, -17f), 34f, 20f, 34f);
             Center = Helpers.GetPositionFromMatrix(RobotBase.CenterPoint);
             RobotBase.SetColor(Color4.DarkOrange);
@@ -65,13 +65,6 @@ namespace RobotSimulatorApp.Robot.SCARA
             RobotJoints.Add(CreateRectangularLimb("J2", new Vector3(27f, 26f, -9f), 35f, 20f, 15f, 30f));
             RobotJoints.Add(CreateCylindricalLimb("J3", new Vector3(62f, 6.5f, -3.5f), 7.95f, 68.3f, 25f));
             RobotJoints.Add(CreateConicalLimb("Manipulator", new Vector3(62f, 6.5f, -3.5f), 6.3f, -3.8f, 21f));
-
-
-            //RobotJoints.Add(CreateRectangularLimb("J1", new Vector3(9f, 20f, 9f), 40f, 6f, 14f, 9f));
-            //RobotJoints.Add(CreateRectangularLimb("J2", new Vector3(44f, 26f, 6f), 35f, 20f, 15f, 30f));
-            //RobotJoints.Add(CreateCylindricalLimb("J3", new Vector3(79f, 6.5f, 13.5f), 7.95f, 68.3f, 25f));
-            //RobotJoints.Add(CreateCylindricalLimb("J4", new Vector3(79f, 6.5f, 13.5f), 1.35f, 68.3f, 25f));
-            //RobotJoints.Add(CreateConicalLimb("Manipulator", new Vector3(79f, 6.5f, 13.5f), 6.3f, -3.8f, 21f));
 
             for (int i = 0; i < RobotJoints.Count; i++)
             {
@@ -123,6 +116,7 @@ namespace RobotSimulatorApp.Robot.SCARA
         public virtual void OnRobotMoved(Vector3 position)
         {
             RobotMoved?.Invoke(this, position);
+            Tool = position;
         }
 
         public void CreateJointCenters()
@@ -203,23 +197,11 @@ namespace RobotSimulatorApp.Robot.SCARA
             double d = MathHelper.Sqrt((position.X * position.X) + (position.Z * position.Z));
             double a = RobotJoints[0].Length;
             double b = RobotJoints[1].Length;
-
-            //position += RobotBase.Center;
-            marker1.SetPosition(position);
-
-            //double phi = MathHelper.Tan(MathHelper.DegreesToRadians(position.Z / position.X));
-            //double tt = position.Z / position.X;
-            //double phi = MathHelper.RadiansToDegrees(MathHelper.Atan(position.Z / position.X));
-            //double phi = MathHelper.RadiansToDegrees(MathHelper.Atan2(position.Z, position.X));
             double phi = MathHelper.RadiansToDegrees(MathHelper.Atan2(position.Z, position.X));
             double beta = MathHelper.RadiansToDegrees(MathHelper.Acos(((a * a) + (d * d) - (b * b)) / (2 * a * d)));
             double theta = MathHelper.RadiansToDegrees(MathHelper.Acos(((a * a) + (b * b) - (d * d)) / (2 * a * b)));
-            //double alpha = MathHelper.RadiansToDegrees(MathHelper.Acos(((b * b) + (d * d) - (a * a)) / (2 * b * d)));
-            //double sum = beta + theta + alpha;
 
             float j1 = (float)(beta - phi);
-            //float j2 = (float)(360 - (180 - theta));
-            //float j2 = (float)(360 - (180 - theta));
             float j2 = (float)(theta - 180);
             float j3 = position.Y - RobotJoints[2].Position.Y;
 
@@ -228,11 +210,7 @@ namespace RobotSimulatorApp.Robot.SCARA
                 SendValues(RobotJoints[0].Distance, RobotJoints[1].Distance, j3);
                 return;
             }
-
-            Debug.WriteLine($"phi:{phi}, beta:{beta}, theta:{theta}");
-            Debug.WriteLine($"X:{position.X}, Z:{position.Z}, d:{d}");
-            //Debug.WriteLine($"j1:{j1}, j2:{j2}, j3:{j3}");
-            SendValues(j1, j2, j3);           
+            SendValues(j1, j2, j3);
         }
 
         public void SendValues(float j1, float j2, float j3, float j4 = -1)

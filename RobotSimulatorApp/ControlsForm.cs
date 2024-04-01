@@ -13,6 +13,13 @@ namespace RobotSimulatorApp
         {
             InitializeComponent();
             Scara = scara;
+            scara.RobotMoved += TextBox_RobotMoved;
+
+        }
+
+        private void TextBox_RobotMoved(object? sender, Vector3 position)
+        {
+            CartesianPositionTextBox.Text = position.ToString("F2");
         }
 
         protected override void OnLoad(EventArgs e)
@@ -23,6 +30,7 @@ namespace RobotSimulatorApp
             J2TextBox.Text = J2TrackBar.Value.ToString();
             J3TextBox.Text = J3TrackBar.Value.ToString();
             J4TextBox.Text = J4TrackBar.Value.ToString();
+            CartesianPositionTextBox.Text = Scara.Tool.ToString();
         }
 
         private void J1TrackBar_Scroll(object sender, EventArgs e)
@@ -140,6 +148,11 @@ namespace RobotSimulatorApp
                 J3label.Show();
                 J4label.Show();
 
+                J1TrackBar.Value = (int)(Scara.RobotJoints[0].Distance < 0 ? Scara.RobotJoints[0].Distance + 360 : Scara.RobotJoints[0].Distance);
+                J2TrackBar.Value = (int)(Scara.RobotJoints[1].Distance < 0 ? Scara.RobotJoints[1].Distance + 360 : Scara.RobotJoints[1].Distance);
+                J3TrackBar.Value = (int)Scara.RobotJoints[2].Distance;
+                J4TrackBar.Value = (int)(Scara.RobotJoints[3].Distance < 0 ? Scara.RobotJoints[3].Distance + 360 : Scara.RobotJoints[3].Distance);              
+
                 XLabel.Hide();
                 YLabel.Hide();
                 ZLabel.Hide();
@@ -169,13 +182,11 @@ namespace RobotSimulatorApp
                 XTrackBar.Show();
                 YTrackBar.Show();
                 ZTrackBar.Show();
-            }
-        }
 
-        private void SendPosition_Click(object sender, EventArgs e)
-        {
-            //Scara.MoveToPosition(new Vector3(float.Parse(wipx.Text), float.Parse(wipy.Text), float.Parse(wipz.Text)));
-            Scara.MoveToPosition(Vector3.Zero);
+                XTrackBar.Value = (int)Scara.Tool.X;
+                YTrackBar.Value = (int)Scara.Tool.Y;
+                ZTrackBar.Value = (int)Scara.Tool.Z;
+            }
         }
     }
 }
