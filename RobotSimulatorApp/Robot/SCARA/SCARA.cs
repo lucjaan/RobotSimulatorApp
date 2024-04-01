@@ -1,6 +1,7 @@
 ﻿using OpenTK.Mathematics;
 using OpenTK.WinForms;
 using RobotSimulatorApp.GlConfig;
+using RobotSimulatorApp.Shapes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -30,7 +31,6 @@ namespace RobotSimulatorApp.Robot.SCARA
         public Cube marker2;
         public Cube marker3;
         public Cube marker4;
-
         private Cube Manipulator;
 
         public SCARA_Robot(GLControl glc, string name)
@@ -57,21 +57,46 @@ namespace RobotSimulatorApp.Robot.SCARA
             marker3.SetColor(Color4.Yellow);
             marker4.SetColor(Color4.Yellow);
 
-            RobotBase = new(GLControl, new Vector3(-17f, 0f, -17f), 34f, 20f, 34f);
+            //RobotBase = new(GLControl, new Vector3(-17f, 0f, -17f), 34f, 20f, 34f);
+            marker1.SetPosition(Vector3.Zero);
+            RobotBase = new(GLControl, Vector3.Zero, 34f, 20f, 34f);
             Center = Helpers.GetPositionFromMatrix(RobotBase.CenterPoint);
             RobotBase.SetColor(Color4.DarkOrange);
 
-            RobotJoints.Add(CreateRectangularLimb("J1", new Vector3(-6f, 20f, -6f), 40f, 6f, 14f, 9f));
-            RobotJoints.Add(CreateRectangularLimb("J2", new Vector3(27f, 26f, -9f), 35f, 20f, 15f, 30f));
-            RobotJoints.Add(CreateCylindricalLimb("J3", new Vector3(62f, 6.5f, -3.5f), 7.95f, 68.3f, 25f));
-            RobotJoints.Add(CreateConicalLimb("Manipulator", new Vector3(62f, 6.5f, -3.5f), 6.3f, -3.8f, 21f));
+            Vector3 p0 = RobotBase.GetRotationCenter();
+            RobotLimb j1 = CreateRectangularLimb("J1", p0, 35f, 4.5f, 6f, 14f, 0f);
+            marker2.SetColor(Color4.Yellow);
+            Vector3 p1 = j1.GetRotationCenter();
+            RobotLimb j2 = CreateRectangularLimb("J2", p1, 30f, 2.5f, 6f, 14f, 0f);
+            Vector3 p2 = j2.GetRotationCenter();
+            RobotLimb j3 = CreateCylindricalLimb("J3", new Vector3(p2.X, 6.5f, p2.Z), 7.95f, 68.3f, 25f);
+            Vector3 p3 = j3.GetRotationCenter();
+            RobotLimb j4 = CreateConicalLimb("Manipulator", p3, 6.3f, -3.8f, 21f);
+            Vector3 p4 = j4.GetRotationCenter();
+
+            RobotJoints.Add(j1);
+            RobotJoints.Add(j2);
+            RobotJoints.Add(j3);
+            RobotJoints.Add(j4);
+
+            JointCenters.Add(p0);
+            JointCenters.Add(p1);
+            JointCenters.Add(p2);
+            JointCenters.Add(p3);
+            JointCenters.Add(p4);
+
+            //RobotJoints.Add(CreateRectangularLimb("J1", new Vector3(-6f, 20f, -6f), 40f, 6f, 14f, 9f));
+            //RobotJoints.Add(CreateRectangularLimb("J2", new Vector3(27f, 26f, -9f), 35f, 20f, 15f, 30f));
+            //RobotJoints.Add(CreateCylindricalLimb("J3", new Vector3(62f, 6.5f, -3.5f), 7.95f, 68.3f, 25f));
+            //RobotJoints.Add(CreateConicalLimb("Manipulator", new Vector3(62f, 6.5f, -3.5f), 6.3f, -3.8f, 21f));
+
 
             for (int i = 0; i < RobotJoints.Count; i++)
             {
                 RobotJoints[i].SetColor(Color4.LightSlateGray);
                 DenavitHartenbergTable.Add(Matrix4.Identity);
             }
-            CreateJointCenters();
+            //CreateJointCenters();
         }
 
         public void MoveRevoluteJoint(int jointId, float value)
@@ -141,8 +166,8 @@ namespace RobotSimulatorApp.Robot.SCARA
             //marker4.SetPosition(j4);
 
             //HEAVY WIP
-            RobotJoints[0].Length = 40f;
-            RobotJoints[1].Length = 35f;
+            //RobotJoints[0].Length = 40f;
+            //RobotJoints[1].Length = 35f;
 
             RobotJoints[0].SetRotationCenter(j1);
             RobotJoints[1].SetRotationCenter(j2);
@@ -163,10 +188,10 @@ namespace RobotSimulatorApp.Robot.SCARA
             RobotJoints[2].Distance = d3;
             RobotJoints[3].Distance = th4;
 
-            DHParameters[0] = new Vector4(th1, 0, 0, 0);
-            DHParameters[1] = new Vector4(th2, 0, 0, 0);
-            DHParameters[2] = new Vector4(0, d3, 0, 0);
-            DHParameters[3] = new Vector4(th4, 0, 0, 0);
+            //DHParameters[0] = new Vector4(th1, 0, 0, 0);
+            //DHParameters[1] = new Vector4(th2, 0, 0, 0);
+            //DHParameters[2] = new Vector4(0, d3, 0, 0);
+            //DHParameters[3] = new Vector4(th4, 0, 0, 0);
         }
 
         public void UpdateModels()
@@ -195,8 +220,10 @@ namespace RobotSimulatorApp.Robot.SCARA
         public void MoveToPosition(Vector3 position)
         {
             double d = MathHelper.Sqrt((position.X * position.X) + (position.Z * position.Z));
-            double a = RobotJoints[0].Length;
-            double b = RobotJoints[1].Length;
+            //double a = 40f;
+            //double b = 35f;
+            double a = RobotJoints[0].GetLength() + 2;
+            double b = RobotJoints[1].GetLength() + 2;
             double phi = MathHelper.RadiansToDegrees(MathHelper.Atan2(position.Z, position.X));
             double beta = MathHelper.RadiansToDegrees(MathHelper.Acos(((a * a) + (d * d) - (b * b)) / (2 * a * d)));
             double theta = MathHelper.RadiansToDegrees(MathHelper.Acos(((a * a) + (b * b) - (d * d)) / (2 * a * b)));
@@ -240,12 +267,18 @@ namespace RobotSimulatorApp.Robot.SCARA
             SaveToFile();
         }
 
-        public RobotLimb CreateRectangularLimb(string name,  Vector3 position, float sizeX, float sizeY, float sizeZ, float maxMovement)
+        public RobotLimb CreateRectangularLimb(string name,  Vector3 position, float distanceToPointB, float paddingX, float sizeY, float sizeZ, float maxMovement)
         {
             RobotLimb limb = new(GLControl, name, Geometry.Cube, position, maxMovement);
-            limb.CreateCube(sizeX, sizeY, sizeZ);
+            limb.CreateCube(distanceToPointB, paddingX, sizeY, sizeZ);
             return limb;
         }
+        //public RobotLimb CreateRectangularLimb(string name, Vector3 position, float sizeX, float sizeY, float sizeZ, float maxMovement)
+        //{
+        //    RobotLimb limb = new(GLControl, name, Geometry.Cube, position, maxMovement);
+        //    limb.CreateCube(sizeX, sizeY, sizeZ);
+        //    return limb;
+        //}
 
         public RobotLimb CreateCylindricalLimb(string name, Vector3 position, float radius, float height, float maxMovement)
         {

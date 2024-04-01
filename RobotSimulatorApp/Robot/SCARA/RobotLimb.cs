@@ -1,11 +1,7 @@
-﻿
-
-using RobotSimulatorApp.GlConfig;
-using System.Xml.Linq;
-using OpenTK.Mathematics;
+﻿using OpenTK.Mathematics;
 using System;
 using OpenTK.WinForms;
-using RobotSimulatorApp.OpenGL;
+using RobotSimulatorApp.Shapes;
 
 namespace RobotSimulatorApp.Robot.SCARA
 {
@@ -34,14 +30,14 @@ namespace RobotSimulatorApp.Robot.SCARA
             Length = 0f;
         }
 
-        public void CreateCube(float sizeX, float sizeY, float sizeZ)
+        public void CreateCube(float distanceToPointB, float paddingX, float sizeY, float sizeZ)
         {
             if (Geometry != Geometry.Cube)
             {
                 throw new InvalidOperationException($"Tried to call function for Cube while current geometry is {Geometry}");
             }
 
-            Cube = new(gl, Position, sizeX, sizeY, sizeZ);
+            Cube = new(gl, Position, distanceToPointB, paddingX, sizeY, sizeZ);
             Center = Cube.Center;
         }
 
@@ -103,12 +99,26 @@ namespace RobotSimulatorApp.Robot.SCARA
             }
         }
 
+        public float GetLength()
+        {
+            float result = 0;
+            switch (Geometry)
+            {
+                case Geometry.Cube:
+                    return Cube.Length;
+                case Geometry.Cylinder:
+                case Geometry.Cone:
+                    break;
+            }
+            return result;
+        }
+
         public void SetRotationCenter(Vector3 rotationCenter)
         {
             switch (Geometry)
             {
                 case Geometry.Cube:
-                    Cube.SetPoint(rotationCenter);
+                    Cube.SetRotationCenter(rotationCenter);
                     break; 
                 case Geometry.Cylinder:
                 case Geometry.Cone:
