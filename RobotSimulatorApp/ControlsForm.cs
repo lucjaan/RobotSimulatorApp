@@ -13,8 +13,12 @@ namespace RobotSimulatorApp
         {
             InitializeComponent();
             Scara = scara;
-            scara.RobotMoved += TextBox_RobotMoved;
+            Scara.RobotMoved += TextBox_RobotMoved;
 
+            XTrackBar.Maximum = (int)(Scara.RobotJoints[0].GetLength() + Scara.RobotJoints[1].GetLength());
+            XTrackBar.Minimum = -(int)(Scara.RobotJoints[0].GetLength() + Scara.RobotJoints[1].GetLength());
+            ZTrackBar.Maximum = (int)(Scara.RobotJoints[0].GetLength() + Scara.RobotJoints[1].GetLength());
+            ZTrackBar.Minimum = -(int)(Scara.RobotJoints[0].GetLength() + Scara.RobotJoints[1].GetLength());
         }
 
         private void TextBox_RobotMoved(object? sender, Vector3 position)

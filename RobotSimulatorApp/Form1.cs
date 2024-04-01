@@ -45,7 +45,7 @@ namespace RobotSimulatorApp
             grid = new Grid(glControl);
             scara = new SCARA_Robot(glControl, "scara");
             trace = new Trace();
-            Timer timer = new Timer();
+            Timer timer = new();
             timer.Tick += (sender, e) =>
             {
                 Render();

@@ -9,13 +9,15 @@ namespace RobotSimulatorApp.GlConfig
     {
         public Vector3 Center { get; set; }
         public Vector3 Position { get; set; }
-        public Vector3 Size { get; set; }
         public Matrix4 Model { get; set; }
+        public float Length {get; set; }
         public Matrix4 Transformation { get; set; }
-        public Matrix4 Point { get; set; }
         public Matrix4 CenterPoint { get; set; }
-        public Matrix4 Buffer1 { get; set; }
-        public Matrix4 Buffer2 { get; set; }
+        public Matrix4 RotationCenter { get; set; }
+        public Matrix4 StartPoint { get; set; }
+        private Matrix4 CenterBuffer { get; set; }
+        private Matrix4 RotationBuffer { get; set; }
+        private Matrix4 StartBuffer { get; set; }
 
         private readonly GLControl GlControl;
         private int VertexArrayObject { get; set; }
@@ -65,37 +67,43 @@ void main()
 {
     oColor = fColor;
 }";
-
+        /// <summary>
+        /// Creates Cube from center, where sizeX/Y/Z is total size in given axis
+        /// </summary>
         public Cube(GLControl glControl, Vector3 position, float sizeX, float sizeY, float sizeZ)
         {
-            Position = position;
             GlControl = glControl;
-            Size = new Vector3(sizeX, sizeY, sizeZ);
+            Position = position;
             //Center = new Vector3(sizeX / 2, sizeY / 2, sizeZ / 2) + position;
             Center = new Vector3(sizeX / 2, sizeY / 2, sizeZ / 2);
-            Transformation = Point = Matrix4.Identity;
-            Buffer1 = Buffer2 = Matrix4.Identity;
+            Transformation = Matrix4.Identity;
 
             Model = Matrix4.CreateTranslation(position);
-            CenterPoint = Matrix4.CreateTranslation(sizeX / 2, sizeY / 2, sizeZ / 2) * Matrix4.CreateTranslation(position);
-            Buffer1 = CenterPoint;
-            ////Create vertices responsible for generating a cube and add them for later use:
-            float x = sizeX / 2;
-            float y = sizeY / 2;
-            float z = sizeZ / 2;
-            //Vertices.AddRange(CreateWall(sizeX, sizeY, 0, Axis.Z));
-            //Vertices.AddRange(CreateWall(sizeX, 0, sizeZ, Axis.Y));
-            //Vertices.AddRange(CreateWall(0, sizeY, sizeZ, Axis.X));
-            //Vertices.AddRange(CreateWall(sizeX, sizeY, sizeZ, Axis.Z));
-            //Vertices.AddRange(CreateWall(sizeX, sizeY, sizeZ, Axis.Y));
-            //Vertices.AddRange(CreateWall(sizeX, sizeY, sizeZ, Axis.X));
+            CenterPoint = CenterBuffer = Matrix4.CreateTranslation(Center) * Matrix4.CreateTranslation(position);
+            RotationCenter = RotationBuffer = Matrix4.CreateTranslation(new Vector3(0, sizeY, 0));
+            Length = 0;
+            CreateVertices(sizeX, sizeY, sizeZ);
+        }
 
-            Vertices.AddRange(CreateWall(x, y, -z, Axis.Z));
-            Vertices.AddRange(CreateWall(x, -y, z, Axis.Y));
-            Vertices.AddRange(CreateWall(-x, y, z, Axis.X));
-            Vertices.AddRange(CreateWall(x, y, z, Axis.Z));
-            Vertices.AddRange(CreateWall(x, y, z, Axis.Y));
-            Vertices.AddRange(CreateWall(x, y, z, Axis.X));
+        /// <summary>
+        /// Creates cube between point A and point B:(A.X + distanceToEndPoint, A.Y, A.Z), and where paddingX is distance between points A,B and
+        /// borders of the model in X axis and sizeY/Z are sizes in Y/Z axis
+        /// </summary>
+        public Cube(GLControl glControl, Vector3 startPoint, float distanceToEndPoint, float paddingX, float sizeY, float sizeZ)
+        {
+            GlControl = glControl;
+            Position = new Vector3(startPoint.X + (distanceToEndPoint / 2), startPoint.Y, startPoint.Z);
+            float sizeX = distanceToEndPoint + (2 * paddingX);
+            Center = new Vector3(sizeX / 2, sizeY / 2, sizeZ / 2);
+            Model = Matrix4.CreateTranslation(Position);
+
+            StartPoint = StartBuffer = Matrix4.CreateTranslation(startPoint);
+            RotationCenter = RotationBuffer = Matrix4.CreateTranslation(new Vector3(startPoint.X + distanceToEndPoint, startPoint.Y + sizeY, startPoint.Z));
+            CenterPoint = CenterBuffer = Matrix4.CreateTranslation(Center) * Matrix4.CreateTranslation(Position);
+            Transformation = Matrix4.Identity;
+            Length = distanceToEndPoint;
+
+            CreateVertices(sizeX, sizeY, sizeZ);
         }
 
         public void RenderCube(Matrix4 view, Matrix4 projection)
@@ -126,8 +134,8 @@ void main()
             GL.EnableVertexAttribArray(colorLocation);
             GL.VertexAttribPointer(colorLocation, 4, VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
 
-            Point = Buffer2 * Transformation;
-            CenterPoint = Buffer1 * Transformation;
+            RotationCenter = RotationBuffer * Transformation;
+            CenterPoint = CenterBuffer * Transformation;
             shader.SetMatrix4("model", Model * Transformation);
             shader.SetMatrix4("view", view);
             shader.SetMatrix4("projection", projection);
@@ -136,20 +144,18 @@ void main()
             shader.Dispose();
         }
 
-        public void SetPoint(Vector3 point)
-        {
-            Buffer2 = Point = Matrix4.CreateTranslation(point) * Matrix4.CreateTranslation(Position);
-        }
-
-        public Vector3 GetRotationCenter() => Helpers.GetPositionFromMatrix(Buffer2 * Transformation);
-
+        public void SetStartPoint(Vector3 point) => StartBuffer = StartPoint = Matrix4.CreateTranslation(point) * Matrix4.CreateTranslation(Position);
+        public Vector3 GetStartPoint() => Helpers.GetPositionFromMatrix(StartBuffer * Transformation);
+        public void SetRotationCenter(Vector3 point) => RotationBuffer = RotationCenter = Matrix4.CreateTranslation(point) * Matrix4.CreateTranslation(Position);
+        public Vector3 GetRotationCenter() => Helpers.GetPositionFromMatrix(RotationBuffer * Transformation);
         public void SetPosition(Vector3 position) => Model = Matrix4.CreateTranslation(position);
 
         public void UpdateBaseModel()
         {
-            Model = Model * Transformation;
-            Buffer2 *= Transformation;
-            Buffer1 *= Buffer1 * Transformation;
+            Model *= Transformation;
+            RotationBuffer *= Transformation;
+            CenterBuffer *= Transformation;
+            StartBuffer *= Transformation;
             Transformation = Matrix4.Identity;
         }
 
@@ -158,63 +164,60 @@ void main()
             Color4[] color = new Color4[24];
             for (int i = 0; i < 4; i++)
             {
-                //very rudimentary shadow simulation
                 color[i + 16] = new Color4(
                     MathHelper.Clamp(colorData.R + 0.05f, 0f, 1),
                     MathHelper.Clamp(colorData.G + 0.05f, 0f, 1),
                     MathHelper.Clamp(colorData.B + 0.05f, 0f, 1),
                     1);
 
-                //color[i + 16] = colorData;
                 color[i] = color[i + 8] = color[i + 12] = color[i + 20] = colorData;
-
-                //color[i] = color[i + 8] = color[i + 12] = color[i + 20] = new Color4(
-                //    MathHelper.Clamp(colorData.R - 0.05f, 0f, 1),
-                //    MathHelper.Clamp(colorData.G - 0.05f, 0f, 1),
-                //    MathHelper.Clamp(colorData.B - 0.05f, 0f, 1),
-                //    1);
-
-                //color[i + 4] = new Color4(
-                //    MathHelper.Clamp(colorData.R - 0.1f, 0f, 1),
-                //    MathHelper.Clamp(colorData.G - 0.1f, 0f, 1),
-                //    MathHelper.Clamp(colorData.B - 0.1f, 0f, 1),
-                //    1);
 
                 color[i + 4] = new Color4(
                     MathHelper.Clamp(colorData.R - 0.05f, 0f, 1),
                     MathHelper.Clamp(colorData.G - 0.05f, 0f, 1),
                     MathHelper.Clamp(colorData.B - 0.05f, 0f, 1),
                     1);
-
             }
-
             ColorData = color;
+        }
+
+        private void CreateVertices(float sizeX, float sizeY, float sizeZ)
+        {
+            float x = sizeX / 2;
+            float y = sizeY / 2;
+            float z = sizeZ / 2;
+            Vertices.AddRange(CreateWall(x, y, -z, Axis.Z));
+            Vertices.AddRange(CreateWall(x, -y, z, Axis.Y));
+            Vertices.AddRange(CreateWall(-x, y, z, Axis.X));
+            Vertices.AddRange(CreateWall(x, y, z, Axis.Z));
+            Vertices.AddRange(CreateWall(x, y, z, Axis.Y));
+            Vertices.AddRange(CreateWall(x, y, z, Axis.X));
         }
 
         private List<Vector3> CreateWall(float x, float y, float z, Axis axis)
         {
             List<Vector3> result = [];
-
+            float absY = MathHelper.Abs(y);
             switch (axis)
             {
                 case Axis.X:
                     foreach (Vector2 v in CreateWallRectangle(y, z))
                     {
-                        result.Add(new Vector3(x, v.X, v.Y));
+                        result.Add(new Vector3(x, v.X + absY, v.Y));
                     }
                     break;
 
                 case Axis.Y:
                     foreach (Vector2 v in CreateWallRectangle(x, z))
                     {
-                        result.Add(new Vector3(v.X, y, v.Y));
+                        result.Add(new Vector3(v.X, y + absY, v.Y));
                     }
                     break;
 
                 case Axis.Z:
                     foreach (Vector2 v in CreateWallRectangle(x, y))
                     {
-                        result.Add(new Vector3(v.X, v.Y, z));
+                        result.Add(new Vector3(v.X, v.Y + absY, z));
                     }
                     break;
             }
@@ -222,7 +225,6 @@ void main()
         }
 
         private static Vector2[] CreateWallRectangle(float a, float b)
-            //=> new Vector2[] { new(0, 0), new(a, 0), new(a, b), new(0, b) };
             => new Vector2[] { new(-a, -b), new(a, -b), new(a, b), new(-a, b) };
     }
 }
