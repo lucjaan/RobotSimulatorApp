@@ -57,14 +57,22 @@ namespace RobotSimulatorApp.Robot.SCARA
             marker3.SetColor(Color4.Yellow);
             marker4.SetColor(Color4.Yellow);
 
-            RobotBase = new(GLControl, new Vector3(-17f, 0f, -17f), 34f, 20f, 34f);
+            //RobotBase = new(GLControl, new Vector3(-17f, 0f, -17f), 34f, 20f, 34f);
+            marker1.SetPosition(Vector3.Zero);
+            RobotBase = new(GLControl, new Vector3(0f, 10f, 0f), 34f, 20f, 34f);
             Center = Helpers.GetPositionFromMatrix(RobotBase.CenterPoint);
             RobotBase.SetColor(Color4.DarkOrange);
+
+            //RobotJoints.Add(CreateRectangularLimb("J1", new Vector3(-6f, 20f, -6f), 40f, 6f, 14f, 9f));
+            //RobotJoints.Add(CreateRectangularLimb("J2", new Vector3(27f, 26f, -9f), 35f, 20f, 15f, 30f));
+            //RobotJoints.Add(CreateCylindricalLimb("J3", new Vector3(62f, 6.5f, -3.5f), 7.95f, 68.3f, 25f));
+            //RobotJoints.Add(CreateConicalLimb("Manipulator", new Vector3(62f, 6.5f, -3.5f), 6.3f, -3.8f, 21f));
 
             RobotJoints.Add(CreateRectangularLimb("J1", new Vector3(-6f, 20f, -6f), 40f, 6f, 14f, 9f));
             RobotJoints.Add(CreateRectangularLimb("J2", new Vector3(27f, 26f, -9f), 35f, 20f, 15f, 30f));
             RobotJoints.Add(CreateCylindricalLimb("J3", new Vector3(62f, 6.5f, -3.5f), 7.95f, 68.3f, 25f));
             RobotJoints.Add(CreateConicalLimb("Manipulator", new Vector3(62f, 6.5f, -3.5f), 6.3f, -3.8f, 21f));
+
 
             for (int i = 0; i < RobotJoints.Count; i++)
             {

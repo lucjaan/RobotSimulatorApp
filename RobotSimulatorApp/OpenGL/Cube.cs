@@ -80,12 +80,22 @@ void main()
             CenterPoint = Matrix4.CreateTranslation(sizeX / 2, sizeY / 2, sizeZ / 2) * Matrix4.CreateTranslation(position);
             Buffer1 = CenterPoint;
             ////Create vertices responsible for generating a cube and add them for later use:
-            Vertices.AddRange(CreateWall(sizeX, sizeY, 0, Axis.Z));
-            Vertices.AddRange(CreateWall(sizeX, 0, sizeZ, Axis.Y));
-            Vertices.AddRange(CreateWall(0, sizeY, sizeZ, Axis.X));
-            Vertices.AddRange(CreateWall(sizeX, sizeY, sizeZ, Axis.Z));
-            Vertices.AddRange(CreateWall(sizeX, sizeY, sizeZ, Axis.Y));
-            Vertices.AddRange(CreateWall(sizeX, sizeY, sizeZ, Axis.X));
+            float x = sizeX / 2;
+            float y = sizeY / 2;
+            float z = sizeZ / 2;
+            //Vertices.AddRange(CreateWall(sizeX, sizeY, 0, Axis.Z));
+            //Vertices.AddRange(CreateWall(sizeX, 0, sizeZ, Axis.Y));
+            //Vertices.AddRange(CreateWall(0, sizeY, sizeZ, Axis.X));
+            //Vertices.AddRange(CreateWall(sizeX, sizeY, sizeZ, Axis.Z));
+            //Vertices.AddRange(CreateWall(sizeX, sizeY, sizeZ, Axis.Y));
+            //Vertices.AddRange(CreateWall(sizeX, sizeY, sizeZ, Axis.X));
+
+            Vertices.AddRange(CreateWall(x, y, -z, Axis.Z));
+            Vertices.AddRange(CreateWall(x, -y, z, Axis.Y));
+            Vertices.AddRange(CreateWall(-x, y, z, Axis.X));
+            Vertices.AddRange(CreateWall(x, y, z, Axis.Z));
+            Vertices.AddRange(CreateWall(x, y, z, Axis.Y));
+            Vertices.AddRange(CreateWall(x, y, z, Axis.X));
         }
 
         public void RenderCube(Matrix4 view, Matrix4 projection)
@@ -126,8 +136,9 @@ void main()
             shader.Dispose();
         }
 
-        public void SetPoint(Vector3 point) {
-           Buffer2 = Point = Matrix4.CreateTranslation(point) * Matrix4.CreateTranslation(Position);
+        public void SetPoint(Vector3 point)
+        {
+            Buffer2 = Point = Matrix4.CreateTranslation(point) * Matrix4.CreateTranslation(Position);
         }
 
         public Vector3 GetRotationCenter() => Helpers.GetPositionFromMatrix(Buffer2 * Transformation);
@@ -211,6 +222,7 @@ void main()
         }
 
         private static Vector2[] CreateWallRectangle(float a, float b)
-            => new Vector2[] { new(0, 0), new(a, 0), new(a, b), new(0, b) };
+            //=> new Vector2[] { new(0, 0), new(a, 0), new(a, b), new(0, b) };
+            => new Vector2[] { new(-a, -b), new(a, -b), new(a, b), new(-a, b) };
     }
 }
