@@ -40,7 +40,7 @@ namespace RobotSimulatorApp
 
         private void SetUpOpenGL()
         {
-            GL.Enable(EnableCap.DepthTest);
+            //GL.Enable(EnableCap.DepthTest);
 
             grid = new Grid(glControl);
             scara = new SCARA_Robot(glControl, "scara");

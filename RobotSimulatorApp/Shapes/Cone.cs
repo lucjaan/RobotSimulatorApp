@@ -21,6 +21,7 @@ namespace RobotSimulatorApp.Shapes
         private readonly GLControl GlControl;
         private ShapeArrays BaseArrays = new();
         private ShapeArrays SideArrays = new();
+        private ShapeArrays BorderArrays = new();
         #endregion
 
         public Cone(GLControl glControl, Vector3 position, float radius, float height)
@@ -43,14 +44,19 @@ namespace RobotSimulatorApp.Shapes
             List<Vector3> sides = [ApexPoint, .. BaseArrays.Vertices];
             SideArrays.IndexData = GenerateSideIndices().ToArray();
             SideArrays.Vertices = sides.ToArray();
+            CreateBorder();
 
         }
 
-        public void RenderCone(Matrix4 view, Matrix4 projection)
+        public void RenderCone(Matrix4 view, Matrix4 projection, bool borderShown = false)
         {
             Render(Model, Transformation, view, projection, BaseArrays);
             Render(Model, Transformation, view, projection, SideArrays);
             Apex = ApexBuffer * Transformation;
+            if (borderShown)
+            {
+                RenderBorder(Model, Transformation, view, projection, BorderArrays);
+            }
         }
 
         public override void UpdateBaseModel()
@@ -126,6 +132,67 @@ namespace RobotSimulatorApp.Shapes
             result.Add(2);
             result.Add(Sides + 1);
             return result;
+        }
+        private ShapeArrays CreateBorder()
+        {
+            List<Vector3> vertices = [ApexPoint];
+            vertices.AddRange(CreateBorderVertices(Position.Y));
+            BorderArrays.Vertices = vertices.ToArray();
+
+            List<int> indices = [];
+            indices.AddRange(GenerateBorderBaseIndices());
+            indices.AddRange(CreateSideIndices());
+            BorderArrays.IndexData = indices.ToArray();
+
+            SetBorderColor(Color4.Black);
+            return BorderArrays;
+        }
+
+        private Vector3[] CreateBorderVertices(float level)
+        {
+            float angle = MathHelper.DegreesToRadians(360 / Sides);
+            Vector3[] result = new Vector3[Sides + 1];
+            for (int i = 0; i < Sides; i++)
+            {
+                Vector2 point = new((float)MathHelper.Cos(angle * i) * Radius, (float)MathHelper.Sin(angle * i) * Radius);
+                result[i] = new(point.X, level, point.Y);
+            }
+            return result;
+        }
+
+        private List<int> GenerateBorderBaseIndices()
+        {
+            List<int> result = [];
+            for (int i = 1; i < Sides; i++)
+            {
+                result.Add(i);
+                result.Add(i + 1);
+            }
+            result.Add(Sides - 1);
+            result.Add(1);
+            return result;
+        }
+
+        private List<int> CreateSideIndices(int lines = 9)
+        {
+            List<int> result = [];
+            int step = Sides / lines;
+            for (int i = 0; i <= lines; i++)
+            {
+                result.Add(i * step);
+                result.Add(0);
+            }
+            return result;
+        }
+
+        public void SetBorderColor(Color4 colorData)
+        {
+            List<Color4> color = [];
+            for (int i = 0; i < BorderArrays.IndexData.Length; i++)
+            {
+                color.Add(colorData);
+            }
+            BorderArrays.ColorsData = color.ToArray();
         }
     }
 }

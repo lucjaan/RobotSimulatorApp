@@ -7,9 +7,7 @@ namespace RobotSimulatorApp.GlConfig
 {
     public class Trace
     {
-        public Vector3 Center { get; set; }
-        public Vector3 Position { get; set; }
-        public Vector3 Size { get; set; }
+        #region Fields
         public Matrix4 Model { get; set; }
         public Color4 Color { get; set; }
 
@@ -53,7 +51,7 @@ void main()
 {
     oColor = fColor;
 }";
-
+        #endregion
         public Trace() 
         {
             Model = Matrix4.Identity;

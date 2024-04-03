@@ -20,8 +20,8 @@ namespace RobotSimulatorApp.Shapes
         private Matrix4 StartBuffer { get; set; }
 
         private readonly GLControl GlControl;
-        public ShapeArrays Arrays = new ShapeArrays();
-        private readonly List<Vector3> Vertices = []; 
+        public ShapeArrays Arrays = new();
+        public ShapeArrays BorderArrays = new();
         private readonly List<int> _indexData =
         [
              0,
@@ -61,7 +61,6 @@ namespace RobotSimulatorApp.Shapes
             23,
             20
         ];
-        private List<Color4> ColorData = [];
         #endregion
 
         /// <summary>
@@ -80,6 +79,7 @@ namespace RobotSimulatorApp.Shapes
             Length = 0;
             Arrays.Vertices = CreateVertices(sizeX, sizeY, sizeZ).ToArray();
             Arrays.IndexData = _indexData.ToArray();
+            CreateBorder(sizeX, sizeY, sizeZ);
 
             SetColor(Color4.DarkOrange);
         }
@@ -105,13 +105,18 @@ namespace RobotSimulatorApp.Shapes
             Arrays.Vertices = CreateVertices(sizeX, sizeY, sizeZ).ToArray();
             Arrays.IndexData = _indexData.ToArray();
             SetColor(Color4.DarkOrange);
+            CreateBorder(sizeX, sizeY, sizeZ);
         }
 
-        public void RenderCube(Matrix4 view, Matrix4 projection)
+        public void RenderCube(Matrix4 view, Matrix4 projection, bool borderShown = false)
         {
             Render(Model, Transformation, view, projection, Arrays);
             RotationCenter = RotationBuffer * Transformation;
             CenterPoint = CenterBuffer * Transformation;
+            if (borderShown)
+            {
+                RenderBorder(Model, Transformation, view, projection, BorderArrays);
+            }
         }
 
         public void SetRotationCenter(Vector3 point) => RotationBuffer = RotationCenter = Matrix4.CreateTranslation(point) * Matrix4.CreateTranslation(Position);
@@ -197,5 +202,44 @@ namespace RobotSimulatorApp.Shapes
 
         private static Vector2[] CreateWallRectangle(float a, float b)
             => new Vector2[] { new(-a, -b), new(a, -b), new(a, b), new(-a, b) };
+
+        private ShapeArrays CreateBorder(float sizeX, float sizeY, float sizeZ)
+        {
+            BorderArrays.Vertices = CreateBorderVertices(sizeX, sizeY, sizeZ).ToArray();
+            BorderArrays.IndexData = CreateBorderIndices().ToArray();
+            SetBorderColor(Color4.Black);
+            return BorderArrays;
+        }
+
+        private List<Vector3> CreateBorderVertices(float sizeX, float sizeY, float sizeZ)
+        {
+            List<Vector3> vert1 = [];
+            List<Vector3> vert2 = [];
+
+            foreach (Vector2 v in CreateWallRectangle(sizeX / 2, sizeZ / 2))
+            {
+                vert1.Add(new Vector3(v.X, 0, v.Y));
+                vert2.Add(new Vector3(v.X, sizeY, v.Y));
+            }
+
+            vert1.AddRange(vert2);
+            return vert1;
+        }
+
+        private List<int> CreateBorderIndices()
+        {
+            List<int> indices = [0, 1, 0, 4, 1, 2, 1, 5, 2, 3, 2, 6, 3, 7, 0, 3, 4, 5, 5, 6, 6, 7, 4, 7];
+            return indices;
+        }
+
+        public void SetBorderColor(Color4 colorData)
+        {
+            List<Color4> color = [];
+            for (int i = 0; i < BorderArrays.IndexData.Length; i++)
+            {
+                color.Add(colorData);
+            }
+            BorderArrays.ColorsData = color.ToArray();
+        }
     }
 }
