@@ -7,6 +7,7 @@ namespace RobotSimulatorApp.Shapes
 {
     public class Cylinder : Shape
     {
+        #region Fields
         public Vector3 Center { get; set; }
         public Vector3 Position { get; set; }
         public Matrix4 Model { get; set; }
@@ -16,16 +17,10 @@ namespace RobotSimulatorApp.Shapes
 
         private readonly GLControl GlControl;
 
-        private readonly List<Vector3> TopVertices = [];
-        private readonly List<Vector3> BottomVertices = [];
-        private readonly List<int> BaseIndexData = [];
-        private readonly List<int> SidesIndexData = [];
-        private readonly List<Vector3> SidesVertices = [];
-
-        private readonly List<Color4> SideColorData = [];
-        private readonly List<Color4> TopColorData = [];
-        private readonly List<Color4> BottomColorData = [];
-
+        private ShapeArrays TopArrays;
+        private ShapeArrays BottomArrays;
+        private ShapeArrays SideArrays;
+        #endregion
         public Cylinder(GLControl glControl, Vector3 position, float radius, float height)
         {
             Position = Center = position;
@@ -35,22 +30,23 @@ namespace RobotSimulatorApp.Shapes
             Transformation = Matrix4.Identity;
             Model = Matrix4.CreateTranslation(position);
 
-            BottomVertices = CreateRoundBase(position.Y).ToList();
-            TopVertices = CreateRoundBase(position.Y + height).ToList();
+            BottomArrays.Vertices = CreateRoundBase(position.Y);
+            BottomArrays.IndexData = GenerateBaseIndices().ToArray();
 
-            SidesVertices.AddRange(BottomVertices);
-            SidesVertices.AddRange(TopVertices);
-            GenerateBaseIndices();
-            GenerateSideIndices();
+            TopArrays.Vertices = CreateRoundBase(position.Y + height);
+            TopArrays.IndexData = GenerateBaseIndices().ToArray();
+
+            SideArrays.Vertices = BottomArrays.Vertices.Concat(TopArrays.Vertices).ToArray();
+            SideArrays.IndexData = GenerateSideIndices().ToArray();
 
             SetColor(Color4.Green);
         }
 
         public void RenderCylinder(Matrix4 view, Matrix4 projection)
         {
-            Render(Model, Transformation, view, projection, BaseIndexData.ToArray(), TopVertices.ToArray(), TopColorData.ToArray());
-            Render(Model, Transformation, view, projection, BaseIndexData.ToArray(), BottomVertices.ToArray(), BottomColorData.ToArray());
-            Render(Model, Transformation, view, projection, SidesIndexData.ToArray(), SidesVertices.ToArray(), SideColorData.ToArray());
+            Render(Model, Transformation, view, projection, TopArrays);
+            Render(Model, Transformation, view, projection, BottomArrays);
+            Render(Model, Transformation, view, projection, SideArrays);
         }
 
         public override void UpdateBaseModel()
@@ -62,21 +58,17 @@ namespace RobotSimulatorApp.Shapes
         public Vector3 GetCenterPoint() => Center = Helpers.GetPositionFromMatrix(Model);
         public override void SetColor(Color4 colorData)
         {
-            if (TopColorData != null || BottomColorData != null || SideColorData != null)
+            List<Color4> top = [];
+            List<Color4> bottom = [];
+            List<Color4> sides = [];
+            for (int i = 0; i < SideArrays.IndexData.Length; i++)
             {
-                TopColorData.Clear();
-                BottomColorData.Clear();
-                SideColorData.Clear();
+                sides.Add(colorData);
             }
 
-            for (int i = 0; i < SidesIndexData.Count; i++)
+            for (int i = 0; i < TopArrays.IndexData.Length; i++)
             {
-                SideColorData.Add(colorData);
-            }
-
-            for (int i = 0; i < BaseIndexData.Count; i++)
-            {
-                //TopColorData.Add(new Color4(
+                //top.Add(new Color4(
                 //       MathHelper.Clamp(colorData.R + 0.05f, 0f, 1),
                 //       MathHelper.Clamp(colorData.G + 0.05f, 0f, 1),
                 //       MathHelper.Clamp(colorData.B + 0.05f, 0f, 1),
@@ -84,7 +76,7 @@ namespace RobotSimulatorApp.Shapes
 
                 if (i % 2 == 0)
                 {
-                    TopColorData.Add(new Color4(
+                    top.Add(new Color4(
                     MathHelper.Clamp(colorData.R + 0.05f, 0f, 1),
                     MathHelper.Clamp(colorData.G + 0.05f, 0f, 1),
                     MathHelper.Clamp(colorData.B + 0.05f, 0f, 1),
@@ -92,18 +84,21 @@ namespace RobotSimulatorApp.Shapes
                 }
                 else
                 {
-                    TopColorData.Add(Color4.OrangeRed);
+                    top.Add(Color4.OrangeRed);
                 }
             }
 
-            for (int i = 0; i < BaseIndexData.Count; i++)
+            for (int i = 0; i < BottomArrays.IndexData.Length; i++)
             {
-                BottomColorData.Add(new Color4(
+                bottom.Add(new Color4(
                 MathHelper.Clamp(colorData.R - 0.05f, 0f, 1),
                 MathHelper.Clamp(colorData.G - 0.05f, 0f, 1),
                 MathHelper.Clamp(colorData.B - 0.05f, 0f, 1),
                 1));
             }
+            TopArrays.ColorsData = top.ToArray();
+            BottomArrays.ColorsData = bottom.ToArray();
+            SideArrays.ColorsData = sides.ToArray();
         }
 
         private Vector3[] CreateRoundBase(float level)
@@ -119,38 +114,42 @@ namespace RobotSimulatorApp.Shapes
             return result;
         }
 
-        private void GenerateBaseIndices()
+        private List<int> GenerateBaseIndices()
         {
+            List<int> result = new();
             for (int i = 1; i < Sides; i++)
             {
-                BaseIndexData.Add(0);
-                BaseIndexData.Add(i);
-                BaseIndexData.Add(i + 1);
+                result.Add(0);
+                result.Add(i);
+                result.Add(i + 1);
             }
-            BaseIndexData.Add(0);
-            BaseIndexData.Add(Sides);
-            BaseIndexData.Add(1);
+            result.Add(0);
+            result.Add(Sides);
+            result.Add(1);
+            return result;
         }
 
-        private void GenerateSideIndices()
+        private List<int> GenerateSideIndices()
         {
-            int c = TopVertices.Count;
+            List<int> result = new();
+            int c = TopArrays.Vertices.Length;
             for (int i = 1; i < Sides; i++)
             {
-                SidesIndexData.Add(i);
-                SidesIndexData.Add(i + 1);
-                SidesIndexData.Add(i + c);
-                SidesIndexData.Add(i + c);
-                SidesIndexData.Add(i + c + 1);
-                SidesIndexData.Add(i + 1);
+                result.Add(i);
+                result.Add(i + 1);
+                result.Add(i + c);
+                result.Add(i + c);
+                result.Add(i + c + 1);
+                result.Add(i + 1);
             }
 
-            SidesIndexData.Add(1);
-            SidesIndexData.Add(c - 1);
-            SidesIndexData.Add(c + 1);
-            SidesIndexData.Add(c + 1);
-            SidesIndexData.Add(c + Sides);
-            SidesIndexData.Add(c - 1);
+            result.Add(1);
+            result.Add(c - 1);
+            result.Add(c + 1);
+            result.Add(c + 1);
+            result.Add(c + Sides);
+            result.Add(c - 1);
+            return result;
         }
     }
 }

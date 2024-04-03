@@ -41,7 +41,7 @@ void main()
     oColor = fColor;
 }";
 
-        public void Render(Matrix4 model, Matrix4 transformation, Matrix4 view, Matrix4 projection, int[] indexData, Vector3[] vertices, Color4[] colorData)
+        public void Render(Matrix4 model, Matrix4 transformation, Matrix4 view, Matrix4 projection, ShapeArrays arrays)
         {
             Shader shader = new(VertexShader, FragmentShader);
             shader.Use();
@@ -51,11 +51,11 @@ void main()
 
             ElementBufferObject = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ElementBufferObject);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, indexData.Length * sizeof(int), indexData, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, arrays.IndexData.Length * sizeof(int), arrays.IndexData, BufferUsageHint.StaticDraw);
 
             PositionBufferObject = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, PositionBufferObject);
-            GL.BufferData(BufferTarget.ArrayBuffer, 3 * vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, 3 * arrays.Vertices.Length * sizeof(float), arrays.Vertices, BufferUsageHint.StaticDraw);
 
             int vertexLocation = shader.GetAttribLocation("aPosition");
             GL.EnableVertexAttribArray(vertexLocation);
@@ -63,7 +63,7 @@ void main()
 
             ColorBufferObject = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, ColorBufferObject);
-            GL.BufferData(BufferTarget.ArrayBuffer, colorData.Length * sizeof(float) * 4, colorData, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, arrays.ColorsData.Length * sizeof(float) * 4, arrays.ColorsData, BufferUsageHint.StaticDraw);
 
             int colorLocation = shader.GetAttribLocation("aColor");
             GL.EnableVertexAttribArray(colorLocation);
@@ -73,8 +73,13 @@ void main()
             shader.SetMatrix4("view", view);
             shader.SetMatrix4("projection", projection);
 
-            GL.DrawElements(BeginMode.Triangles, indexData.Length, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(BeginMode.Triangles, arrays.IndexData.Length, DrawElementsType.UnsignedInt, 0);
             shader.Dispose();
+        }
+
+        public void RenderBorder(Matrix4 model, Matrix4 transformation, Matrix4 view, Matrix4 projection, ShapeArrays arrays)
+        {
+
         }
 
         public abstract void UpdateBaseModel();
