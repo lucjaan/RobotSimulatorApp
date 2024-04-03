@@ -1,14 +1,12 @@
-﻿using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
+﻿using OpenTK.Mathematics;
 using OpenTK.WinForms;
-using RobotSimulatorApp.GlConfig;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace RobotSimulatorApp.Shapes
 {
     public class Cone : Shape
     {
+        #region Fields
         public Vector3 Center { get; set; }
         public Vector3 Position { get; set; }
         public Vector3 ApexPoint { get; set; }
@@ -21,15 +19,10 @@ namespace RobotSimulatorApp.Shapes
         private Matrix4 ApexBuffer { get; set; }
 
         private readonly GLControl GlControl;
-
-        private readonly List<Vector3> BaseVertices = [];
-        private readonly List<Vector3> SidesVertices = [];
-
-        private readonly List<int> BaseIndexData = [];
-        private readonly List<int> SidesIndexData = [];
-
-        private readonly List<Color4> SideColorData = [];
-        private readonly List<Color4> BaseColorData = [];
+        private ShapeArrays BaseArrays = new();
+        private ShapeArrays SideArrays = new();
+        private ShapeArrays BorderArrays = new();
+        #endregion
 
         public Cone(GLControl glControl, Vector3 position, float radius, float height)
         {
@@ -43,21 +36,27 @@ namespace RobotSimulatorApp.Shapes
 
             Apex = ApexBuffer = Matrix4.CreateTranslation(new Vector3(0, height, 0));
             ApexPoint = Helpers.GetPositionFromMatrix(Apex);
-
-            BaseVertices = CreateRoundBase(position.Y).ToList();
-            SidesVertices.Add(ApexPoint);
-            SidesVertices.AddRange(BaseVertices);
-            GenerateBaseIndices();
-            GenerateSideIndices();
-
             Apex = ApexBuffer *= Matrix4.CreateTranslation(position);
+
+            BaseArrays.IndexData = GenerateBaseIndices().ToArray();
+            BaseArrays.Vertices = CreateRoundBase(position.Y);
+
+            List<Vector3> sides = [ApexPoint, .. BaseArrays.Vertices];
+            SideArrays.IndexData = GenerateSideIndices().ToArray();
+            SideArrays.Vertices = sides.ToArray();
+            CreateBorder();
+
         }
 
-        public void RenderCone(Matrix4 view, Matrix4 projection)
+        public void RenderCone(Matrix4 view, Matrix4 projection, bool borderShown = false)
         {
-            Render(Model, Transformation, view, projection, BaseIndexData.ToArray(), BaseVertices.ToArray(), BaseColorData.ToArray());
-            Render(Model, Transformation, view, projection, SidesIndexData.ToArray(), SidesVertices.ToArray(), SideColorData.ToArray());
+            Render(Model, Transformation, view, projection, BaseArrays);
+            Render(Model, Transformation, view, projection, SideArrays);
             Apex = ApexBuffer * Transformation;
+            if (borderShown)
+            {
+                RenderBorder(Model, Transformation, view, projection, BorderArrays);
+            }
         }
 
         public override void UpdateBaseModel()
@@ -72,19 +71,24 @@ namespace RobotSimulatorApp.Shapes
 
         public override void SetColor(Color4 colorData)
         {
-            for (int i = 0; i < BaseIndexData.Count; i++)
+            List <Color4> bases = [];
+            List <Color4> sides = [];
+            for (int i = 0; i < BaseArrays.IndexData.Length; i++)
             {
-                BaseColorData.Add(new Color4(
+                bases.Add(new Color4(
                     MathHelper.Clamp(colorData.R - 0.05f, 0f, 1),
                     MathHelper.Clamp(colorData.G - 0.05f, 0f, 1),
                     MathHelper.Clamp(colorData.B - 0.05f, 0f, 1),
                     1));
             }
 
-            for (int i = 0; i < SidesIndexData.Count; i++)
+            for (int i = 0; i < SideArrays.IndexData.Length; i++)
             {
-                SideColorData.Add(colorData);
+                sides.Add(colorData);
             }
+
+            BaseArrays.ColorsData = bases.ToArray();
+            SideArrays.ColorsData = bases.ToArray();
         }
 
         private Vector3[] CreateRoundBase(float level)
@@ -100,30 +104,95 @@ namespace RobotSimulatorApp.Shapes
             return result;
         }
 
-        private void GenerateBaseIndices()
+        private List<int> GenerateBaseIndices()
         {
+            List<int> result = [];
             for (int i = 1; i < Sides; i++)
             {
-                BaseIndexData.Add(0);
-                BaseIndexData.Add(i);
-                BaseIndexData.Add(i + 1);
+                result.Add(0);
+                result.Add(i);
+                result.Add(i + 1);
             }
-            BaseIndexData.Add(0);
-            BaseIndexData.Add(Sides);
-            BaseIndexData.Add(1);
+            result.Add(0);
+            result.Add(Sides);
+            result.Add(1);
+            return result;
         }
 
-        private void GenerateSideIndices()
+        private List<int> GenerateSideIndices()
         {
+            List<int> result = [];
             for (int i = 2; i <= Sides; i++)
             {
-                SidesIndexData.Add(0);
-                SidesIndexData.Add(i);
-                SidesIndexData.Add(i + 1);
+                result.Add(0);
+                result.Add(i);
+                result.Add(i + 1);
             }
-            SidesIndexData.Add(0);
-            SidesIndexData.Add(2);
-            SidesIndexData.Add(Sides + 1);
+            result.Add(0);
+            result.Add(2);
+            result.Add(Sides + 1);
+            return result;
+        }
+        private ShapeArrays CreateBorder()
+        {
+            List<Vector3> vertices = [ApexPoint];
+            vertices.AddRange(CreateBorderVertices(Position.Y));
+            BorderArrays.Vertices = vertices.ToArray();
+
+            List<int> indices = [];
+            indices.AddRange(GenerateBorderBaseIndices());
+            indices.AddRange(CreateSideIndices());
+            BorderArrays.IndexData = indices.ToArray();
+
+            SetBorderColor(Color4.Black);
+            return BorderArrays;
+        }
+
+        private Vector3[] CreateBorderVertices(float level)
+        {
+            float angle = MathHelper.DegreesToRadians(360 / Sides);
+            Vector3[] result = new Vector3[Sides + 1];
+            for (int i = 0; i < Sides; i++)
+            {
+                Vector2 point = new((float)MathHelper.Cos(angle * i) * Radius, (float)MathHelper.Sin(angle * i) * Radius);
+                result[i] = new(point.X, level, point.Y);
+            }
+            return result;
+        }
+
+        private List<int> GenerateBorderBaseIndices()
+        {
+            List<int> result = [];
+            for (int i = 1; i < Sides; i++)
+            {
+                result.Add(i);
+                result.Add(i + 1);
+            }
+            result.Add(Sides - 1);
+            result.Add(1);
+            return result;
+        }
+
+        private List<int> CreateSideIndices(int lines = 9)
+        {
+            List<int> result = [];
+            int step = Sides / lines;
+            for (int i = 0; i <= lines; i++)
+            {
+                result.Add(i * step);
+                result.Add(0);
+            }
+            return result;
+        }
+
+        public void SetBorderColor(Color4 colorData)
+        {
+            List<Color4> color = [];
+            for (int i = 0; i < BorderArrays.IndexData.Length; i++)
+            {
+                color.Add(colorData);
+            }
+            BorderArrays.ColorsData = color.ToArray();
         }
     }
 }

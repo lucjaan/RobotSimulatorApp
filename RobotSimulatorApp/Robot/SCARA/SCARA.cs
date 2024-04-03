@@ -202,16 +202,16 @@ namespace RobotSimulatorApp.Robot.SCARA
             }
         }
 
-        public void RenderRobot(Matrix4 view, Matrix4 projection)
+        public void RenderRobot(Matrix4 view, Matrix4 projection, bool borderShown = true)
         {
-            RobotBase.RenderCube(view, projection);
+            RobotBase.RenderCube(view, projection, borderShown);
 
             foreach (RobotLimb joint in RobotJoints)
             {
-                joint.RenderModel(view, projection);
+                joint.RenderModel(view, projection, borderShown);
             }
 
-            marker1.RenderCube(view, projection);
+            //marker1.RenderCube(view, projection);
             //marker2.RenderCube(view, projection);
             //marker3.RenderCube(view, projection);
             //marker4.RenderCube(view, projection);

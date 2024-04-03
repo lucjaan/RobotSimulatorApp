@@ -6,6 +6,7 @@ namespace RobotSimulatorApp.Shapes
 {
     public class Cube : Shape
     {
+        #region Fields
         public Vector3 Center { get; set; }
         public Vector3 Position { get; set; }
         public Matrix4 Model { get; set; }
@@ -19,13 +20,9 @@ namespace RobotSimulatorApp.Shapes
         private Matrix4 StartBuffer { get; set; }
 
         private readonly GLControl GlControl;
-        private int VertexArrayObject { get; set; }
-        private int ElementBufferObject { get; set; }
-        private int PositionBufferObject { get; set; }
-        private int ColorBufferObject { get; set; }
-
-        private readonly List<Vector3> Vertices = [];
-        private readonly List<int> IndexData =
+        public ShapeArrays Arrays = new();
+        public ShapeArrays BorderArrays = new();
+        private readonly List<int> _indexData =
         [
              0,
             1,
@@ -64,7 +61,7 @@ namespace RobotSimulatorApp.Shapes
             23,
             20
         ];
-        private List<Color4> ColorData = [];
+        #endregion
 
         /// <summary>
         /// Creates Cube from center, where sizeX/Y/Z is total size in given axis
@@ -73,7 +70,6 @@ namespace RobotSimulatorApp.Shapes
         {
             GlControl = glControl;
             Position = position;
-            //Center = new Vector3(sizeX / 2, sizeY / 2, sizeZ / 2) + position;
             Center = new Vector3(sizeX / 2, sizeY / 2, sizeZ / 2);
             Transformation = Matrix4.Identity;
 
@@ -81,7 +77,10 @@ namespace RobotSimulatorApp.Shapes
             CenterPoint = CenterBuffer = Matrix4.CreateTranslation(Center) * Matrix4.CreateTranslation(position);
             RotationCenter = RotationBuffer = Matrix4.CreateTranslation(new Vector3(0, sizeY, 0));
             Length = 0;
-            CreateVertices(sizeX, sizeY, sizeZ);
+            Arrays.Vertices = CreateVertices(sizeX, sizeY, sizeZ).ToArray();
+            Arrays.IndexData = _indexData.ToArray();
+            CreateBorder(sizeX, sizeY, sizeZ);
+
             SetColor(Color4.DarkOrange);
         }
 
@@ -103,15 +102,21 @@ namespace RobotSimulatorApp.Shapes
             Transformation = Matrix4.Identity;
             Length = distanceToEndPoint;
 
-            CreateVertices(sizeX, sizeY, sizeZ);
+            Arrays.Vertices = CreateVertices(sizeX, sizeY, sizeZ).ToArray();
+            Arrays.IndexData = _indexData.ToArray();
             SetColor(Color4.DarkOrange);
+            CreateBorder(sizeX, sizeY, sizeZ);
         }
 
-        public void RenderCube(Matrix4 view, Matrix4 projection)
+        public void RenderCube(Matrix4 view, Matrix4 projection, bool borderShown = false)
         {
-            Render(Model, Transformation, view, projection, IndexData.ToArray(), Vertices.ToArray(), ColorData.ToArray());
+            Render(Model, Transformation, view, projection, Arrays);
             RotationCenter = RotationBuffer * Transformation;
             CenterPoint = CenterBuffer * Transformation;
+            if (borderShown)
+            {
+                RenderBorder(Model, Transformation, view, projection, BorderArrays);
+            }
         }
 
         public void SetRotationCenter(Vector3 point) => RotationBuffer = RotationCenter = Matrix4.CreateTranslation(point) * Matrix4.CreateTranslation(Position);
@@ -129,11 +134,7 @@ namespace RobotSimulatorApp.Shapes
 
         public override void SetColor(Color4 colorData)
         {
-            List<Color4> color = new();
-            for (int i = 0; i < 36; i++)
-            {
-                color.Add(Color4.White);
-            }
+            Color4[] color = new Color4[24];
 
             for (int i = 0; i < 4; i++)
             {
@@ -151,20 +152,22 @@ namespace RobotSimulatorApp.Shapes
                     MathHelper.Clamp(colorData.B - 0.05f, 0f, 1),
                     1);
             }
-            ColorData = color;
+            Arrays.ColorsData = color;
         }
 
-        private void CreateVertices(float sizeX, float sizeY, float sizeZ)
+        private List<Vector3> CreateVertices(float sizeX, float sizeY, float sizeZ)
         {
+            List<Vector3> vertices = new List<Vector3>();
             float x = sizeX / 2;
             float y = sizeY / 2;
             float z = sizeZ / 2;
-            Vertices.AddRange(CreateWall(x, y, -z, Axis.Z));
-            Vertices.AddRange(CreateWall(x, -y, z, Axis.Y));
-            Vertices.AddRange(CreateWall(-x, y, z, Axis.X));
-            Vertices.AddRange(CreateWall(x, y, z, Axis.Z));
-            Vertices.AddRange(CreateWall(x, y, z, Axis.Y));
-            Vertices.AddRange(CreateWall(x, y, z, Axis.X));
+            vertices.AddRange(CreateWall(x, y, -z, Axis.Z));
+            vertices.AddRange(CreateWall(x, -y, z, Axis.Y));
+            vertices.AddRange(CreateWall(-x, y, z, Axis.X));
+            vertices.AddRange(CreateWall(x, y, z, Axis.Z));
+            vertices.AddRange(CreateWall(x, y, z, Axis.Y));
+            vertices.AddRange(CreateWall(x, y, z, Axis.X));
+            return vertices;
         }
 
         private List<Vector3> CreateWall(float x, float y, float z, Axis axis)
@@ -199,5 +202,44 @@ namespace RobotSimulatorApp.Shapes
 
         private static Vector2[] CreateWallRectangle(float a, float b)
             => new Vector2[] { new(-a, -b), new(a, -b), new(a, b), new(-a, b) };
+
+        private ShapeArrays CreateBorder(float sizeX, float sizeY, float sizeZ)
+        {
+            BorderArrays.Vertices = CreateBorderVertices(sizeX, sizeY, sizeZ).ToArray();
+            BorderArrays.IndexData = CreateBorderIndices().ToArray();
+            SetBorderColor(Color4.Black);
+            return BorderArrays;
+        }
+
+        private List<Vector3> CreateBorderVertices(float sizeX, float sizeY, float sizeZ)
+        {
+            List<Vector3> vert1 = [];
+            List<Vector3> vert2 = [];
+
+            foreach (Vector2 v in CreateWallRectangle(sizeX / 2, sizeZ / 2))
+            {
+                vert1.Add(new Vector3(v.X, 0, v.Y));
+                vert2.Add(new Vector3(v.X, sizeY, v.Y));
+            }
+
+            vert1.AddRange(vert2);
+            return vert1;
+        }
+
+        private List<int> CreateBorderIndices()
+        {
+            List<int> indices = [0, 1, 0, 4, 1, 2, 1, 5, 2, 3, 2, 6, 3, 7, 0, 3, 4, 5, 5, 6, 6, 7, 4, 7];
+            return indices;
+        }
+
+        public void SetBorderColor(Color4 colorData)
+        {
+            List<Color4> color = [];
+            for (int i = 0; i < BorderArrays.IndexData.Length; i++)
+            {
+                color.Add(colorData);
+            }
+            BorderArrays.ColorsData = color.ToArray();
+        }
     }
 }

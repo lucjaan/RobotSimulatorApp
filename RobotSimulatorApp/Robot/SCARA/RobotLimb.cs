@@ -171,20 +171,20 @@ namespace RobotSimulatorApp.Robot.SCARA
             }
         }
 
-        public void RenderModel(Matrix4 view, Matrix4 projection)
+        public void RenderModel(Matrix4 view, Matrix4 projection, bool borderShown = false)
         {
             switch (Geometry)
             {
                 case Geometry.Cube:
-                    Cube.RenderCube(view, projection);
+                    Cube.RenderCube(view, projection, borderShown);
                     break;
 
                 case Geometry.Cylinder:
-                    Cylinder.RenderCylinder(view, projection);
+                    Cylinder.RenderCylinder(view, projection, borderShown);
                     break;
 
                 case Geometry.Cone:
-                    Cone.RenderCone(view, projection);
+                    Cone.RenderCone(view, projection, borderShown);
                     break;
             }
         }
