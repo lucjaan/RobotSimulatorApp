@@ -1,7 +1,6 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
-using System.IO;
 
 namespace RobotSimulatorApp.GlConfig
 {
@@ -88,7 +87,6 @@ namespace RobotSimulatorApp.GlConfig
             }
         }
 
-        //Below is weird shit when it comes to disposing, see https://www.khronos.org/opengl/wiki/Common_Mistakes#The_Object_Oriented_Language_Problem to understand what it's about
         private bool disposedValue = false;
 
         protected virtual void Dispose(bool disposing)
@@ -98,14 +96,6 @@ namespace RobotSimulatorApp.GlConfig
                 GL.DeleteProgram(Handle);
 
                 disposedValue = true;
-            }
-        }
-
-        ~Shader()
-        {
-            if (disposedValue == false)
-            {
-                Console.WriteLine("GPU Resource leak! Did you forget to call Dispose()?");
             }
         }
 

@@ -1,17 +1,7 @@
-﻿using OpenTK;
-using OpenTK.Graphics.OpenGL;
+﻿using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using OpenTK.WinForms;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.DirectoryServices;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace RobotSimulatorApp.GlConfig
 {
