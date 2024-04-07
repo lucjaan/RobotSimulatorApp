@@ -88,7 +88,6 @@ namespace RobotSimulatorApp.GlConfig
             }
         }
 
-        //Below is weird shit when it comes to disposing, see https://www.khronos.org/opengl/wiki/Common_Mistakes#The_Object_Oriented_Language_Problem to understand what it's about
         private bool disposedValue = false;
 
         protected virtual void Dispose(bool disposing)
