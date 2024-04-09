@@ -41,7 +41,9 @@ namespace RobotSimulatorApp.Shapes
             BaseArrays.IndexData = GenerateBaseIndices().ToArray();
             BaseArrays.Vertices = CreateRoundBase(position.Y);
 
-            List<Vector3> sides = [ApexPoint, .. BaseArrays.Vertices];
+            List<Vector3> sides = new() { ApexPoint };
+            sides.AddRange(BaseArrays.Vertices);
+            //List<Vector3> sides = [ApexPoint, .. BaseArrays.Vertices];
             SideArrays.IndexData = GenerateSideIndices().ToArray();
             SideArrays.Vertices = sides.ToArray();
             CreateBorder();
@@ -71,8 +73,8 @@ namespace RobotSimulatorApp.Shapes
 
         public override void SetColor(Color4 colorData)
         {
-            List <Color4> bases = [];
-            List <Color4> sides = [];
+            List <Color4> bases = new();
+            List <Color4> sides = new();
             for (int i = 0; i < BaseArrays.IndexData.Length; i++)
             {
                 bases.Add(new Color4(
@@ -106,7 +108,7 @@ namespace RobotSimulatorApp.Shapes
 
         private List<int> GenerateBaseIndices()
         {
-            List<int> result = [];
+            List<int> result = new();
             for (int i = 1; i < Sides; i++)
             {
                 result.Add(0);
@@ -121,7 +123,7 @@ namespace RobotSimulatorApp.Shapes
 
         private List<int> GenerateSideIndices()
         {
-            List<int> result = [];
+            List<int> result = new();
             for (int i = 2; i <= Sides; i++)
             {
                 result.Add(0);
@@ -135,11 +137,11 @@ namespace RobotSimulatorApp.Shapes
         }
         private ShapeArrays CreateBorder()
         {
-            List<Vector3> vertices = [ApexPoint];
+            List<Vector3> vertices = new() { ApexPoint };
             vertices.AddRange(CreateBorderVertices(Position.Y));
             BorderArrays.Vertices = vertices.ToArray();
 
-            List<int> indices = [];
+            List<int> indices  = new();
             indices.AddRange(GenerateBorderBaseIndices());
             indices.AddRange(CreateSideIndices());
             BorderArrays.IndexData = indices.ToArray();
@@ -162,7 +164,7 @@ namespace RobotSimulatorApp.Shapes
 
         private List<int> GenerateBorderBaseIndices()
         {
-            List<int> result = [];
+            List<int> result  = new();
             for (int i = 1; i < Sides; i++)
             {
                 result.Add(i);
@@ -175,7 +177,7 @@ namespace RobotSimulatorApp.Shapes
 
         private List<int> CreateSideIndices(int lines = 9)
         {
-            List<int> result = [];
+            List<int> result  = new();
             int step = Sides / lines;
             for (int i = 0; i <= lines; i++)
             {
@@ -187,7 +189,7 @@ namespace RobotSimulatorApp.Shapes
 
         public void SetBorderColor(Color4 colorData)
         {
-            List<Color4> color = [];
+            List<Color4> color  = new();
             for (int i = 0; i < BorderArrays.IndexData.Length; i++)
             {
                 color.Add(colorData);
