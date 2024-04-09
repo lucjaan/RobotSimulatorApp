@@ -12,14 +12,14 @@ namespace RobotSimulatorApp.Robot.SCARA
 {
     public class SCARA_Robot : Robot
     {
-        public List<RobotLimb> RobotJoints = [];
+        public List<RobotLimb> RobotJoints = new();
         //public List<RobotLimb2> RobotJoints = [];
         public List<Matrix4> DenavitHartenbergTable = new List<Matrix4>(4);
         /// <summary>
         /// X = theta, Y = a, Z = d, W = alpha
         /// </summary>
-        public List<Vector4> DHParameters = [];
-        public List<Vector3> JointCenters = [];
+        public List<Vector4> DHParameters = new();
+        public List<Vector3> JointCenters = new();
         private GLControl GLControl { get; set; }
         public Cube RobotBase;
         public Vector3 Center;

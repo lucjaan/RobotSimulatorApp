@@ -67,9 +67,9 @@ namespace RobotSimulatorApp.Shapes
         public Vector3 GetCenterPoint() => Center = Helpers.GetPositionFromMatrix(Model);
         public override void SetColor(Color4 colorData)
         {
-            List<Color4> top = [];
-            List<Color4> bottom = [];
-            List<Color4> sides = [];
+            List<Color4> top  = new();
+            List<Color4> bottom  = new();
+            List<Color4> sides  = new();
             for (int i = 0; i < SideArrays.IndexData.Length; i++)
             {
                 sides.Add(colorData);
@@ -112,7 +112,7 @@ namespace RobotSimulatorApp.Shapes
 
         private List<int> GenerateBaseIndices()
         {
-            List<int> result = [];
+            List<int> result  = new();
             for (int i = 1; i < Sides; i++)
             {
                 result.Add(0);
@@ -154,7 +154,7 @@ namespace RobotSimulatorApp.Shapes
             bases.AddRange(CreateBorderVertices(Position.Y + Height));
             BorderArrays.Vertices = bases.ToArray();
 
-            List<int> indices = [];
+            List<int> indices  = new();
             indices.AddRange(GenerateBorderBaseIndices());
             indices.AddRange(GenerateBorderBaseIndices(Sides));
             indices.AddRange(CreateSideIndices());
@@ -178,7 +178,7 @@ namespace RobotSimulatorApp.Shapes
 
         private List<int> GenerateBorderBaseIndices(int step = 0)
         {
-            List<int> result = [];
+            List<int> result  = new();
             for (int i = 0; i < Sides - 1; i++)
             {
                 result.Add(i + step);
@@ -191,7 +191,7 @@ namespace RobotSimulatorApp.Shapes
 
         private List<int> CreateSideIndices(int lines = 10) 
         {
-            List<int> result = [];
+            List<int> result  = new();
             int step = Sides / lines;
             for (int i = 0; i < lines; i++)
             {
@@ -203,7 +203,7 @@ namespace RobotSimulatorApp.Shapes
 
         public void SetBorderColor(Color4 colorData)
         {
-            List<Color4> color = [];
+            List<Color4> color  = new();
             for (int i = 0; i < BorderArrays.IndexData.Length; i++)
             {
                 color.Add(colorData);

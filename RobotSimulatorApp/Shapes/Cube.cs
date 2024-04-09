@@ -22,8 +22,8 @@ namespace RobotSimulatorApp.Shapes
         private readonly GLControl GlControl;
         public ShapeArrays Arrays = new();
         public ShapeArrays BorderArrays = new();
-        private readonly List<int> _indexData =
-        [
+        private readonly List<int> _indexData = new()
+        {
              0,
             1,
             2,
@@ -60,7 +60,7 @@ namespace RobotSimulatorApp.Shapes
             22,
             23,
             20
-        ];
+        };
         #endregion
 
         /// <summary>
@@ -172,7 +172,7 @@ namespace RobotSimulatorApp.Shapes
 
         private List<Vector3> CreateWall(float x, float y, float z, Axis axis)
         {
-            List<Vector3> result = [];
+            List<Vector3> result  = new();
             float absY = MathHelper.Abs(y);
             switch (axis)
             {
@@ -213,8 +213,8 @@ namespace RobotSimulatorApp.Shapes
 
         private List<Vector3> CreateBorderVertices(float sizeX, float sizeY, float sizeZ)
         {
-            List<Vector3> vert1 = [];
-            List<Vector3> vert2 = [];
+            List<Vector3> vert1  = new();
+            List<Vector3> vert2  = new();
 
             foreach (Vector2 v in CreateWallRectangle(sizeX / 2, sizeZ / 2))
             {
@@ -228,13 +228,13 @@ namespace RobotSimulatorApp.Shapes
 
         private List<int> CreateBorderIndices()
         {
-            List<int> indices = [0, 1, 0, 4, 1, 2, 1, 5, 2, 3, 2, 6, 3, 7, 0, 3, 4, 5, 5, 6, 6, 7, 4, 7];
+            List<int> indices = new() { 0, 1, 0, 4, 1, 2, 1, 5, 2, 3, 2, 6, 3, 7, 0, 3, 4, 5, 5, 6, 6, 7, 4, 7 };
             return indices;
         }
 
         public void SetBorderColor(Color4 colorData)
         {
-            List<Color4> color = [];
+            List<Color4> color  = new();
             for (int i = 0; i < BorderArrays.IndexData.Length; i++)
             {
                 color.Add(colorData);
