@@ -74,6 +74,11 @@ void main()
             shader.SetMatrix4("projection", projection);
 
             GL.DrawElements(BeginMode.Triangles, arrays.IndexData.Length, DrawElementsType.UnsignedInt, 0);
+
+            GL.DeleteVertexArray(VertexArrayObject);
+            GL.DeleteBuffer(ElementBufferObject);
+            GL.DeleteBuffer(PositionBufferObject);
+            GL.DeleteBuffer(ColorBufferObject);
             shader.Dispose();
         }
 
@@ -110,6 +115,11 @@ void main()
             shader.SetMatrix4("projection", projection);
 
             GL.DrawElements(BeginMode.Lines, arrays.IndexData.Length, DrawElementsType.UnsignedInt, 0);
+
+            GL.DeleteVertexArray(VertexArrayObject);
+            GL.DeleteBuffer(ElementBufferObject);
+            GL.DeleteBuffer(PositionBufferObject);
+            GL.DeleteBuffer(ColorBufferObject);
             shader.Dispose();
         }
 

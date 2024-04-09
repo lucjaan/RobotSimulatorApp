@@ -3,6 +3,7 @@ using OpenTK.WinForms;
 using RobotSimulatorApp.Shapes;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace RobotSimulatorApp.Robot.SCARA
 {
@@ -51,15 +52,15 @@ namespace RobotSimulatorApp.Robot.SCARA
             marker2.SetColor(Color4.Yellow);
             marker3.SetColor(Color4.Yellow);
             marker4.SetColor(Color4.Yellow);
+            marker2.SetColor(Color4.Yellow);
 
             //RobotBase = new(GLControl, new Vector3(-17f, 0f, -17f), 34f, 20f, 34f);
             marker1.SetPosition(Vector3.Zero);
-            RobotBase = new(GLControl, Vector3.Zero, 34f, 20f, 34f);
-            Center = Helpers.GetPositionFromMatrix(RobotBase.CenterPoint);
+            //Center = Helpers.GetPositionFromMatrix(RobotBase.CenterPoint);
 
+            RobotBase = new(GLControl, Vector3.Zero, 34f, 20f, 34f);
             Vector3 p0 = RobotBase.GetRotationCenter();
             RobotLimb j1 = CreateRectangularLimb("J1", p0, 35f, 4.5f, 6f, 14f, 0f);
-            marker2.SetColor(Color4.Yellow);
             Vector3 p1 = j1.GetRotationCenter();
             RobotLimb j2 = CreateRectangularLimb("J2", p1, 30f, 2.5f, 19.5f, 14f, 0f);
             Vector3 p2 = j2.GetRotationCenter();
@@ -67,7 +68,8 @@ namespace RobotSimulatorApp.Robot.SCARA
             Vector3 p3 = j3.GetRotationCenter();
             RobotLimb j4 = CreateConicalLimb("Manipulator", p3, 6.3f, -3.8f, 21f);
             Vector3 p4 = j4.GetRotationCenter();
-
+            Vector3 p5 = j4.GetApexPoint();
+            Debug.WriteLine($"{p0}, {p1}, {p2}, {p3}, {p4}, {p5}");
             RobotJoints.Add(j1);
             RobotJoints.Add(j2);
             RobotJoints.Add(j3);
@@ -176,23 +178,35 @@ namespace RobotSimulatorApp.Robot.SCARA
 
         public void MoveToPosition(Vector3 position)
         {
+            float j1, j2, j3;
             double d = MathHelper.Sqrt((position.X * position.X) + (position.Z * position.Z));
-            //double a = 40f;
-            //double b = 35f;
-            double a = RobotJoints[0].GetLength() + 2;
-            double b = RobotJoints[1].GetLength() + 2;
+            double a = RobotJoints[0].GetLength();
+            double b = RobotJoints[1].GetLength();
             double phi = MathHelper.RadiansToDegrees(MathHelper.Atan2(position.Z, position.X));
             double beta = MathHelper.RadiansToDegrees(MathHelper.Acos(((a * a) + (d * d) - (b * b)) / (2 * a * d)));
             double theta = MathHelper.RadiansToDegrees(MathHelper.Acos(((a * a) + (b * b) - (d * d)) / (2 * a * b)));
 
-            float j1 = (float)(beta - phi);
-            float j2 = (float)(theta - 180);
-            float j3 = position.Y - RobotJoints[2].Position.Y;
+            j3 = position.Y - RobotJoints[2].Position.Y;
 
-            if (double.IsNaN(j1) || double.IsNaN(j2))
+            if (Math.Abs(d) == a + b)
             {
-                SendValues(RobotJoints[0].Distance, RobotJoints[1].Distance, j3);
-                return;
+                j1 = -(float)phi;
+                j2 = 0;
+            }
+            else
+            {
+                j1 = (float)(beta - phi);
+                j2 = (float)(theta - 180);
+                if (double.IsNaN(j1) || double.IsNaN(j2))
+                {
+                    j1 = (float)(360 - beta);
+                    j2 = (float)(180 - theta);
+                    if (double.IsNaN(j1) || double.IsNaN(j2))
+                    {
+                        SendValues(RobotJoints[0].Distance, RobotJoints[1].Distance, j3);
+                        return;
+                    }
+                }
             }
             SendValues(j1, j2, j3);
         }

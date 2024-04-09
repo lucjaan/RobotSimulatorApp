@@ -110,17 +110,6 @@ namespace RobotSimulatorApp
                 glControl.Bounds.Height);
         }
 
-        private void glControl_Paint(object sender, PaintEventArgs e)
-        {
-            if (sender != null)
-            {
-                glControl.MakeCurrent();
-                GL.ClearColor(Color4.MidnightBlue);
-                GL.Clear(ClearBufferMask.ColorBufferBit);
-                glControl.SwapBuffers();
-            }
-        }
-
         private void SendValuesToCamera(Vector3 position, float pitch, float yaw)
         {
             prevPosition = camera.Position;
