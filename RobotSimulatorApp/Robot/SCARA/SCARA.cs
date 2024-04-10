@@ -9,8 +9,7 @@ namespace RobotSimulatorApp.Robot.SCARA
 {
     public class SCARA_Robot : Robot
     {
-        public List<RobotLimb> RobotJoints = [];
-        //public List<RobotLimb2> RobotJoints = [];
+        public List<RobotLimb> RobotJoints = new();
         public List<Matrix4> DenavitHartenbergTable = new List<Matrix4>(4);
         /// <summary>
         /// X = theta, Y = a, Z = d, W = alpha
