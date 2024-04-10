@@ -45,6 +45,8 @@ namespace RobotSimulatorApp
             grid = new Grid(glControl);
             scara = new SCARA_Robot(glControl, "scara");
             trace = new Trace();
+            scara.RobotMoved += Form_RobotMoved;
+
             Timer timer = new();
             timer.Tick += (sender, e) =>
             {
@@ -74,7 +76,7 @@ namespace RobotSimulatorApp
 
             if (TraceCheckbox.Checked)
             {
-                scara.RobotMoved += Form_RobotMoved;
+                //scara.RobotMoved += Form_RobotMoved;
                 trace.RenderTrace(camera.View, projection);
             }
 
