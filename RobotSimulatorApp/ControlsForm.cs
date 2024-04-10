@@ -25,11 +25,14 @@ namespace RobotSimulatorApp
         private void TextBox_RobotMoved(object? sender, Vector3 position)
         {
             CartesianPositionTextBox.Text = position.ToString("F2");
-
-            J1TrackBar.Value = (int)(Scara.RobotJoints[0].Distance < 0 ? Scara.RobotJoints[0].Distance + 360 : Scara.RobotJoints[0].Distance);
-            J2TrackBar.Value = (int)(Scara.RobotJoints[1].Distance < 0 ? Scara.RobotJoints[1].Distance + 360 : Scara.RobotJoints[1].Distance);
-            J3TrackBar.Value = (int)Scara.RobotJoints[2].Distance;
-            J4TrackBar.Value = (int)(Scara.RobotJoints[3].Distance < 0 ? Scara.RobotJoints[3].Distance + 360 : Scara.RobotJoints[3].Distance);
+            if (CartesianRadioButton.Checked)
+            {
+                J1TrackBar.Value = (int)(Scara.RobotJoints[0].Distance < 0 ? Scara.RobotJoints[0].Distance + 360 : Scara.RobotJoints[0].Distance);
+                J2TrackBar.Value = (int)(Scara.RobotJoints[1].Distance < 0 ? Scara.RobotJoints[1].Distance + 360 : Scara.RobotJoints[1].Distance);
+                J3TrackBar.Value = (int)Scara.RobotJoints[2].Distance;
+                J4TrackBar.Value = (int)(Scara.RobotJoints[3].Distance < 0 ? Scara.RobotJoints[3].Distance + 360 : Scara.RobotJoints[3].Distance);
+            }
+            
             J1TextBox.Text = J1TrackBar.Value.ToString();
             J2TextBox.Text = J2TrackBar.Value.ToString();
             J3TextBox.Text = J3TrackBar.Value.ToString();
@@ -152,6 +155,7 @@ namespace RobotSimulatorApp
         {
             if (JointRadioButton.Checked)
             {
+                TitleLabel.Text = "Robot Joints";
                 CartesianRadioButton.Checked = false;
                 J1TrackBar.Show();
                 J2TrackBar.Show();
@@ -180,6 +184,7 @@ namespace RobotSimulatorApp
         {
             if (CartesianRadioButton.Checked)
             {
+                TitleLabel.Text = "Coordinates";
                 JointRadioButton.Checked = false;
                 J1TrackBar.Hide();
                 J2TrackBar.Hide();

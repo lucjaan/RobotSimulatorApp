@@ -1,7 +1,6 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
-using System.IO;
 
 namespace RobotSimulatorApp.GlConfig
 {
@@ -97,14 +96,6 @@ namespace RobotSimulatorApp.GlConfig
                 GL.DeleteProgram(Handle);
 
                 disposedValue = true;
-            }
-        }
-
-        ~Shader()
-        {
-            if (disposedValue == false)
-            {
-                Console.WriteLine("GPU Resource leak! Did you forget to call Dispose()?");
             }
         }
 

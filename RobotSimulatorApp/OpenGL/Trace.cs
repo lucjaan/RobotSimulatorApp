@@ -60,14 +60,14 @@ void main()
 
         public void AddToTrace(Vector3 point)
         {
-            if (Resolution == 10)
-            {
+            //if (Resolution == 10)
+            //{
                 Vertices.Add(point);
                 IndexData.Add(Vertices.Count - 1);
                 ColorData.Add(Color);
                 Resolution = 0;
-            }
-            Resolution++;
+            //}
+            //Resolution++;
         }
 
         public void RenderTrace(Matrix4 view, Matrix4 projection)

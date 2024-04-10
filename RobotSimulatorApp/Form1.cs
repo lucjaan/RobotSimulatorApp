@@ -31,7 +31,8 @@ namespace RobotSimulatorApp
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-            //glControl.Paint += glControl_Paint;
+            this.FormBorderStyle = FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
             SetUpOpenGL();
 
             ControlsForm controlsForm = new ControlsForm(scara);
@@ -45,6 +46,9 @@ namespace RobotSimulatorApp
             grid = new Grid(glControl);
             scara = new SCARA_Robot(glControl, "scara");
             trace = new Trace();
+            scara.RobotMoved += Form_RobotMoved;
+            this.Resize += glControl_Resize;
+
             Timer timer = new();
             timer.Tick += (sender, e) =>
             {
@@ -74,7 +78,7 @@ namespace RobotSimulatorApp
 
             if (TraceCheckbox.Checked)
             {
-                scara.RobotMoved += Form_RobotMoved;
+                //scara.RobotMoved += Form_RobotMoved;
                 trace.RenderTrace(camera.View, projection);
             }
 
@@ -108,17 +112,6 @@ namespace RobotSimulatorApp
                 glControl.Bounds.Y + Bounds.Y + titleHeight,
                 glControl.Bounds.Width,
                 glControl.Bounds.Height);
-        }
-
-        private void glControl_Paint(object sender, PaintEventArgs e)
-        {
-            if (sender != null)
-            {
-                glControl.MakeCurrent();
-                GL.ClearColor(Color4.MidnightBlue);
-                GL.Clear(ClearBufferMask.ColorBufferBit);
-                glControl.SwapBuffers();
-            }
         }
 
         private void SendValuesToCamera(Vector3 position, float pitch, float yaw)
