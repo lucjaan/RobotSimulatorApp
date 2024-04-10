@@ -9,11 +9,12 @@ namespace RobotSimulatorApp.GlConfig
     {
         private readonly GLControl GlControl;
 
-        private readonly List<Vector3> GridVertices = [];
-        private readonly List<int> GridIndexData = [];
+        private readonly List<Vector3> GridVertices = new();
+        private readonly List<int> GridIndexData = new();
 
-        private List<Vector3> XYZVertices = [];
-        private static readonly List<int> XYZIndexData = [0, 1, 2, 3, 4, 5];
+        private List<Vector3> XYZVertices = new();
+        private static readonly List<int> value = new() { 0, 1, 2, 3, 4, 5};
+        private static readonly List<int> XYZIndexData = value;
 
         private int VertexBufferObject { get; set; }
         private int VertexArrayObject { get; set; }
@@ -22,7 +23,7 @@ namespace RobotSimulatorApp.GlConfig
 
         private static readonly Color4 GridColor = Color4.FloralWhite;
         private static readonly Color4[] XYZColors =
-            [Color4.IndianRed, Color4.IndianRed, Color4.DeepSkyBlue, Color4.DeepSkyBlue, Color4.ForestGreen, Color4.ForestGreen];
+            new Color4[] { Color4.IndianRed, Color4.IndianRed, Color4.DeepSkyBlue, Color4.DeepSkyBlue, Color4.ForestGreen, Color4.ForestGreen };
 
         private static readonly string XyzVertexShader =
    @"#version 330 core
@@ -97,14 +98,14 @@ void main()
             //Creating vertical lines
             for (int i = -bounds; i < bounds; i+=size) 
             {
-                Vector3[] vertical = [new(-bounds, 0f, i + size), new(bounds, 0f, i + size)];
+                Vector3[] vertical = new Vector3[] { new(-bounds, 0f, i + size), new(bounds, 0f, i + size) };
                 GridVertices.AddRange(vertical);
             }
 
             //Creating horizontal lines
             for (int i = -bounds; i < bounds; i += size)
             {
-                Vector3[] vertical = [new(i + size, 0f, -bounds), new(i + size, 0f, bounds)];
+                Vector3[] vertical = new Vector3[] { new(i + size, 0f, -bounds), new(i + size, 0f, bounds) };
                 GridVertices.AddRange(vertical);
             }
 

@@ -18,9 +18,9 @@ namespace RobotSimulatorApp.GlConfig
         private int ColorBufferObject { get; set; }
         private int Resolution = 10;
 
-        private static readonly List<Color4> ColorData = [];
-        private readonly List<Vector3> Vertices = [];
-        private readonly List<int> IndexData = [];
+        private static readonly List<Color4> ColorData = new ();
+        private readonly List<Vector3> Vertices = new();
+        private readonly List<int> IndexData = new();
 
         public static readonly string VertexShader =
    @"#version 330 core

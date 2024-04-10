@@ -1,4 +1,4 @@
-﻿using OpenTK.Mathematics;
+using OpenTK.Mathematics;
 using OpenTK.WinForms;
 using RobotSimulatorApp.Shapes;
 using System;
@@ -14,8 +14,8 @@ namespace RobotSimulatorApp.Robot.SCARA
         /// <summary>
         /// X = theta, Y = a, Z = d, W = alpha
         /// </summary>
-        public List<Vector4> DHParameters = [];
-        public List<Vector3> JointCenters = [];
+        public List<Vector4> DHParameters = new();
+        public List<Vector3> JointCenters = new();
         private GLControl GLControl { get; set; }
         public Cube RobotBase;
         public Vector3 Center;

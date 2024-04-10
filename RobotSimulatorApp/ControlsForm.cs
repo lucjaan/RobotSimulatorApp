@@ -1,6 +1,7 @@
 ﻿using OpenTK.Mathematics;
 using RobotSimulatorApp.Robot.SCARA;
 using System;
+using System.Diagnostics;
 using System.Windows.Forms;
 
 namespace RobotSimulatorApp
@@ -31,7 +32,7 @@ namespace RobotSimulatorApp
                 J3TrackBar.Value = (int)Scara.RobotJoints[2].Distance;
                 J4TrackBar.Value = (int)(Scara.RobotJoints[3].Distance < 0 ? Scara.RobotJoints[3].Distance + 360 : Scara.RobotJoints[3].Distance);
             }
-
+            
             J1TextBox.Text = J1TrackBar.Value.ToString();
             J2TextBox.Text = J2TrackBar.Value.ToString();
             J3TextBox.Text = J3TrackBar.Value.ToString();
