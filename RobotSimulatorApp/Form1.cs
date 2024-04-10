@@ -31,7 +31,8 @@ namespace RobotSimulatorApp
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-            //glControl.Paint += glControl_Paint;
+            this.FormBorderStyle = FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
             SetUpOpenGL();
 
             ControlsForm controlsForm = new ControlsForm(scara);
@@ -46,6 +47,7 @@ namespace RobotSimulatorApp
             scara = new SCARA_Robot(glControl, "scara");
             trace = new Trace();
             scara.RobotMoved += Form_RobotMoved;
+            this.Resize += glControl_Resize;
 
             Timer timer = new();
             timer.Tick += (sender, e) =>

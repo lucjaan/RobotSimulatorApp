@@ -154,6 +154,7 @@ namespace RobotSimulatorApp
         {
             if (JointRadioButton.Checked)
             {
+                TitleLabel.Text = "Robot Joints";
                 CartesianRadioButton.Checked = false;
                 J1TrackBar.Show();
                 J2TrackBar.Show();
@@ -182,6 +183,7 @@ namespace RobotSimulatorApp
         {
             if (CartesianRadioButton.Checked)
             {
+                TitleLabel.Text = "Coordinates";
                 JointRadioButton.Checked = false;
                 J1TrackBar.Hide();
                 J2TrackBar.Hide();
