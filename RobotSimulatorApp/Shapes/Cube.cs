@@ -1,5 +1,4 @@
 ﻿using OpenTK.Mathematics;
-using OpenTK.WinForms;
 using System.Collections.Generic;
 
 namespace RobotSimulatorApp.Shapes
@@ -19,7 +18,6 @@ namespace RobotSimulatorApp.Shapes
         private Matrix4 RotationBuffer { get; set; }
         private Matrix4 StartBuffer { get; set; }
 
-        private readonly GLControl GlControl;
         public ShapeArrays Arrays = new();
         public ShapeArrays BorderArrays = new();
         private readonly List<int> _indexData = new()
@@ -66,9 +64,8 @@ namespace RobotSimulatorApp.Shapes
         /// <summary>
         /// Creates Cube from center, where sizeX/Y/Z is total size in given axis
         /// </summary>
-        public Cube(GLControl glControl, Vector3 position, float sizeX, float sizeY, float sizeZ)
+        public Cube(Vector3 position, float sizeX, float sizeY, float sizeZ)
         {
-            GlControl = glControl;
             Position = position;
             Center = new Vector3(sizeX / 2, sizeY / 2, sizeZ / 2);
             Transformation = Matrix4.Identity;
@@ -88,9 +85,8 @@ namespace RobotSimulatorApp.Shapes
         /// Creates cube between point A and point B:(A.X + distanceToEndPoint, A.Y, A.Z), and where paddingX is distance between points A,B and
         /// borders of the model in X axis and sizeY/Z are sizes in Y/Z axis
         /// </summary>
-        public Cube(GLControl glControl, Vector3 startPoint, float distanceToEndPoint, float paddingX, float sizeY, float sizeZ)
+        public Cube(Vector3 startPoint, float distanceToEndPoint, float paddingX, float sizeY, float sizeZ)
         {
-            GlControl = glControl;
             Position = new Vector3(startPoint.X + distanceToEndPoint / 2, startPoint.Y, startPoint.Z);
             float sizeX = distanceToEndPoint + 2 * paddingX;
             Center = new Vector3(sizeX / 2, sizeY / 2, sizeZ / 2);

@@ -1,5 +1,4 @@
 ﻿using OpenTK.Mathematics;
-using OpenTK.WinForms;
 using System.Collections.Generic;
 
 namespace RobotSimulatorApp.Shapes
@@ -18,16 +17,14 @@ namespace RobotSimulatorApp.Shapes
         private Matrix4 Apex { get; set; }
         private Matrix4 ApexBuffer { get; set; }
 
-        private readonly GLControl GlControl;
         private ShapeArrays BaseArrays = new();
         private ShapeArrays SideArrays = new();
         private ShapeArrays BorderArrays = new();
         #endregion
 
-        public Cone(GLControl glControl, Vector3 position, float radius, float height)
+        public Cone(Vector3 position, float radius, float height)
         {
             Position = Center = position;
-            GlControl = glControl;
             Radius = radius;
             Height = height;
             Sides = 90;
@@ -43,7 +40,6 @@ namespace RobotSimulatorApp.Shapes
 
             List<Vector3> sides = new() { ApexPoint };
             sides.AddRange(BaseArrays.Vertices);
-            //List<Vector3> sides = [ApexPoint, .. BaseArrays.Vertices];
             SideArrays.IndexData = GenerateSideIndices().ToArray();
             SideArrays.Vertices = sides.ToArray();
             CreateBorder();

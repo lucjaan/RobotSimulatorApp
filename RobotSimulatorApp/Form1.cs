@@ -11,12 +11,11 @@ namespace RobotSimulatorApp
     public partial class Form1 : Form
     {
         readonly private float AspectRatio;
-        Rectangle GlControlBounds;
 
         Camera camera;
         Grid grid;
         Trace trace;
-        public SCARA_Robot scara { get; set; }
+        public SCARA_Robot Scara { get; set; }
 
         private Vector3 prevPosition;
         private float prevPitch;
@@ -35,18 +34,16 @@ namespace RobotSimulatorApp
             this.MaximizeBox = false;
             SetUpOpenGL();
 
-            ControlsForm controlsForm = new ControlsForm(scara);
+            ControlsForm controlsForm = new ControlsForm(Scara);
             controlsForm.Show();
         }
 
         private void SetUpOpenGL()
         {
-            //GL.Enable(EnableCap.DepthTest);
-
             grid = new Grid(glControl);
-            scara = new SCARA_Robot(glControl, "scara");
+            Scara = new SCARA_Robot(glControl, "scara");
             trace = new Trace();
-            scara.RobotMoved += Form_RobotMoved;
+            Scara.RobotMoved += Form_RobotMoved;
             this.Resize += glControl_Resize;
 
             Timer timer = new();
@@ -54,7 +51,7 @@ namespace RobotSimulatorApp
             {
                 Render();
             };
-            timer.Interval = 50;   // 1000 ms per sec / 50 ms per frame = 20 FPS
+            timer.Interval = 50;
             timer.Start();
 
             glControl_Resize(glControl, EventArgs.Empty);
@@ -73,12 +70,10 @@ namespace RobotSimulatorApp
 
             Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, AspectRatio, 0.1f, 500f);
 
-            scara.RenderRobot(camera.View, projection);
+            Scara.RenderRobot(camera.View, projection);
             grid.RenderWorld(camera.View, projection);
-
             if (TraceCheckbox.Checked)
             {
-                //scara.RobotMoved += Form_RobotMoved;
                 trace.RenderTrace(camera.View, projection);
             }
 
@@ -103,15 +98,6 @@ namespace RobotSimulatorApp
             }
 
             GL.Viewport(0, 0, glControl.ClientSize.Width, glControl.ClientSize.Height);
-
-            Rectangle screenRectangle = this.RectangleToScreen(this.ClientRectangle);
-            int titleHeight = screenRectangle.Top - this.Top;
-            int borderWidth = screenRectangle.Right - this.Right;
-
-            GlControlBounds = new Rectangle(glControl.Bounds.X + Bounds.X - borderWidth,
-                glControl.Bounds.Y + Bounds.Y + titleHeight,
-                glControl.Bounds.Width,
-                glControl.Bounds.Height);
         }
 
         private void SendValuesToCamera(Vector3 position, float pitch, float yaw)
@@ -194,7 +180,7 @@ namespace RobotSimulatorApp
 
         private void OpenControlsButton_Click(object sender, EventArgs e)
         {
-            ControlsForm controlsForm = new(scara);
+            ControlsForm controlsForm = new(Scara);
             if (!controlsForm.Visible)
             {
                 controlsForm.Show();
@@ -207,27 +193,27 @@ namespace RobotSimulatorApp
 
         private void TopButton_Click(object sender, EventArgs e)
         {
-            SendValuesToCamera(new Vector3(scara.Center.X, scara.Height * 2f, scara.Center.Z), MathHelper.DegreesToRadians(-89f), -MathHelper.PiOver2);
+            SendValuesToCamera(new Vector3(Scara.Center.X, Scara.Height * 2f, Scara.Center.Z), MathHelper.DegreesToRadians(-89f), -MathHelper.PiOver2);
         }
 
         private void NorthButton_Click(object sender, EventArgs e)
         {
-            SendValuesToCamera(new Vector3(scara.Center.X, scara.Height / 2, scara.Center.Z - (scara.Radius * 1.1f)), 0f, MathHelper.PiOver2);
+            SendValuesToCamera(new Vector3(Scara.Center.X, Scara.Height / 2, Scara.Center.Z - (Scara.Radius * 1.1f)), 0f, MathHelper.PiOver2);
         }
 
         private void SouthButton_Click(object sender, EventArgs e)
         {
-            SendValuesToCamera(new Vector3(scara.Center.X, scara.Height / 2, scara.Center.Z + (scara.Radius * 1.1f)), 0f, -MathHelper.PiOver2);
+            SendValuesToCamera(new Vector3(Scara.Center.X, Scara.Height / 2, Scara.Center.Z + (Scara.Radius * 1.1f)), 0f, -MathHelper.PiOver2);
         }
 
         private void EastButton_Click(object sender, EventArgs e)
         {
-            SendValuesToCamera(new Vector3(scara.Center.X - (scara.Radius * 1.1f), scara.Height / 2, scara.Center.Z), 0f, 0f);
+            SendValuesToCamera(new Vector3(Scara.Center.X - (Scara.Radius * 1.1f), Scara.Height / 2, Scara.Center.Z), 0f, 0f);
         }
 
         private void WestButton_Click(object sender, EventArgs e)
         {
-            SendValuesToCamera(new Vector3(scara.Center.X + (scara.Radius * 1.1f), scara.Height / 2, scara.Center.Z), 0f, MathHelper.Pi);
+            SendValuesToCamera(new Vector3(Scara.Center.X + (Scara.Radius * 1.1f), Scara.Height / 2, Scara.Center.Z), 0f, MathHelper.Pi);
         }
 
         private void BackButton_Click(object sender, EventArgs e)

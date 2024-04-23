@@ -1,7 +1,6 @@
 ﻿using OpenTK.Mathematics;
 using RobotSimulatorApp.Robot.SCARA;
 using System;
-using System.Diagnostics;
 using System.Windows.Forms;
 
 namespace RobotSimulatorApp
