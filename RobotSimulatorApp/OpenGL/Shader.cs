@@ -66,7 +66,6 @@ namespace RobotSimulatorApp.GlConfig
             GL.GetShader(shader, ShaderParameter.CompileStatus, out var code);
             if (code != (int)All.True)
             {
-                // We can use `GL.GetShaderInfoLog(shader)` to get information about the error.
                 var infoLog = GL.GetShaderInfoLog(shader);
                 throw new Exception($"Error occurred whilst compiling Shader({shader}).\n\n{infoLog}");
             }
@@ -74,15 +73,10 @@ namespace RobotSimulatorApp.GlConfig
 
         private static void LinkProgram(int program)
         {
-            //TODO
-            // We link the program
             GL.LinkProgram(program);
-
-            // Check for linking errors
             GL.GetProgram(program, GetProgramParameterName.LinkStatus, out var code);
             if (code != (int)All.True)
             {
-                // We can use `GL.GetProgramInfoLog(program)` to get information about the error.
                 throw new Exception($"Error occurred whilst linking Program({program})");
             }
         }

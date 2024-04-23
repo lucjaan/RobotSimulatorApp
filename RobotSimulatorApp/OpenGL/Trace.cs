@@ -11,12 +11,10 @@ namespace RobotSimulatorApp.GlConfig
         public Matrix4 Model { get; set; }
         public Color4 Color { get; set; }
 
-        private readonly GLControl GlControl;
         private int VertexArrayObject { get; set; }
         private int ElementBufferObject { get; set; }
         private int PositionBufferObject { get; set; }
         private int ColorBufferObject { get; set; }
-        private int Resolution = 10;
 
         private static readonly List<Color4> ColorData = new ();
         private readonly List<Vector3> Vertices = new();
@@ -60,14 +58,9 @@ void main()
 
         public void AddToTrace(Vector3 point)
         {
-            //if (Resolution == 10)
-            //{
-                Vertices.Add(point);
-                IndexData.Add(Vertices.Count - 1);
-                ColorData.Add(Color);
-                Resolution = 0;
-            //}
-            //Resolution++;
+        Vertices.Add(point);
+        IndexData.Add(Vertices.Count - 1);
+        ColorData.Add(Color);
         }
 
         public void RenderTrace(Matrix4 view, Matrix4 projection)

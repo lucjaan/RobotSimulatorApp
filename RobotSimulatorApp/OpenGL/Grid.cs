@@ -21,7 +21,6 @@ namespace RobotSimulatorApp.GlConfig
         private int ElementBufferObject { get; set; }
         private int ColorBufferObject { get; set; }
 
-        private static readonly Color4 GridColor = Color4.FloralWhite;
         private static readonly Color4[] XYZColors =
             new Color4[] { Color4.IndianRed, Color4.IndianRed, Color4.DeepSkyBlue, Color4.DeepSkyBlue, Color4.ForestGreen, Color4.ForestGreen };
 
@@ -93,7 +92,6 @@ void main()
         {
             int bounds = 300;
             int size = 10;
-            int rows = bounds / size;
 
             //Creating vertical lines
             for (int i = -bounds; i < bounds; i+=size) 

@@ -1,5 +1,4 @@
 ﻿using OpenTK.Mathematics;
-using OpenTK.WinForms;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -16,17 +15,14 @@ namespace RobotSimulatorApp.Shapes
         public float Height { get; set; }
         private int Sides { get; set; }
 
-        private readonly GLControl GlControl;
-
         private ShapeArrays TopArrays;
         private ShapeArrays BottomArrays;
         private ShapeArrays SideArrays;
         private ShapeArrays BorderArrays;
         #endregion
-        public Cylinder(GLControl glControl, Vector3 position, float radius, float height)
+        public Cylinder( Vector3 position, float radius, float height)
         {
             Position = Center = position;
-            GlControl = glControl;
             Radius = radius;
             Height = height;
             Sides = 90;

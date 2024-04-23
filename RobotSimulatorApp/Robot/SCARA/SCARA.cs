@@ -23,10 +23,6 @@ namespace RobotSimulatorApp.Robot.SCARA
         public float Height;
         public float Radius;
         public event EventHandler<Vector3> RobotMoved;
-        public Cube marker1;
-        public Cube marker2;
-        public Cube marker3;
-        public Cube marker4;
 
         public SCARA_Robot(GLControl glc, string name)
         {
@@ -42,22 +38,8 @@ namespace RobotSimulatorApp.Robot.SCARA
 
         public void CreateRobot()
         {
-            marker1 = new(GLControl, Vector3.Zero, 1, 500, 1);
-            marker2 = new(GLControl, Vector3.Zero, 1, 500, 1);
-            marker3 = new(GLControl, Vector3.Zero, 1, 500, 1);
-            marker4 = new(GLControl, Vector3.Zero, 1, 500, 1);
 
-            marker1.SetColor(Color4.Yellow);
-            marker2.SetColor(Color4.Yellow);
-            marker3.SetColor(Color4.Yellow);
-            marker4.SetColor(Color4.Yellow);
-            marker2.SetColor(Color4.Yellow);
-
-            //RobotBase = new(GLControl, new Vector3(-17f, 0f, -17f), 34f, 20f, 34f);
-            marker1.SetPosition(Vector3.Zero);
-            //Center = Helpers.GetPositionFromMatrix(RobotBase.CenterPoint);
-
-            RobotBase = new(GLControl, Vector3.Zero, 34f, 20f, 34f);
+            RobotBase = new(Vector3.Zero, 34f, 20f, 34f);
             Vector3 p0 = RobotBase.GetRotationCenter();
             RobotLimb j1 = CreateRectangularLimb("J1", p0, 35f, 4.5f, 6f, 14f, 0f);
             Vector3 p1 = j1.GetRotationCenter();
@@ -82,7 +64,6 @@ namespace RobotSimulatorApp.Robot.SCARA
 
             for (int i = 0; i < RobotJoints.Count; i++)
             {
-                //RobotJoints[i].SetColor(Color4.LightSlateGray);
                 DenavitHartenbergTable.Add(Matrix4.Identity);
             }
 
@@ -91,16 +72,10 @@ namespace RobotSimulatorApp.Robot.SCARA
             RobotJoints[1].SetColor(Color4.Goldenrod);
             RobotJoints[2].SetColor(Color4.DarkGray);
             RobotJoints[3].SetColor(Color4.DarkGray);
-            //CreateJointCenters();
         }
 
         public void MoveRevoluteJoint(int jointId, float value)
         {
-            //marker1.SetPosition(RobotJoints[0].GetRotationCenter());
-            //marker2.SetPosition(RobotJoints[1].GetRotationCenter());
-            //marker3.SetPosition(RobotJoints[2].GetRotationCenter());
-            //marker4.SetPosition(RobotJoints[3].GetRotationCenter());
-
             for (int i = 0; i < RobotJoints.Count; i++)
             {
                 JointCenters[i + 1] = RobotJoints[i].GetRotationCenter();
@@ -116,11 +91,6 @@ namespace RobotSimulatorApp.Robot.SCARA
 
         public void MoveLinearJoint(int jointId, float value)
         {
-            //marker1.SetPosition(RobotJoints[0].GetRotationCenter());
-            //marker2.SetPosition(RobotJoints[1].GetRotationCenter());
-            //marker3.SetPosition(RobotJoints[2].GetRotationCenter());
-            //marker4.SetPosition(RobotJoints[3].GetRotationCenter());
-
             for (int i = 0; i < RobotJoints.Count; i++)
             {
                 JointCenters[i + 1] = RobotJoints[i].GetRotationCenter();
@@ -145,11 +115,6 @@ namespace RobotSimulatorApp.Robot.SCARA
             RobotJoints[1].Distance = th2;
             RobotJoints[2].Distance = d3;
             RobotJoints[3].Distance = th4;
-
-            //DHParameters[0] = new Vector4(th1, 0, 0, 0);
-            //DHParameters[1] = new Vector4(th2, 0, 0, 0);
-            //DHParameters[2] = new Vector4(0, d3, 0, 0);
-            //DHParameters[3] = new Vector4(th4, 0, 0, 0);
         }
 
         public void UpdateModels()
@@ -168,11 +133,6 @@ namespace RobotSimulatorApp.Robot.SCARA
             {
                 joint.RenderModel(view, projection, borderShown);
             }
-
-            //marker1.RenderCube(view, projection);
-            //marker2.RenderCube(view, projection);
-            //marker3.RenderCube(view, projection);
-            //marker4.RenderCube(view, projection);
         }
 
         public void MoveToPosition(Vector3 position)
@@ -243,12 +203,6 @@ namespace RobotSimulatorApp.Robot.SCARA
             limb.CreateCube(distanceToPointB, paddingX, sizeY, sizeZ);
             return limb;
         }
-        //public RobotLimb CreateRectangularLimb(string name, Vector3 position, float sizeX, float sizeY, float sizeZ, float maxMovement)
-        //{
-        //    RobotLimb limb = new(GLControl, name, Geometry.Cube, position, maxMovement);
-        //    limb.CreateCube(sizeX, sizeY, sizeZ);
-        //    return limb;
-        //}
 
         public RobotLimb CreateCylindricalLimb(string name, Vector3 position, float radius, float height, float maxMovement)
         {

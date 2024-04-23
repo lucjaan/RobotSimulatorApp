@@ -37,7 +37,7 @@ namespace RobotSimulatorApp.Robot.SCARA
                 throw new InvalidOperationException($"Tried to call function for Cube while current geometry is {Geometry}");
             }
 
-            Cube = new(gl, Position, distanceToPointB, paddingX, sizeY, sizeZ);
+            Cube = new(Position, distanceToPointB, paddingX, sizeY, sizeZ);
             Center = Cube.Center;
         }
 
@@ -48,7 +48,7 @@ namespace RobotSimulatorApp.Robot.SCARA
                 throw new InvalidOperationException($"Tried to call function for Cylinder while current geometry is {Geometry}");
             }
 
-            Cylinder = new(gl, Position, radius, height);
+            Cylinder = new(Position, radius, height);
             Center = Cylinder.Center;
         }
 
@@ -59,7 +59,7 @@ namespace RobotSimulatorApp.Robot.SCARA
                 throw new InvalidOperationException($"Tried to call function for Cone while current geometry is {Geometry}");
             }
 
-            Cone = new(gl, Position, radius, height);
+            Cone = new(Position, radius, height);
             Center = Cone.Center;
         }
 
@@ -129,20 +129,13 @@ namespace RobotSimulatorApp.Robot.SCARA
 
         public Vector3 GetRotationCenter()
         {
-            switch (Geometry)
+            return Geometry switch
             {
-                case Geometry.Cube:
-                    return Cube.GetRotationCenter();
-
-                case Geometry.Cylinder:
-                    return Cylinder.GetCenterPoint();
-
-                case Geometry.Cone:
-                    return Cone.GetCenterPoint();
-
-                default:
-                    return Vector3.Zero;
-            }
+                Geometry.Cube => Cube.GetRotationCenter(),
+                Geometry.Cylinder => Cylinder.GetCenterPoint(),
+                Geometry.Cone => Cone.GetCenterPoint(),
+                _ => Vector3.Zero,
+            };
         }
 
         public Vector3 GetApexPoint()
